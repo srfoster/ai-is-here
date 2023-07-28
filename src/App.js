@@ -6,6 +6,10 @@ import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Container from '@mui/material/Container';
 import Pagination from '@mui/material/Pagination';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
 import '@fontsource/roboto/400.css';
 
 function getMargin(elem){
@@ -17,6 +21,7 @@ function getMargin(elem){
 function App() {
   let [page, setPage] = React.useState(1)
   let [pageLengths, setPageLengths] = React.useState([])
+  let [lastRecalc, setLastRecalc] = React.useState(new Date())
   const ref = React.useRef(null);
 
   //Get off the ground: Calculate page lengths
@@ -28,7 +33,8 @@ function App() {
       //Hide all elements
       for(let i = 0; i < nodes.length; i++) {
         let element = nodes[i]
-        //element.style.visibility = "hidden"
+        element.style.display = "block"
+        element.style.visibility = "hidden"
       }
 
       let lengths = []
@@ -67,7 +73,7 @@ function App() {
       console.log("Page lengths", lengths)
       setPageLengths(lengths)
     }
-  }, []);
+  }, [lastRecalc]);
 
 
   React.useEffect(() => {
@@ -137,10 +143,11 @@ function App() {
               borderTop: "1px solid gray",
               padding: 5
             }}>
-            <Pagination count={10}
+            <Pagination count={pageLengths.length}
               page={page}
               onChange={(e, p) => setPage(p)}
             />
+            <Button onClick={()=> setLastRecalc(new Date()) }>Repaginate</Button>
           </Box>
         </Box>
 
@@ -149,14 +156,25 @@ function App() {
   );
 }
 
+let HelloWorldDemo = (props) => {
+  let [clicked, setClicked] = React.useState(false)
+  return <Card>
+    <CardContent>
+      <Button onClick={() => { setClicked(true) }}>
+        Press this button
+      </Button>
+      {clicked && <Typography>Great! You clicked a button.  There will be more cool stuff like this (but better!) as we go along, and I think you'll soon see why.  The arrival of AI-writing tools means that they can contribute not only to the document you're reading -- but also to the code that's underneath the document.  </Typography>}
+    </CardContent>
+  </Card>
+}
+
 function Pages({ page}) {
   return <>
-    <ReactMarkdown>{fullText}</ReactMarkdown>
-    {/*<ReactMarkdown>{paginate(fullText,page)}</ReactMarkdown> */}
+    {fullText.map((x, i) => typeof(x) == "string" ? <ReactMarkdown key={i}>{x}</ReactMarkdown> : x )}
   </>
 }
 
-let fullText = `
+let fullText = [`
 ### Part 1
 
 #### 1.
@@ -179,20 +197,34 @@ Even if I could somehow convince you I wrote this myself (“Look, Ma!  No ChatG
 * New types of automation tend to change the nature of work.
 * When work changes, systems of education must adapt.
 
-Lately, as an educator and writer (of much software and even a few books), I’ve begun using AI in my lectures and professional writing.  The more it increases my productivity, the more I find myself mulling certain questions as I lay awake at night.  Who will lose their jobs?  If writing can be automated, what else can?  And how must education adapt?  
+Lately, as an educator and writer (of much software and even a few books), I’ve begun using AI in my lectures and professional writing.  The more it increases my productivity, the more I find myself mulling certain questions as I lay awake at night.  (Who will lose their jobs?  If writing can be automated, what else can?  And how must education adapt?)
 
-What follows are the answers I’ve found, prepared in a way that I hope will be useful to other writers, educators, students, and even just the average worrier.  It’s a wild world.
+What follows are the answers I’ve found, prepared in a way that I hope will be useful to other writers, educators, students (including mine), and even just the average worrier.  It’s a wild world.
 
-#### 2. 
+#### 2.
 
-This is a living document, as any meaningful text about a moving target must inevitably be.  Let me demonstrate this aliveness by introducing what I call a “benchmark.” Since this is the first one, I’ll try to make it fun (though admittedly very subjective).
+If you've made it this far, then I want to let you in on a secret: this is an interactive experience.`,
 
-*Benchmark 1:* Write a Novel
-* Goal: Get an AI to write a novel that I’d actually want to read. 
+  <HelloWorldDemo />,
+
+`#### 3. 
+
+Not only is this an interactive document.  It's also a living one, as any meaningful text about a moving target must inevitably be.  What I mean is that as AI-writing tools improve, I'll update the text to reflect the new reality.
+
+Let me try to explain how by introducing what I'll refer to as a “benchmark.” Since this is the first one, I’ll try to make it fun (though admittedly very subjective).`,
+
+<Card>
+  <CardHeader title="Benchmark: Write a Novel"/>
+  <CardContent>
+    HI
+    <ReactMarkdown>{`* Goal: Get an AI to write a novel that I’d actually want to read. 
 * Models Tested:  GPT 3.5 and GPT 4.0
-* Result: FAILED (as of Jul 26, 2023)
+* Result: FAILED (as of Jul 26, 2023)`}
+    </ReactMarkdown>
+  </CardContent>
+</Card>,
 
-I’ll admit, this benchmark might seem unfair at first glance.  Maybe I don’t even like novels.  Maybe I have unreasonably high standards.  Who am I to appoint myself judge?  Look, these are valid concerns.   But if I may:
+`I’ll admit, this benchmark might seem unfair at first glance.  Maybe I don’t even like novels.  Maybe I have unreasonably high standards.  Who am I to appoint myself judge?  Look, these are valid concerns.   But if I may:
 
 * On the one hand, I’m not subjecting AI to any more subjectivity than human writers have been subjected to since the birth of writing (3400 BCE).  Writing is good if readers like it.
 * On the other hand, I’m not publishing these benchmarks in hopes that you’ll accept my results; rather, I’m asking you to evaluate the benchmarks for yourself.
@@ -228,6 +260,6 @@ More test content
 * C
 
 The end
-  `
+  `]
 
 export default App;
