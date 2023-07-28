@@ -8,48 +8,175 @@ import Container from '@mui/material/Container';
 import Pagination from '@mui/material/Pagination';
 import '@fontsource/roboto/400.css';
 
+function getMargin(elem){
+  //Use parseInt method to get only number
+          return parseInt(window.getComputedStyle(elem, null).getPropertyValue('margin-top')) 
+          + parseInt(window.getComputedStyle(elem, null).getPropertyValue('margin-bottom'));
+  }
+
 function App() {
   let [page, setPage] = React.useState(1)
+  let [pageLengths, setPageLengths] = React.useState([])
+  const ref = React.useRef(null);
+
+  //Get off the ground: Calculate page lengths
+  React.useEffect(() => {
+    if (ref.current) {
+      let nodes = [...ref.current.childNodes]
+      let parentRect = ref.current.getBoundingClientRect()
+
+      //Hide all elements
+      for(let i = 0; i < nodes.length; i++) {
+        let element = nodes[i]
+
+        if (element.style) {
+            element.style.visibility = "hidden"
+        }
+      }
+
+      let lengths = []
+      let numElementsOnCurrentPage = 0 
+      let currentPagePixelHeight = 0 
+      let maxPagePixelHeight = parentRect.height 
+
+      console.log("Total elements", nodes.length)
+
+      for(let i = 0; i < nodes.length; i++) {
+        let element = nodes[i]
+
+        if (element.style) {
+          let rect = element.getBoundingClientRect()
+          let currentElementPixelHeight = rect.height + getMargin(element)
+          /*
+          console.log("maxPagePixelHeight", maxPagePixelHeight, "currentPagePixelHeight", currentPagePixelHeight, "currentElementPixelHeight", currentElementPixelHeight,
+            ">>> " + element.textContent,
+            element
+          )
+          */
+
+          if (currentPagePixelHeight + currentElementPixelHeight <= maxPagePixelHeight) {
+            numElementsOnCurrentPage += 1
+            currentPagePixelHeight += currentElementPixelHeight 
+          } else {
+            lengths.push(numElementsOnCurrentPage)
+            numElementsOnCurrentPage = 0
+            currentPagePixelHeight = 0
+
+            console.log("**********NEXT PAGE**********")
+            //i--; //Current element will be on next page.  Process it again.
+          }
+        } else {
+            numElementsOnCurrentPage += 1
+        }
+      }
+
+      lengths.push(numElementsOnCurrentPage)
+
+      console.log("Elements assigned to pages", lengths.reduce((sum, x) => sum + x, 0))
+      console.log("Page lengths", lengths)
+      setPageLengths(lengths)
+    }
+  }, []);
+
+
+  React.useEffect(() => {
+    if(!pageLengths) return
+
+    if (ref.current) {
+      let nodes = [...ref.current.childNodes]
+
+      let pageIndex = page - 1
+
+      let startElement; 
+
+      if (pageIndex == 0) {
+        startElement = 0
+      } else {
+        startElement = pageLengths.slice(0, pageIndex).reduce((sum, x) => sum + x, 0) + 1
+      }
+
+      let endElement
+      if (pageIndex == pageLengths.length - 1) {
+        endElement = pageLengths.reduce((sum, x) => sum + x, 0) + 2  //Why magic 2?? 
+      } else {
+        endElement = startElement + pageLengths[pageIndex]
+      }
+
+      console.log("page turn", pageIndex, startElement, endElement, pageLengths)
+
+      //Hide everything before the page
+      for (let i = 0; i < startElement; i++) {
+        let element = nodes[i]
+        console.log("Hiding", i,  element)
+
+        if (element.style) {
+          element.style.display = "none"
+          element.style.visibility = "hidden"
+        }
+      }
+
+      //Show everything on the page
+      for (let i = startElement; i <= endElement; i++) {
+        let element = nodes[i]
+        console.log("Showing", i, element)
+
+        if (element.style) {
+          element.style.display = "block"
+          element.style.visibility = "visible"
+        }
+      }
+
+      //Hide everything after the page
+      for (let i = endElement+1; i < nodes.length; i++) {
+        let element = nodes[i]
+        console.log("Hiding", i, element)
+
+        if (element.style) {
+          element.style.display = "none"
+          element.style.visibility = "hidden"
+        }
+      }
+    }
+  }, [pageLengths, page])
 
   return (
     <>
       <Container maxWidth="sm">
-        <Paper style={{ width: "100%" }}>
+        <Box style={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column"}}>
           <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">Education and AI</Typography>
 
           <Typography pt={1} style={{ textAlign: "center" }} component="h2" variant="h5">By Stephen R. Foster, Ph.D. </Typography>
 
-          <Box p={1} pl={5} >
+          <Box ref={ref}  style={{
+            flexGrow: 1, overflow: "hidden", textOverflow: "ellipsis", display: "block", width: "100%",
+            whiteSpace: "unset"
+          }}>
             <Pages page={page} />
           </Box>
-        </Paper>
-      </Container>
-        <Paper
-          sx={{
-            borderTop: "1px solid #000",
-            marginTop: "auto",
-            p: 2,
-            position: "fixed",
-            bottom: 0,
-            width: "100%",
-          }}
-          component="footer"
-      >
-        <Box style={{margin: "auto", width: 400}}>
-          <Pagination count={10}
-            page={page}
-            onChange={(e, p) => setPage(p)}
-          />
+          <Box style={
+            {
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderTop: "1px solid gray",
+              padding: 5
+            }}>
+            <Pagination count={10}
+              page={page}
+              onChange={(e, p) => setPage(p)}
+            />
+          </Box>
         </Box>
-      </Paper>
+
+      </Container>
     </>
   );
 }
 
 function Pages({ page}) {
-
   return <>
-    <ReactMarkdown>{paginate(fullText,page)}</ReactMarkdown>
+    <ReactMarkdown>{fullText}</ReactMarkdown>
+    {/*<ReactMarkdown>{paginate(fullText,page)}</ReactMarkdown> */}
   </>
 }
 
@@ -148,7 +275,15 @@ Again, maybe it’s me.  Or maybe (just maybe) the labor of book-writing can’t
 
 #### 3.
 
-Here we go again...
+Test content
+
+More test content
+
+* A
+* B
+* C
+
+The end
   `
 
 export default App;
