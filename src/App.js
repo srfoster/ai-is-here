@@ -22,16 +22,13 @@ function App() {
   //Get off the ground: Calculate page lengths
   React.useEffect(() => {
     if (ref.current) {
-      let nodes = [...ref.current.childNodes]
+      let nodes = [...ref.current.childNodes].filter(x => x.style)
       let parentRect = ref.current.getBoundingClientRect()
 
       //Hide all elements
       for(let i = 0; i < nodes.length; i++) {
         let element = nodes[i]
-
-        if (element.style) {
-            element.style.visibility = "hidden"
-        }
+        //element.style.visibility = "hidden"
       }
 
       let lengths = []
@@ -44,33 +41,27 @@ function App() {
       for(let i = 0; i < nodes.length; i++) {
         let element = nodes[i]
 
-        if (element.style) {
-          let rect = element.getBoundingClientRect()
-          let currentElementPixelHeight = rect.height + getMargin(element)
-          /*
-          console.log("maxPagePixelHeight", maxPagePixelHeight, "currentPagePixelHeight", currentPagePixelHeight, "currentElementPixelHeight", currentElementPixelHeight,
-            ">>> " + element.textContent,
-            element
-          )
-          */
+        let rect = element.getBoundingClientRect()
+        let currentElementPixelHeight = rect.height + getMargin(element)/2 //Why magic division by 2?  Are margins overlapping?
 
-          if (currentPagePixelHeight + currentElementPixelHeight <= maxPagePixelHeight) {
-            numElementsOnCurrentPage += 1
-            currentPagePixelHeight += currentElementPixelHeight 
-          } else {
-            lengths.push(numElementsOnCurrentPage)
-            numElementsOnCurrentPage = 0
-            currentPagePixelHeight = 0
-
-            console.log("**********NEXT PAGE**********")
-            //i--; //Current element will be on next page.  Process it again.
-          }
+        //console.log("Considering",element)
+        if (currentPagePixelHeight + currentElementPixelHeight <= maxPagePixelHeight) {
+          //console.log("Adding",element)
+          numElementsOnCurrentPage += 1
+          currentPagePixelHeight += currentElementPixelHeight
         } else {
-            numElementsOnCurrentPage += 1
+          //console.log("Heights", currentPagePixelHeight + currentElementPixelHeight, maxPagePixelHeight)
+          lengths.push(numElementsOnCurrentPage)
+          numElementsOnCurrentPage = 0
+          currentPagePixelHeight = 0
+
+          //console.log("**********NEXT PAGE**********")
+          i--; //Current element will be on next page.  Process it again.
         }
       }
 
-      lengths.push(numElementsOnCurrentPage)
+      if(numElementsOnCurrentPage > 0)
+        lengths.push(numElementsOnCurrentPage)
 
       console.log("Elements assigned to pages", lengths.reduce((sum, x) => sum + x, 0))
       console.log("Page lengths", lengths)
@@ -83,24 +74,16 @@ function App() {
     if(!pageLengths) return
 
     if (ref.current) {
-      let nodes = [...ref.current.childNodes]
+      let nodes = [...ref.current.childNodes].filter(x => x.style)
 
       let pageIndex = page - 1
 
       let startElement; 
 
-      if (pageIndex == 0) {
-        startElement = 0
-      } else {
-        startElement = pageLengths.slice(0, pageIndex).reduce((sum, x) => sum + x, 0) + 1
-      }
+      startElement = pageLengths.slice(0, pageIndex).reduce((sum, x) => sum + x, 0) 
 
       let endElement
-      if (pageIndex == pageLengths.length - 1) {
-        endElement = pageLengths.reduce((sum, x) => sum + x, 0) + 2  //Why magic 2?? 
-      } else {
-        endElement = startElement + pageLengths[pageIndex]
-      }
+      endElement = startElement + pageLengths[pageIndex]
 
       console.log("page turn", pageIndex, startElement, endElement, pageLengths)
 
@@ -108,33 +91,26 @@ function App() {
       for (let i = 0; i < startElement; i++) {
         let element = nodes[i]
         console.log("Hiding", i,  element)
-
-        if (element.style) {
-          element.style.display = "none"
-          element.style.visibility = "hidden"
-        }
+        element.style.display = "none"
+        element.style.visibility = "hidden"
       }
 
       //Show everything on the page
-      for (let i = startElement; i <= endElement; i++) {
+      for (let i = startElement; i < endElement; i++) {
         let element = nodes[i]
         console.log("Showing", i, element)
 
-        if (element.style) {
-          element.style.display = "block"
-          element.style.visibility = "visible"
-        }
+        element.style.display = "block"
+        element.style.visibility = "visible"
       }
 
       //Hide everything after the page
-      for (let i = endElement+1; i < nodes.length; i++) {
+      for (let i = endElement; i < nodes.length; i++) {
         let element = nodes[i]
         console.log("Hiding", i, element)
 
-        if (element.style) {
-          element.style.display = "none"
-          element.style.visibility = "hidden"
-        }
+        element.style.display = "none"
+        element.style.visibility = "hidden"
       }
     }
   }, [pageLengths, page])
@@ -178,38 +154,6 @@ function Pages({ page}) {
     <ReactMarkdown>{fullText}</ReactMarkdown>
     {/*<ReactMarkdown>{paginate(fullText,page)}</ReactMarkdown> */}
   </>
-}
-
-let paginate = (text, page) => {
-  let charsPerPage = 1000
-
-  let start = (page - 1) * charsPerPage 
-  let end = start + charsPerPage
-
-  let startFuzz = 0 
-  let endFuzz = 0 
-
-  if (start > 0) {
-    let startingChar = text[start + startFuzz]
-    while (startingChar && !canEndPage(startingChar)) {
-      startFuzz += 1
-      startingChar = text[start + startFuzz]
-    }
-  }
-
-  let endingChar = text[end + endFuzz]
-  while (endingChar && !canEndPage(endingChar)) {  
-    endFuzz += 1
-    endingChar = text[end + endFuzz]
-  }
-
-  console.log(canEndPage("*"))
-
-  return text.substring(start + startFuzz, end + endFuzz)
-}
-
-let canEndPage = (char) => {
-  return char == "\n"
 }
 
 let fullText = `
