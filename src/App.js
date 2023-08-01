@@ -1,5 +1,6 @@
 
 /*TODO
+  * Get mobile gestures working (with snazzy page turns?)
   * Footnotes as modals
   * More content!
 */
@@ -16,6 +17,7 @@ import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
+import Stack from '@mui/material/Stack';
 import '@fontsource/roboto/400.css';
 
 import {useLocalStorage} from 'react-use'
@@ -23,6 +25,7 @@ import Confetti from 'react-confetti'
 import {
   useWindowSize,
 } from '@react-hook/window-size'
+import { useSwipeable } from "react-swipeable";
 
 function App() {
   let [page, setPage] = useLocalStorage("current-page",1)
@@ -31,6 +34,21 @@ function App() {
   const [windowWidth, windowHeight] = useWindowSize()
 
   const ref = React.useRef(null);
+
+  const nextPage = () => {
+    if (page < pageLengths.length)
+      setPage(page + 1)
+  }
+
+  const prevPage = () => {
+    if (page > 1)
+      setPage(page - 1)
+  }
+
+  const swipeHandlers = useSwipeable({
+    onSwipedRight: (eventData) => prevPage(),
+    onSwipedLeft: (eventData) => nextPage(),
+  });
 
   //Get off the ground: Calculate page lengths
   React.useEffect(() => {
@@ -52,6 +70,8 @@ function App() {
 
       //console.log("Total elements", nodes.length)
 
+      let fuzz = 20 // Keeps things from being clipped (I guess this is currently a magic number that equals the top padding of the text container.  Should de-magic it.)
+
       for(let i = 0; i < nodes.length; i++) {
         let element = nodes[i]
 
@@ -59,7 +79,7 @@ function App() {
         let currentElementPixelHeight = rect.height 
 
         //console.log("Considering",element)
-        if (currentPagePixelHeight + currentElementPixelHeight <= maxPagePixelHeight) {
+        if (currentPagePixelHeight + currentElementPixelHeight <= maxPagePixelHeight - fuzz) {
           //console.log("Adding",element)
           numElementsOnCurrentPage += 1
           currentPagePixelHeight += currentElementPixelHeight
@@ -137,13 +157,17 @@ function App() {
 
   return (
     <>
-      <Container maxWidth="sm">
+      <Container maxWidth="sm"
+          {...swipeHandlers} 
+      >
         <Box style={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column"}}>
           <Box ref={ref}  style={{
             flexGrow: 1, overflow: "hidden", textOverflow: "ellipsis", display: "block", width: "100%",
             whiteSpace: "unset",
             marginTop: 20,
-          }}>
+          }}
+          
+          >
             {fullText.map(
               (x, i) => {
                 //console.log(x)
@@ -164,9 +188,10 @@ function App() {
               borderTop: "1px solid gray",
               padding: 5
             }}>
-            <Pagination count={pageLengths.length}
+            <SimplePagination count={pageLengths.length}
               page={page}
-              onChange={(e, p) => setPage(p)}
+              prev={prevPage}
+              next={nextPage}
             />
             {/* <Button onClick={repaginate}>Repaginate</Button> */}
           </Box>
@@ -175,6 +200,15 @@ function App() {
       </Container>
     </>
   );
+}
+
+let SimplePagination = ({ count, page, prev, next }) => {
+//}
+  return <Stack direction="row">
+    <Button onClick={ prev }>Prev</Button>
+    <Button disabled>Page {page} of { count }</Button>
+    <Button onClick={ next }>Next</Button>
+  </Stack>
 }
 
 let ClickToReveal = ({text, repaginate}) => {
