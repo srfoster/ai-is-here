@@ -9,13 +9,10 @@ import './App.css';
 import ReactMarkdown from 'react-markdown'
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
 import Container from '@mui/material/Container';
-import Pagination from '@mui/material/Pagination';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
 import Stack from '@mui/material/Stack';
 import '@fontsource/roboto/400.css';
 
@@ -25,12 +22,26 @@ import {
   useWindowSize,
 } from '@react-hook/window-size'
 import { useSwipeable } from "react-swipeable";
-import { PROPERTY_TYPES } from '@babel/types';
 
-export function EReader({ content }) {
+import Modal from '@mui/material/Modal';
+
+const modalStyle = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
+
+export function EReader({ content, footnotes }) {
   let [page, setPage] = useLocalStorage("current-page",1)
   let [pageLengths, setPageLengths] = React.useState([])
   let [lastRecalc, setLastRecalc] = React.useState(new Date())
+  let [showFootnote, setShowFootnote] = React.useState(null)
   const [windowWidth, windowHeight] = useWindowSize()
 
   const ref = React.useRef(null);
@@ -49,6 +60,24 @@ export function EReader({ content }) {
     onSwipedRight: (eventData) => prevPage(),
     onSwipedLeft: (eventData) => nextPage(),
   });
+
+
+    React.useEffect(() => {
+        let as = ref.current.querySelectorAll("a")
+
+        for (let a of as) {
+            let parts = a.href.split("/")
+            let footnoteKey = parts[parts.length - 1]
+            delete(a.href)
+            a.addEventListener("click", () => {
+                if (!showFootnote) {
+                    setShowFootnote(footnoteKey) 
+                } else {
+                    setShowFootnote(null)
+                }
+            })
+        }
+  },[])
 
   //Get off the ground: Calculate page lengths
   React.useEffect(() => {
@@ -197,6 +226,8 @@ export function EReader({ content }) {
           </Box>
         </Box>
 
+              <Footnote toShow={footnotes[showFootnote]}
+                  handleClose={ ()=>setShowFootnote(null)} />
       </Container>
     </>
   );
@@ -227,6 +258,23 @@ export let ClickToReveal = ({text, repaginate}) => {
       </>}
     </CardContent>
   </Card>
+}
+
+export let Footnote = ({ toShow, handleClose }) => {
+ return (
+    <>
+      <Modal
+        open={!!toShow}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={modalStyle}>
+            { toShow }
+        </Box>
+      </Modal>
+    </>
+  );
 }
 
 

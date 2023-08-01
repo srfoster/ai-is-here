@@ -1,13 +1,12 @@
 
 /*TODO
-  * Footnotes as modals
   * More content!
 */
 
 import * as React from 'react';
 import './App.css';
 import Typography from '@mui/material/Typography';
-import { EReader, Benchmark, ClickToReveal} from './EReader';
+import { EReader, Benchmark, ClickToReveal, Footnote} from './EReader';
 
 let fullText = [
   <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">Education and AI</Typography>,
@@ -27,7 +26,7 @@ Next (after much economic upheaval and a couple of big wars) came a very special
 
 To make a long story short, the "digital revolution" showed that a lot of cool stuff actually boiled down to "really fast math" – everything from putting pixels on your screen, to reading the mouse and keyboard, to making the internet work, to *Fortnite*.  Bit by bit (byte by byte), the computers won.
 
-Now, AI has arrived.  And by "arrived" – I mean that AI can, at times, perform what was once believed to be another human-only kind of labor: namely, writing.  AI-writing isn't perfect, and it can't write everything – but admit it, dear reader: 
+Now, [AI](/#/footnote/ai-informal) has arrived.  And by "arrived" – I mean that AI can, at times, perform what was once believed to be another human-only kind of labor: namely, writing.  AI-writing isn't perfect, and it can't write everything – but admit it, dear reader: 
 
 > *You know in your heart that some parts of this very text might have been AI-generated, and you can never be sure exactly which ones.*
 
@@ -102,6 +101,10 @@ More test content
 The end
   `]
 
+let footnotes = {
+  "ai-informal": `By "AI," I mean what is referred to as a "transformer" -- the technical term for the dominant neural network architecture for natural language processing and generative AI.  We'll get to these later.  Until then, I'll use the coloquial term "AI" because this book is intended to be approachable to a non-technical audience.`
+}
+
 /*
 
 <<Successful benchmarks:
@@ -127,7 +130,7 @@ If you can't check the work more quickly than doing the work, don't use AI
 function App() {
   return (
     <>
-      <EReader content={ fullText } />
+      <EReader content={fullText} footnotes={footnotes} />
     </>
   );
 }
