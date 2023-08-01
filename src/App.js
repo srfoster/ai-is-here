@@ -102,7 +102,7 @@ The end
   `]
 
 let footnotes = {
-  "ai-informal": `By "AI," I mean what is referred to as a "transformer" -- the technical term for the dominant neural network architecture for natural language processing and generative AI.  We'll get to these later.  Until then, I'll use the coloquial term "AI" because this book is intended to be approachable to a non-technical audience.`
+  "ai-informal": `By "AI," I mean what is referred to as a "transformer" -- the technical term for the dominant neural network architecture for natural language processing and text generation.  In fact, it's the T in ChatGPT.  We'll get to transformers later.  Until then, I'll use the coloquial term "AI" because this book is intended to be approachable to a non-technical audience.`
 }
 
 /*
