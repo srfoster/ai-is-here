@@ -1,6 +1,5 @@
 
 /*TODO
-  * Repaginate when things change size
   * Footnotes as modals
   * More content!
 */
@@ -21,12 +20,16 @@ import '@fontsource/roboto/400.css';
 
 import {useLocalStorage} from 'react-use'
 import Confetti from 'react-confetti'
-
+import {
+  useWindowSize,
+} from '@react-hook/window-size'
 
 function App() {
   let [page, setPage] = useLocalStorage("current-page",1)
   let [pageLengths, setPageLengths] = React.useState([])
   let [lastRecalc, setLastRecalc] = React.useState(new Date())
+  const [windowWidth, windowHeight] = useWindowSize()
+
   const ref = React.useRef(null);
 
   //Get off the ground: Calculate page lengths
@@ -47,7 +50,7 @@ function App() {
       let currentPagePixelHeight = 0 
       let maxPagePixelHeight = parentRect.height 
 
-      console.log("Total elements", nodes.length)
+      //console.log("Total elements", nodes.length)
 
       for(let i = 0; i < nodes.length; i++) {
         let element = nodes[i]
@@ -74,8 +77,8 @@ function App() {
       if(numElementsOnCurrentPage > 0)
         lengths.push(numElementsOnCurrentPage)
 
-      console.log("Elements assigned to pages", lengths.reduce((sum, x) => sum + x, 0))
-      console.log("Page lengths", lengths)
+      //console.log("Elements assigned to pages", lengths.reduce((sum, x) => sum + x, 0))
+      //console.log("Page lengths", lengths)
       setPageLengths(lengths)
     }
   }, [lastRecalc]);
@@ -96,12 +99,12 @@ function App() {
       let endElement
       endElement = startElement + pageLengths[pageIndex]
 
-      console.log("page turn", pageIndex, startElement, endElement, pageLengths)
+      //console.log("page turn", pageIndex, startElement, endElement, pageLengths)
 
       //Hide everything before the page
       for (let i = 0; i < startElement; i++) {
         let element = nodes[i]
-        console.log("Hiding", i,  element)
+        //console.log("Hiding", i,  element)
         element.style.display = "none"
         element.style.visibility = "hidden"
       }
@@ -109,7 +112,7 @@ function App() {
       //Show everything on the page
       for (let i = startElement; i < endElement; i++) {
         let element = nodes[i]
-        console.log("Showing", i, element)
+        //console.log("Showing", i, element)
 
         element.style.display = "block"
         element.style.visibility = "visible"
@@ -118,13 +121,19 @@ function App() {
       //Hide everything after the page
       for (let i = endElement; i < nodes.length; i++) {
         let element = nodes[i]
-        console.log("Hiding", i, element)
+        //console.log("Hiding", i, element)
 
         element.style.display = "none"
         element.style.visibility = "hidden"
       }
     }
   }, [pageLengths, page])
+
+  const repaginate = ()=> setLastRecalc(new Date()) 
+
+  React.useEffect(() => {
+     repaginate()
+  }, [windowWidth, windowHeight])
 
   return (
     <>
@@ -135,7 +144,17 @@ function App() {
             whiteSpace: "unset",
             marginTop: 20,
           }}>
-            <Pages page={page} />
+            {fullText.map(
+              (x, i) => {
+                //console.log(x)
+                if (typeof (x) == "string")
+                  return <ReactMarkdown key={i}>{x}</ReactMarkdown>
+                
+                if (typeof (x) == "function")
+                  return x({ repaginate })
+                
+                return x
+              })}
           </Box>
           <Box style={
             {
@@ -149,7 +168,7 @@ function App() {
               page={page}
               onChange={(e, p) => setPage(p)}
             />
-            {/* <Button onClick={()=> setLastRecalc(new Date()) }>Repaginate</Button> */}
+            {/* <Button onClick={repaginate}>Repaginate</Button> */}
           </Box>
         </Box>
 
@@ -158,11 +177,11 @@ function App() {
   );
 }
 
-let ClickToReveal = ({text}) => {
+let ClickToReveal = ({text, repaginate}) => {
   let [clicked, setClicked] = React.useState(false)
   return <Card style={{marginBottom: 15}}>
     <CardContent>
-      <Button onClick={() => { setClicked(!clicked) }}>
+      <Button onClick={() => { setClicked(!clicked); repaginate() }}>
         Press this button
       </Button>
       {clicked && <>
@@ -190,11 +209,6 @@ let Benchmark = ({ name, goal, modelsTested, result }) => {
   </Card>
 }
 
-function Pages({ page}) {
-  return <>
-    {fullText.map((x, i) => typeof(x) == "string" ? <ReactMarkdown key={i}>{x}</ReactMarkdown> : x )}
-  </>
-}
 
 let fullText = [
   <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">Education and AI</Typography>,
@@ -232,8 +246,10 @@ What follows are the answers I've found, prepared in a way that I hope will be u
 
 If you've made it this far, then I want to let you in on a secret.  Click below to find out what it is!`,
 
-  <ClickToReveal
-    text={`Nice!  You clicked a button.  I just wanted you to know that this is more than a text document.  It's an interactive experience.  Stay tuned for more of that.`} />,
+  (extraProps) => <ClickToReveal
+    text={`Nice!  You clicked a button.  I just wanted you to know that this is more than a text document.  It's an interactive experience.  Stay tuned for more of that.`}
+    {...extraProps}
+  />,
 
 `#### 3. 
 
@@ -241,11 +257,12 @@ Not only is this an interactive document.  It's also a living one, as any meanin
 
 Let me try to explain how by introducing what I'll refer to as a "benchmark." Since this is the first one, I'll try to make it fun (though admittedly very subjective).`,
 
-  <Benchmark
+  (extraProps) => <Benchmark
      name="Write a Novel" 
      goal="Get an AI to write a novel that I'd actually want to read."
      modelsTested="GPT 3.5 and GPT 4.0"
      result="FAILED (as of Jul 26, 2023)"
+      {...extraProps}
   />,
 
 `I'll admit, this benchmark might seem unfair at first glance.  Maybe I don't even like novels.  Maybe I have unreasonably high standards.  Who am I to appoint myself judge?  Look, these are valid concerns.   But if I may:
