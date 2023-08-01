@@ -24,7 +24,7 @@ Once upon a time, as the story goes, labor was something done exclusively by hum
 
 Next (after much economic upheaval and a couple of big wars) came a very special kind of machine called the computer.  Unlike your run-of-the-mill machine, the computer could do something very important – something that had previously been a human-only form of labor: namely, math.  
 
-To make a long story short, the "digital revolution" showed that a lot of cool stuff actually boiled down to "really fast math" – everything from putting pixels on your screen, to reading the mouse and keyboard, to making the internet work, to *Fortnite*.  Bit by bit (byte by byte), the computers won.
+To make a long story short, the digital revolution proved that a lot of cool stuff actually boiled down to "really fast math" – everything from putting pixels on your screen, to reading the mouse and keyboard, to making the internet work, to *Fortnite*.  Bit by bit (byte by byte), the computers won.
 
 Now, [AI](/#/footnote/ai-informal) has arrived.  And by "arrived" – I mean that AI can, at times, perform what was once believed to be another human-only kind of labor: namely, writing.  AI-writing isn't perfect, and it can't write everything – but admit it, dear reader: 
 

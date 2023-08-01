@@ -66,15 +66,18 @@ export function EReader({ content, footnotes }) {
         let as = ref.current.querySelectorAll("a")
 
         for (let a of as) {
-            let parts = a.href.split("/")
+            let parts = a.getAttribute("href").split("/")
             let footnoteKey = parts[parts.length - 1]
-            delete(a.href)
-            a.addEventListener("click", () => {
+            a.style.cursor = "pointer"
+            a.style.color = "blue"
+            a.style.textDecoration = "underline"
+            a.addEventListener("click", (e) => {
                 if (!showFootnote) {
                     setShowFootnote(footnoteKey) 
                 } else {
                     setShowFootnote(null)
                 }
+                e.preventDefault()
             })
         }
   },[])
