@@ -45,7 +45,11 @@ What follows are the answers I've found, prepared in a way that I hope will be u
 If you've made it this far, then I want to let you in on a secret.  Click below to find out what it is!`,
 
   (extraProps) => <ClickToReveal
-    text={`Nice!  You clicked a button.  I just wanted you to know that this is more than a text document.  It's an interactive experience.  Stay tuned for more of that.`}
+    contents={[
+      `Nice!  You clicked a button.  The secret that this book is interactive.  Stay tuned for more of that (and be on the lookout for Easter eggs).`,
+      `You found an Easter Egg!`,
+      `Okay, you can stop clicking now.  I promise there are no more Easter eggs.`
+    ]}
     {...extraProps}
   />,
 

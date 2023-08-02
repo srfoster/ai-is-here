@@ -245,19 +245,25 @@ let SimplePagination = ({ count, page, prev, next }) => {
   </Stack>
 }
 
-export let ClickToReveal = ({text, repaginate}) => {
-  let [clicked, setClicked] = React.useState(false)
+export let ClickToReveal = ({contents, repaginate}) => {
+  let [opened, setOpened] = React.useState(false)
+  let [openedCount, setOpenedCount] = React.useState(0)
   return <Card style={{marginBottom: 15}}>
     <CardContent>
-      <Button onClick={() => { setClicked(!clicked); repaginate() }}>
+      <Button onClick={() => { 
+        setOpened(!opened); 
+        if(!opened)
+          setOpenedCount(openedCount + 1)
+        repaginate() 
+        }}>
         Press this button
       </Button>
-      {clicked && <>
+      {opened && <>
         <Confetti
             recycle={false}
             numberOfPieces={200}
         />
-        <Typography>{text}</Typography>
+        <Typography>{contents[(openedCount-1)%contents.length]}</Typography>
       </>}
     </CardContent>
   </Card>
