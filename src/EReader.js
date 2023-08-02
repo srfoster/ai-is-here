@@ -288,7 +288,7 @@ export let Footnote = ({ toShow, handleClose }) => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={modalStyle}>
-            { toShow }
+            <ReactMarkdown>{ toShow }</ReactMarkdown>
         </Box>
       </Modal>
     </>
