@@ -1,6 +1,7 @@
 
 /*TODO
   * More content!
+  * Prototype some live AI (or baked AI) examples
 */
 
 import * as React from 'react';
@@ -57,7 +58,7 @@ If you've made it this far, then I want to let you in on a secret.  Click below 
 
 Not only is this an interactive document.  It's also a living one, as any meaningful text about a moving target must inevitably be.  What I mean is that as AI-writing tools improve, I'll update the text to reflect the new reality.
 
-Let me try to explain how by introducing what I'll refer to as a "benchmark." Since this is the first one, I'll try to make it fun (though admittedly very subjective).`,
+There are certain things that AI-writing tools simply cannot do and some things that they can do quite well.  This book is designed to help readers understand the difference, so we'll be looking at a lot of benchmarks like this one:`,
 
   (extraProps) => <Benchmark
      name="Write a Novel" 
