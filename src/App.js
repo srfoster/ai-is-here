@@ -93,20 +93,38 @@ I'll close this section by mentioning a strange internet phenomenon I've noticed
 Again, maybe it's me.  Or maybe (just maybe) the labor of authoring book-length works can't be fully automated.  My current assumption is that it won't be (not for a long time, if ever).  In fact, I've based a lot of what follows on this assumption.
 This means that if I'm wrong, then two things will become instantly true:
 
-* I'll have to re-write much of what follows.
+* I'll have to re-write much of this book.
 * I won't be the one doing the work.
 
 #### 3.
 
-Test content
+Let's look at a few benchmarks where AI performs extremely well -- namely ones related to translation (which might not sound like a big deal but actually is).  For example, here's a benchmark that can be passed with flying colors:`,
 
-More test content
+  (extraProps) => <Benchmark
+      name="Translate a Novel"
+      goal="Get an AI to translate a novel from English to Spanish."
+      modelsTested="GPT 3.5 and GPT 4.0" />
 
-* A
-* B
-* C
+,
+`
 
-The end
+Yes, you have to do some tricks with the context window to get this to work.  But the results are excellent.  Here's one of the paragraphs you read earlier translated to Spanish:  
+
+> Después (tras muchos trastornos económicos y un par de grandes guerras) llegó un tipo de máquina muy especial llamada ordenador. A diferencia de una máquina corriente, el ordenador podía hacer algo muy importante, algo que hasta entonces había sido una forma de trabajo exclusivamente humana: es decir, las matemáticas. 
+
+But what's more interesting (and relevant from an educational perspective) is the fact that "translation" can be taken more loosely, from English to English.  Here's what happens when I ask GPT 4.0 to exapand on that paragraph, adding historical details:
+
+> Following the Industrial Revolution, the 19th and 20th centuries were characterized by significant economic upheavals, including market crashes, recessions, and economic depressions, as well as two monumental global conflicts: World War I and World War II. Both of these wars catalyzed advancements in technology, as nations sought to outmaneuver each other on the battlefield.
+
+> Among these advancements, a transformative invention emerged in the mid-20th century: the computer. This machine was unlike any other that had been developed before. Early models such as the ENIAC (Electronic Numerical Integrator and Computer), created during World War II for military purposes, were massive, occupying entire rooms. These computers were primarily used for complex calculations necessary for artillery trajectory and cryptography, among other things.
+
+> Unlike traditional machinery, which was designed to perform a physical task more efficiently or at a larger scale than humans, the computer had a different set of capabilities. It could process data and execute calculations at a speed and accuracy far surpassing that of any human. This computational ability was groundbreaking. Mathematics, once a laborious task reserved exclusively for humans, could now be accomplished with remarkable speed and precision by computers. This paved the way for countless advances in various fields, including engineering, physics, astronomy, economics, and many others. It marked the dawn of the Information Age, forever altering the way humans work and live.
+
+<<Maybe say something about how LLMs are also just fast math...>>
+
+
+
+
 
 ---
 
