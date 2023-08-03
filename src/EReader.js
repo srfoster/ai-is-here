@@ -112,7 +112,7 @@ export function EReader({ content, footnotes }) {
         let currentElementPixelHeight = rect.height 
 
         //console.log("Considering",element)
-        if (!shouldStartNewPage(element, lastElement, i, 4) && currentPagePixelHeight + currentElementPixelHeight <= maxPagePixelHeight - fuzz) {
+        if (!shouldStartNewPage(element, lastElement,  i, 4) && currentPagePixelHeight + currentElementPixelHeight <= maxPagePixelHeight - fuzz) {
           //console.log("Adding",element)
           numElementsOnCurrentPage += 1
           currentPagePixelHeight += currentElementPixelHeight

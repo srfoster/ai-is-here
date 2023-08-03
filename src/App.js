@@ -96,31 +96,59 @@ This means that if I'm wrong, then two things will become instantly true:
 * I'll have to re-write much of this book.
 * I won't be the one doing the work.
 
-#### 3.
+#### 4.
 
-Let's look at a few benchmarks where AI performs extremely well -- namely ones related to translation (which might not sound like a big deal but actually is).  For example, here's a benchmark that can be passed with flying colors:`,
+With one unfair benchmark out of the way, let's look at one where AI performs extremely well -- namely translation.  For example, here's a benchmark that can be passed with flying colors:`,
 
   (extraProps) => <Benchmark
-      name="Translate a Novel"
+      name="Translate a Sentence to a New Language"
       goal="Get an AI to translate a novel from English to Spanish."
       modelsTested="GPT 3.5 and GPT 4.0" />
 
 ,
-`
+`In fact machine translation is the OG benchmark.  Back in 2017, the ground-breaking "transformer" neural network archetecture was introduced in a paper called ["Attention Is All You Need"](/#/footnote/attention-is-all-you-need).  This paper was a breakthrough in the field of natural language processing (NLP) because it showed that AI (using transformers) could translate between languages better than techniques like recurrent neural networks, which had been used for decades.  As it turned out, the same technology that performed so well at translation also performed well at many other benchmarks that boil down to "say this, but different." As a quick demonstration, here's a sentence I wrote earlier:
 
-Yes, you have to do some tricks with the context window to get this to work.  But the results are excellent.  Here's one of the paragraphs you read earlier translated to Spanish:  
+> Next (after much economic upheaval and a couple of big wars) came a very special kind of machine called the computer. 
 
-> Después (tras muchos trastornos económicos y un par de grandes guerras) llegó un tipo de máquina muy especial llamada ordenador. A diferencia de una máquina corriente, el ordenador podía hacer algo muy importante, algo que hasta entonces había sido una forma de trabajo exclusivamente humana: es decir, las matemáticas. 
+Obviously, GPT 4.0 can translate this sentence to Spanish:
 
-But what's more interesting (and relevant from an educational perspective) is the fact that "translation" can be taken more loosely, from English to English.  Here's what happens when I ask GPT 4.0 to exapand on that paragraph, adding historical details:
+> Después (tras muchos trastornos económicos y un par de grandes guerras) llegó un tipo de máquina muy especial llamada ordenador.
 
-> Following the Industrial Revolution, the 19th and 20th centuries were characterized by significant economic upheavals, including market crashes, recessions, and economic depressions, as well as two monumental global conflicts: World War I and World War II. Both of these wars catalyzed advancements in technology, as nations sought to outmaneuver each other on the battlefield.
+And of course, pirate speak is an easy "say this, but different" benchmark for GPT 4.0:
 
-> Among these advancements, a transformative invention emerged in the mid-20th century: the computer. This machine was unlike any other that had been developed before. Early models such as the ENIAC (Electronic Numerical Integrator and Computer), created during World War II for military purposes, were massive, occupying entire rooms. These computers were primarily used for complex calculations necessary for artillery trajectory and cryptography, among other things.
+> Next, matey (after a whole mess o' economic squalls and a pair of hearty wars), there came into bein' a special kind o' contraption, named by folks as the 'computer'. Arr! 
 
-> Unlike traditional machinery, which was designed to perform a physical task more efficiently or at a larger scale than humans, the computer had a different set of capabilities. It could process data and execute calculations at a speed and accuracy far surpassing that of any human. This computational ability was groundbreaking. Mathematics, once a laborious task reserved exclusively for humans, could now be accomplished with remarkable speed and precision by computers. This paved the way for countless advances in various fields, including engineering, physics, astronomy, economics, and many others. It marked the dawn of the Information Age, forever altering the way humans work and live.
+From an educational perspective, though, two other kinds of transformation matter -- ones that reduce and ones that increase the amount of information.  For example, here's what happens when I ask GPT 4.0 to rewrite my sentence in as few words as possible:
 
-<<Maybe say something about how LLMs are also just fast math...>>
+> After economic strife and wars, the computer came.
+
+By contrast, here's what happens when I ask GPT 4.0 to expand on the sentence, adding historical details:
+
+> Following a period characterized by considerable economic turbulence, including the Great Depression and the economic aftermath of two major world conflicts - World War I and II - a revolutionary invention was introduced: the computer. This technological breakthrough, which emerged in the mid-20th century, marked a significant turning point in human history, with its roots in devices like the British Bombe and the American ENIAC, designed during World War II for code-breaking and artillery trajectory calculations, respectively. 
+
+What this means is that writers (both dead and alive) now have the ability to reach not just the audience they are writing to -- but also: Spanish speakers, pirates, history buffs, and people who like short sentences.  
+
+I think this scares some educators because part of our job is to translate texts -- not necessarily into new languages, but into a form comprehensible to our students.  And this is why, within a few short years following the ground-breaking 2017 paper, the transformer was not just transforming text, but also education itself.  AI might not be able to write good books, but it can rewrite them just fine.  And it can do this in a way that is tailored to the needs of individual students.
+
+I mentioned earlier:
+
+* Much writing can be automated.
+* New types of automation tend to change the nature of work.
+* When work changes, systems of education must adapt.
+
+But education is also a form of work.  And writing (or rewriting, or transforming, or whatever word you'd like) is a big part of educational knowledge work.  With the automation of writing, education must adapt in two ways: to the changing nature of external work, and to the changing nature of its own internal work.
+
+I think we can do it.  But I also think it's not going to be easy, partly because making quick adaptations has [historically been a weakness of education systems](/#/footnote/my-grandfathers-thesis), and partly because making quick adaptations is [psychologically difficult for humans in general](/#/footnote/change-is-hard).  I think it's going to be difficult for educators and for students alike and that many in both groups will resist.  But in the end, AI will win -- just as machines and computers won their respective revolutions. 
+
+I also think it'll be worth it: that AI's victory *can* be a victory for education as well.  But this is by no means guaranteed -- which is why I wrote this book.
+
+
+#### 5.
+
+In the conversations around AI and education, many are quick to point out the weaknesses of AI-writing: e.g. its tendency to hallucinate and lie, its inability to use correct citations, and (as I mentioned earlier) its problems remembering beyond its "context window."
+
+
+
 
 
 
@@ -146,6 +174,7 @@ let footnotes = {
   "contact-me": `You can:
 * Open a [GitHub issue](https://github.com/srfoster/ai-is-here/issues)
 * Or email me: [stephen@thoughtstem.com](mailto:stephen@thoughtstem.com)`,
+  "attention-is-all-you-need": "You can find the full paper [here](https://arxiv.org/abs/1706.03762).",
 }
 
 /*
