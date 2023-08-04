@@ -294,3 +294,29 @@ export let Benchmark = ({ name, goal, modelsTested, result }) => {
   </Card>
 }
 
+export let GPTTest = () => {
+  let [response, setResponse] = React.useState("")
+
+  let startStreaming = async () => {
+    let response = await fetch(url, { method: "POST", body: JSON.stringify({ credits: "ABXLDLE", role: "user", content: "What are some fun improv games?" }) });
+    console.log("Got response")
+    let streamResponse = response.body;
+    let reader = streamResponse.getReader();
+    let decoder = new TextDecoder();
+    let done = false;
+    setResponse("")
+
+    while (!done) {
+      let { value, done: doneReading } = await reader.read();
+      done = doneReading;
+      let chunkValue = decoder.decode(value);
+      setResponse((response) => response + chunkValue)
+      console.log(chunkValue)
+    }
+  }
+
+  return <>
+    {response} 
+    <Button onClick={ startStreaming }>Go</Button>
+  </>
+}
