@@ -104,7 +104,6 @@ export function EReader({ content, footnotes }) {
 
       let fuzz = 20 // Keeps things from being clipped (I guess this is currently a magic number that equals the top padding of the text container.  Should de-magic it.)
 
-      let lastElement;
       for(let i = 0; i < nodes.length; i++) {
         let element = nodes[i]
 
@@ -112,7 +111,7 @@ export function EReader({ content, footnotes }) {
         let currentElementPixelHeight = rect.height 
 
         //console.log("Considering",element)
-        if (!shouldStartNewPage(element, lastElement,  i, 4) && currentPagePixelHeight + currentElementPixelHeight <= maxPagePixelHeight - fuzz) {
+        if (currentPagePixelHeight + currentElementPixelHeight <= maxPagePixelHeight - fuzz) {
           //console.log("Adding",element)
           numElementsOnCurrentPage += 1
           currentPagePixelHeight += currentElementPixelHeight
@@ -121,7 +120,6 @@ export function EReader({ content, footnotes }) {
           lengths.push(numElementsOnCurrentPage)
           numElementsOnCurrentPage = 0
           currentPagePixelHeight = 0
-          lastElement = element;
 
           //console.log("**********NEXT PAGE**********")
           i--; //Current element will be on next page.  Process it again.
@@ -239,6 +237,7 @@ export function EReader({ content, footnotes }) {
 }
 
 let SimplePagination = ({ count, page, prev, next }) => {
+//}
   return <Stack direction="row">
     <Button onClick={ prev }>Prev</Button>
     <Button disabled>Page {page} of { count }</Button>
@@ -246,33 +245,19 @@ let SimplePagination = ({ count, page, prev, next }) => {
   </Stack>
 }
 
-let shouldStartNewPage = (element, lastElement, elementIndex, ignoreElements) => {
-  if(elementIndex < ignoreElements) return false //Don't start a new page for the first few elements (e.g. title, author, etc.
-  if(element == lastElement) return false //Don't start a new page if we're seeing the element again
-  if(elementIndex == 0) return false //Otherwise we never start the book...
-
-  return element.tagName == "H2" || element.tagName == "H3" || element.tagName == "H4" || element.tagName == "H5" || element.tagName == "H6" 
-}
-
-export let ClickToReveal = ({contents, repaginate}) => {
-  let [opened, setOpened] = React.useState(false)
-  let [openedCount, setOpenedCount] = React.useState(0)
+export let ClickToReveal = ({text, repaginate}) => {
+  let [clicked, setClicked] = React.useState(false)
   return <Card style={{marginBottom: 15}}>
     <CardContent>
-      <Button onClick={() => { 
-        setOpened(!opened); 
-        if(!opened)
-          setOpenedCount(openedCount + 1)
-        repaginate() 
-        }}>
+      <Button onClick={() => { setClicked(!clicked); repaginate() }}>
         Press this button
       </Button>
-      {opened && <>
+      {clicked && <>
         <Confetti
             recycle={false}
             numberOfPieces={200}
         />
-        <Typography>{contents[(openedCount-1)%contents.length]}</Typography>
+        <Typography>{text}</Typography>
       </>}
     </CardContent>
   </Card>
@@ -288,7 +273,7 @@ export let Footnote = ({ toShow, handleClose }) => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={modalStyle}>
-            <ReactMarkdown>{ toShow }</ReactMarkdown>
+            { toShow }
         </Box>
       </Modal>
     </>
@@ -310,11 +295,11 @@ export let Benchmark = ({ name, goal, modelsTested, result }) => {
 }
 
 export let GPTTest = () => {
+  let url = "https://anx45lyxrwvwwu55z3zj67ndzy0naqal.lambda-url.us-east-1.on.aws/"
   let [response, setResponse] = React.useState("")
 
   let startStreaming = async () => {
     let response = await fetch(url, { method: "POST", body: JSON.stringify({ credits: "ABXLDLE", role: "user", content: "What are some fun improv games?" }) });
-    console.log("Got response")
     let streamResponse = response.body;
     let reader = streamResponse.getReader();
     let decoder = new TextDecoder();
@@ -326,12 +311,12 @@ export let GPTTest = () => {
       done = doneReading;
       let chunkValue = decoder.decode(value);
       setResponse((response) => response + chunkValue)
-      console.log(chunkValue)
+    //  console.log(chunkValue)
     }
   }
 
   return <>
-    {response} 
+    <ReactMarkdown>{response}</ReactMarkdown>
     <Button onClick={ startStreaming }>Go</Button>
   </>
 }

@@ -7,7 +7,7 @@
 import * as React from 'react';
 import './App.css';
 import Typography from '@mui/material/Typography';
-import { EReader, Benchmark, ClickToReveal, Footnote} from './EReader';
+import { EReader, Benchmark, ClickToReveal, GPTTest} from './EReader';
 
 let fullText = [
   <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">Education and AI</Typography>,
@@ -147,12 +147,9 @@ I also think it'll be worth it: that AI's victory *can* be a victory for educati
 
 In the conversations around AI and education, many are quick to point out the weaknesses of AI-writing: e.g. its tendency to hallucinate and lie, its inability to use correct citations, and (as I mentioned earlier) its problems remembering beyond its "context window."
 
-
-
-
-
-
-
+`,
+ <GPTTest /> 
+  ,`
 
 ---
 
