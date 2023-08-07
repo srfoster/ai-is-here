@@ -47,7 +47,7 @@ If you've made it this far, then I want to let you in on a secret.  Click below 
 
   (extraProps) => <ClickToReveal
     contents={[
-      `Nice!  You clicked a button.  The secret that this book is interactive.  Stay tuned for more of that (and be on the lookout for Easter eggs).`,
+      `This book is interactive (so be on the lookout for Easter eggs).`,
       `You found an Easter Egg!`,
       `Okay, you can stop clicking now.  I promise there are no more Easter eggs.`
     ]}
@@ -148,7 +148,7 @@ I also think it'll be worth it: that AI's victory *can* be a victory for educati
 In the conversations around AI and education, many are quick to point out the weaknesses of AI-writing: e.g. its tendency to hallucinate and lie, its inability to use correct citations, and (as I mentioned earlier) its problems remembering beyond its "context window."
 
 `,
- <GPTTest /> 
+ (extraProps) => <GPTTest prompt="What are some fun improv games?" {...extraProps}/> 
   ,`
 
 ---
@@ -162,6 +162,7 @@ If you'd like to be notified when I update this book, please [email me](mailto:s
 Special thanks to the following people for their contributions to this book:
 
 * **Lindsey Handley**, for being generally awesome and for helping me edit this book.
+
 
   `]
 

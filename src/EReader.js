@@ -1,6 +1,5 @@
 /*TODO
-  * Extract eReader component
-  * Footnotes as modals
+  * Fix pagination:  What if element is too long?  Also, can we get put on the wrong page?  Or on a non-existent page?
   * More content!
 */
 
@@ -38,6 +37,7 @@ const modalStyle = {
 };
 
 export function EReader({ content, footnotes }) {
+  let [textAnchor, setTextAnchor] = React.useState(null)
   let [page, setPage] = useLocalStorage("current-page",1)
   let [pageLengths, setPageLengths] = React.useState([])
   let [lastRecalc, setLastRecalc] = React.useState(new Date())
@@ -47,13 +47,25 @@ export function EReader({ content, footnotes }) {
   const ref = React.useRef(null);
 
   const nextPage = () => {
-    if (page < pageLengths.length)
+    if (page < pageLengths.length){
+      //Anchor some text whenever we turn the page,
+      // helps us find our place again after repagination
+      let nodes = pageNodes(page+1,pageLengths)
+      if(nodes)
+        setTextAnchor(nodes[0].textContent.substring(0,100))
       setPage(page + 1)
+    }
   }
 
   const prevPage = () => {
-    if (page > 1)
+    if (page > 1){
+      //Anchor some text whenever we turn the page,
+      // helps us find our place again after repagination
+      let nodes = pageNodes(page-1,pageLengths)
+      if(nodes)
+        setTextAnchor(nodes[0].textContent.substring(0,100))
       setPage(page - 1)
+    }
   }
 
   const swipeHandlers = useSwipeable({
@@ -87,30 +99,42 @@ export function EReader({ content, footnotes }) {
     if (ref.current) {
       let nodes = [...ref.current.childNodes].filter(x => x.style)
       let parentRect = ref.current.getBoundingClientRect()
+      let maxPagePixelHeight = parentRect.height 
 
       //Hide all elements
       for(let i = 0; i < nodes.length; i++) {
         let element = nodes[i]
         element.style.display = "block"
         element.style.visibility = "hidden"
+
       }
 
       let lengths = []
       let numElementsOnCurrentPage = 0 
       let currentPagePixelHeight = 0 
-      let maxPagePixelHeight = parentRect.height 
 
       //console.log("Total elements", nodes.length)
 
       let fuzz = 20 // Keeps things from being clipped (I guess this is currently a magic number that equals the top padding of the text container.  Should de-magic it.)
 
+      let iters = 0
       for(let i = 0; i < nodes.length; i++) {
+        iters++;
+        if(iters> 1000) break; //To ease develpment: Infinite loop protection
+
         let element = nodes[i]
 
         let rect = element.getBoundingClientRect()
         let currentElementPixelHeight = rect.height 
 
-        //console.log("Considering",element)
+        //Ensures we don't have any unpaginatable elements
+        if(currentElementPixelHeight > maxPagePixelHeight - fuzz) {
+          currentElementPixelHeight = maxPagePixelHeight - fuzz
+          element.style.height = (maxPagePixelHeight - fuzz) + "px"
+          element.style.maxHeight = (maxPagePixelHeight - fuzz) + "px"
+          element.style.overflowY = "scroll"
+        }
+
         if (currentPagePixelHeight + currentElementPixelHeight <= maxPagePixelHeight - fuzz) {
           //console.log("Adding",element)
           numElementsOnCurrentPage += 1
@@ -118,6 +142,7 @@ export function EReader({ content, footnotes }) {
         } else {
           //console.log("Heights", currentPagePixelHeight + currentElementPixelHeight, maxPagePixelHeight)
           lengths.push(numElementsOnCurrentPage)
+
           numElementsOnCurrentPage = 0
           currentPagePixelHeight = 0
 
@@ -132,6 +157,13 @@ export function EReader({ content, footnotes }) {
       //console.log("Elements assigned to pages", lengths.reduce((sum, x) => sum + x, 0))
       //console.log("Page lengths", lengths)
       setPageLengths(lengths)
+
+      if(textAnchor){
+        let i = pageIndexContaining(textAnchor, lengths)
+        console.log("Page with anchor", textAnchor, "is", i)
+        if(i)
+          setPage(i + 1)
+      }
     }
   }, [lastRecalc]);
 
@@ -181,10 +213,48 @@ export function EReader({ content, footnotes }) {
     }
   }, [pageLengths, page])
 
-  const repaginate = ()=> setLastRecalc(new Date()) 
+  const repaginate = ({anchor})=> {
+    setLastRecalc(new Date()) 
+    if(anchor)
+      setTextAnchor(anchor)
+  }
+
+  const pageNodes = (page, pageLengths) => {
+    let nodes = [...ref.current.childNodes].filter(x => x.style)
+    for(let i = 0; i < pageLengths.length; i++) {
+      let length = pageLengths[i]
+      let slice = nodes.slice(0, length)
+      nodes.splice(0, length)
+
+      if(i == page - 1) {
+        return slice
+      }
+    }
+
+    return undefined;
+  }
+
+  const pageIndexContaining = (text, lengths) => {
+    let nodes = [...ref.current.childNodes].filter(x => x.style)
+
+    for(let i = 0; i < lengths.length; i++) {
+      let length = lengths[i]
+      let slice = nodes.slice(0, length)
+      nodes.splice(0, length)
+
+      let sliceText = slice.reduce((t, x) => t + "\n" + x.textContent, "")
+      console.log("Slice contains?", text, sliceText, sliceText.match(text))
+
+      if(sliceText.match(text)) {
+        return i;
+      }
+    }
+
+    return undefined
+  }
 
   React.useEffect(() => {
-     repaginate()
+     repaginate({})
   }, [windowWidth, windowHeight])
 
   return (
@@ -236,28 +306,35 @@ export function EReader({ content, footnotes }) {
   );
 }
 
-let SimplePagination = ({ count, page, prev, next }) => {
+let SimplePagination = ({ count, page, prev, next, anchor }) => {
 //}
   return <Stack direction="row">
     <Button onClick={ prev }>Prev</Button>
     <Button disabled>Page {page} of { count }</Button>
     <Button onClick={ next }>Next</Button>
+    {anchor}
   </Stack>
 }
 
-export let ClickToReveal = ({text, repaginate}) => {
-  let [clicked, setClicked] = React.useState(false)
+export let ClickToReveal = ({contents, repaginate}) => {
+  let [open, setOpen] = React.useState(false)
+  let [count, setCount] = React.useState(-1)
+
   return <Card style={{marginBottom: 15}}>
     <CardContent>
-      <Button onClick={() => { setClicked(!clicked); repaginate() }}>
+      <Button onClick={() => { 
+        setOpen(!open); 
+        if(!open)
+          setCount(count => (count + 1) % contents.length)
+        repaginate({}) }}>
         Press this button
       </Button>
-      {clicked && <>
+      {open && <>
         <Confetti
             recycle={false}
             numberOfPieces={200}
         />
-        <Typography>{text}</Typography>
+        <Typography>{[contents[count]]}</Typography>
       </>}
     </CardContent>
   </Card>
@@ -294,12 +371,16 @@ export let Benchmark = ({ name, goal, modelsTested, result }) => {
   </Card>
 }
 
-export let GPTTest = () => {
+export let GPTTest = ({prompt, repaginate}) => {
   let url = "https://anx45lyxrwvwwu55z3zj67ndzy0naqal.lambda-url.us-east-1.on.aws/"
   let [response, setResponse] = React.useState("")
 
+  React.useEffect(() => {
+    repaginate({anchor: response.substring(response.length - 100) })
+  },[response.split("\n").length]);
+
   let startStreaming = async () => {
-    let response = await fetch(url, { method: "POST", body: JSON.stringify({ credits: "ABXLDLE", role: "user", content: "What are some fun improv games?" }) });
+    let response = await fetch(url, { method: "POST", body: JSON.stringify({ credits: "ABXLDLE", role: "user", content: prompt}) });
     let streamResponse = response.body;
     let reader = streamResponse.getReader();
     let decoder = new TextDecoder();
@@ -311,12 +392,12 @@ export let GPTTest = () => {
       done = doneReading;
       let chunkValue = decoder.decode(value);
       setResponse((response) => response + chunkValue)
-    //  console.log(chunkValue)
+
     }
   }
 
   return <>
-    <ReactMarkdown>{response}</ReactMarkdown>
     <Button onClick={ startStreaming }>Go</Button>
+    {response.split("\n").map((x, i) => <ReactMarkdown key={i}>{x}</ReactMarkdown>)}
   </>
 }
