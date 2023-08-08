@@ -12,6 +12,7 @@ import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
 import Stack from '@mui/material/Stack';
 import '@fontsource/roboto/400.css';
 
@@ -130,6 +131,8 @@ export function EReader({ content, footnotes }) {
         //Ensures we don't have any unpaginatable elements
         if(currentElementPixelHeight > maxPagePixelHeight - fuzz) {
           currentElementPixelHeight = maxPagePixelHeight - fuzz
+
+          //setting the height is weird if the element's content goes away (e.g. user regenerates some GPT text).  But on the other hand, it has the nice property that it keeps the user on the same page (because the element doesn't get any smaller).  Least of two evils.
           element.style.height = (maxPagePixelHeight - fuzz) + "px"
           element.style.maxHeight = (maxPagePixelHeight - fuzz) + "px"
           element.style.overflowY = "scroll"
@@ -160,7 +163,7 @@ export function EReader({ content, footnotes }) {
 
       if(textAnchor){
         let i = pageIndexContaining(textAnchor, lengths)
-        console.log("Page with anchor", textAnchor, "is", i)
+        //console.log("Page with anchor", textAnchor, "is", i)
         if(i)
           setPage(i + 1)
       }
@@ -243,9 +246,9 @@ export function EReader({ content, footnotes }) {
       nodes.splice(0, length)
 
       let sliceText = slice.reduce((t, x) => t + "\n" + x.textContent, "")
-      console.log("Slice contains?", text, sliceText, sliceText.match(text))
+      //console.log("Slice contains?", text, sliceText, sliceText.match(text))
 
-      if(sliceText.match(text)) {
+      if(sliceText.includes(text)) {
         return i;
       }
     }
@@ -350,7 +353,7 @@ export let Footnote = ({ toShow, handleClose }) => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={modalStyle}>
-            { toShow }
+            <ReactMarkdown>{ toShow }</ReactMarkdown>
         </Box>
       </Modal>
     </>
@@ -359,7 +362,7 @@ export let Footnote = ({ toShow, handleClose }) => {
 
 
 export let Benchmark = ({ name, goal, modelsTested, result }) => {
-  return <Card style={{marginBottom: 20}}>
+  return <Card style={{marginBottom: 20, border: "1px solid black"}}>
     <CardContent>
       <ReactMarkdown>{`
 **${name}**
@@ -371,9 +374,10 @@ export let Benchmark = ({ name, goal, modelsTested, result }) => {
   </Card>
 }
 
-export let GPTTest = ({prompt, repaginate}) => {
+export let GPT = ({prompt, repaginate}) => {
   let url = "https://anx45lyxrwvwwu55z3zj67ndzy0naqal.lambda-url.us-east-1.on.aws/"
   let [response, setResponse] = React.useState("")
+  //TODO: When response is complete, store full output in localstorage.
 
   React.useEffect(() => {
     repaginate({anchor: response.substring(response.length - 100) })
@@ -396,8 +400,13 @@ export let GPTTest = ({prompt, repaginate}) => {
     }
   }
 
-  return <>
-    <Button onClick={ startStreaming }>Go</Button>
-    {response.split("\n").map((x, i) => <ReactMarkdown key={i}>{x}</ReactMarkdown>)}
-  </>
+  return <Card style={{border: "1px solid black", maxHeight: 300, overflowY: "scroll"}}>
+    <CardContent>
+      <CardHeader subheader={prompt}
+        action={
+          <Button variant="contained" onClick={startStreaming}>Ask GPT</Button>
+        }/>
+      {response.split("\n").map((x, i) => <ReactMarkdown key={i}>{x}</ReactMarkdown>)}
+    </CardContent>
+  </Card>
 }
