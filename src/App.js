@@ -218,21 +218,37 @@ I get asked this on a daily basis, and I always answer.  It's part of my job.
 
 Consent in edcuation is a dicey topic though -- because at the end of the day, education in most first world countries is compusory.  You can't really opt out. 
 
-I have vivid memories of learning this first-hand.  In fact, I hated school from the moment I arrived.  As a child with crippling anxiety and a penchant for daydreaming, I was constantly in trouble for not paying attention, for not doing my homework, for not following directions, and for not being able to sit still.  Also, having a minor disability in my hands, I experienced excruciating cramps when writing by hand -- a pain that 1) I was forced to engage despite my protests, and for which 2) I recieved no immediate results from aside from my own barely legible pencil scrawls and poor grades for penmanship.
+I have vivid memories of learning this first-hand.  In fact, I hated school from the moment I arrived.  As a child with crippling anxiety and a penchant for daydreaming, I was constantly in trouble for not paying attention, for not doing my homework, for not following directions, and for not being able to sit still.  Also, having a minor disability in my hands, I experienced excruciating cramps when writing by hand -- a pain that 1) I was forced to engage in despite my protests, and for which 2) I recieved no obvious results, aside from my own barely legible pencil scrawls and poor grades for penmanship.
 
-This was in the early 1990s so if I'd asked "When am I ever going to use this?" I'm sure I would have been told that penmanship was still quite important for getting a job.  (Less than a decade earlier, the New York Times was [claiming that the personal computer might be a fad](/#/footnote/computer-is-a-fad).)  Learning to write by hand was something that well-meaning educators of the time still believed to be critical.  This therefore overrode my lack of consent and justified subjecting a child to physical pain.
+This was in the early 1990s, so if I'd asked "When am I ever going to use this?" I'm sure I would have been told that penmanship was still quite important for getting a job.  (Less than a decade earlier, the New York Times was still [claiming that the personal computer might be a fad](/#/footnote/computer-is-a-fad).)  Learning to write by hand was something that well-meaning educators of the time still believed to be crucial for educated citizens.  This lofty goal justified 1) overriding my lack of consent and 2) subjecting me to physical pain.
 
-When I share this story with educators today, they are quick to point out that this is an example of education "done wrong" -- that my disabilities ought to have been better supported.  They're right, and I'm sure that in many places education is "done right."  But the point remains: Early education is non-consensual.  It's just more obvious when it's done wrong.  If the system doesn't work for you, you're out of luck.  As a child, you don't have a say in the matter and don't have the vocabulary to critique the system.
+When I share this story with educators today, they are quick to point out that this is an example of education "done wrong" -- that my disabilities ought to have been better supported.  They're right, and in many places education is indeed "done right."  But the point remains: Done right or done wrong, early education is legally permitted to be a non-consensual arrangement.  It's just that this state of affairs is more obvious when education is "done wrong" because students are more likely to be vocal about it.  If the system doesn't work for you, too bad.
 
 But here we are, on the cusp of a future in which a one-size-fits-all education might soon be as antiquated as penmanship classes.  Who knows?  Maybe a universally consensual education system is on the horizon too.`,
 
  (extraProps) => <GPT prompt="Beginning with pre-history, give a brief history of human education systems.  Use short bullet points." {...extraProps}/> 
 
-,` 2.  
+,`
+
+##
+##
+##
+
+#### 2.  
+
+<<Learning is non-consensual too...  You don't get to opt out of learning any more than you get to opt out of thinking or being.  You're alive, and learning is part of it.   You'll learn SOMETHING no matter what you do...  Brains change.  You can't stop them.  They are as in motion as a river -- always adapting to the ongoing changes of experience and the phenomena that surround us.  Reality is a river, and our brains are but reflections of reality.>>
 
 <<Can this book escape the one-size-fits-all model?  Let's try it.  Goal: Learn something -- but you get to pick what it is.>>
 
-<<Education systems are powerful tools.  An educated workforce/citizenship is one of those rare things that economy and state agree upon.  Competition with China (or Russia in decades past) is as much a force on the American education system as Microsoft and Amazon's need to have future software engineers (e.g., who funds code.org??)>>
+<<Education systems are powerful tools.  An educated workforce/citizenship is one of those rare things that economy and state agree upon.  Competition with China (or Russia in decades past) is as much a force on the American education system as Microsoft and Amazon's need to have future software engineers (e.g., who funds code.org??)
+
+Currently, the education system attempts to be one thing -- is at a kind of fix-point, pulled in many directions and ending up where it is.
+
+But with the ability to be many things, each distinct force currently acting on the education system as we know it will likely become the genesis of a new education system in and of itself.  These fragments will become wholes.  And then those wholes will fragment.  
+
+We are watching the educational "big bang" unfold -- an explosion in slow motion.   
+
+>>
 
 
 ---
