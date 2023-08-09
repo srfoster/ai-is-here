@@ -400,7 +400,7 @@ export let GPT = ({prompt, repaginate}) => {
     }
   }
 
-  return <Card style={{border: "1px solid black", maxHeight: 300, overflowY: "scroll"}}>
+  return <Card style={{border: "1px solid black", maxHeight: "50%", overflowY: "scroll"}}>
     <CardContent>
       <CardHeader subheader={prompt}
         action={

@@ -1,5 +1,6 @@
 
 /*TODO
+  * Fix the flashing
   * Missing footnotes  
   * Chapter 1
 */
@@ -108,7 +109,7 @@ Want to test the context window for yourself?  Here's a benchmark for that:`,
 
 ,`I mention this because it gives a sense of why the novel-writing benchmark is so hard for AI-writing tools.  To put the 8,000-word context window into perspective, the first Harry Potter novel is about 77,000 words.  An AI-writing tool that attempts to write such a book will, after the first 8000 words, begin to forget what it previously wrote.
 
-It's an open question whether the 8000-word context window can be circumvented (either now or in the future). Optimists would point out that human authors don't keep every previous word in mind while writing new ones.  Thus, perhaps a clever prompter could simulate a human writing process by continually supplying the AI with a running 500-word "summary-thus-far," while asking it to generate 7,500 words at a time.  Do this 10 times and... *bam!* – you have a novel!
+It's an open question whether an AI model's context window can be circumvented (either now or in the future). Optimists would point out that human authors don't keep every previous word in mind while writing new ones.  Thus, perhaps a clever prompter could simulate a human writing process by continually supplying the AI with a running 500-word "summary-thus-far," while asking it to generate 7,500 words at a time.  Do this 10 times and... *bam!* – you have a novel!
 
 If you get good results with this methodology, please get in touch, so I can update the benchmark.  But please know: I've poured many hours into this problem, tried various such tricks, and generated nothing but trash.  (More on this later – because sometimes even trash can be instructive.)
 
@@ -185,7 +186,7 @@ We'll pick up these threads in the rest of the book and, hopefully, carve out a 
 
 #### 6.
 
-Oh, and one last thing.  As you can see below, this book has GPT built into it.  We'll be using this to explore AI's educational potential.  As they saying goes, "The best way to predict the future is to build it."  So let's get started.
+Oh, and one last thing for the introduction.  As you can see below, this book has GPT built into it.  We'll be using this to explore AI's ability to power interactive textbooks.  As the saying goes, "The best way to predict the future is to build it." 
 
 `,
  (extraProps) => <GPT prompt="If everything a computer does is actually just 'really fast math on binary numbers,' is AI text generation really just math underneath the hood?" {...extraProps}/> 
@@ -196,10 +197,43 @@ Oh, and one last thing.  As you can see below, this book has GPT built into it. 
 ##
 ##
 
+### Chapter 1: The Future of Learning
 
-## Chapter 1: The Future of Writing
+#### 1.
 
-Blah blah blah.
+In this book, we'll make a distinction between learning and education.
+
+* **Learning** is a natural process that happens in the brain.
+* **Education** is a system of institutions and practices that are designed to facilitate learning.
+
+Education is a human invention; learning is not.  Likewise, although many animals learn, only humans build education systems.  In fact, we even sometimes build them for other animals.  For example, we adopt dogs, train them to sit, stay, roll over, etc.  We train horses to be saddled, wear shoes, and carry loads.  We even teach dophins to do military operations.  There are various techniques for accomplishing these aims, and they have been refined over the course of human history.  But the basic idea is the same: we build an environment around the animal, carefully control the behaviors in which they engage, and the outcome is a trained animal.
+
+I would [not be the first to argue](/#/footnote/domestication-references) that these systems for domesticating and training animals were instrumental to our success as a species.  A trained animal is a powerful tool.  Or to put it another way: an animal whose brain has been rewired to something useful is a powerful tool.  
+
+Admittedly, it might seem strange to start off a conversation about education by talking about animal training.  The systems we build around untrained animals and the systems we build around not-yet-educated citizens are, after all, only superficially similar: we build an environment, carefully control behaviors, and the outcome is a brain with key differences from the one we started with.  
+
+The key difference, of course, is that humans are (ideally) willing participants in the whole process.  Whereas not much work goes into convincing a dog, horse, or dolphin that the outcome of getting trained is in its best interest, we do make an effort to this effect with humans.  This takes many forms but is most classically illustrated by our general willingness to answer the never-ending stream of questions that boil down to: "When am I ever going to use this?"  
+
+I get asked this on a daily basis, and I always answer.  It's part of my job.
+
+Consent in edcuation is a dicey topic though -- because at the end of the day, education in most first world countries is compusory.  You can't really opt out. 
+
+I have vivid memories of learning this first-hand.  In fact, I hated school from the moment I arrived.  As a child with crippling anxiety and a penchant for daydreaming, I was constantly in trouble for not paying attention, for not doing my homework, for not following directions, and for not being able to sit still.  Also, having a minor disability in my hands, I experienced excruciating cramps when writing by hand -- a pain that 1) I was forced to engage despite my protests, and for which 2) I recieved no immediate results from aside from my own barely legible pencil scrawls and poor grades for penmanship.
+
+This was in the early 1990s so if I'd asked "When am I ever going to use this?" I'm sure I would have been told that penmanship was still quite important for getting a job.  (Less than a decade earlier, the New York Times was [claiming that the personal computer might be a fad](/#/footnote/computer-is-a-fad).)  Learning to write by hand was something that well-meaning educators of the time still believed to be critical.  This therefore overrode my lack of consent and justified subjecting a child to physical pain.
+
+When I share this story with educators today, they are quick to point out that this is an example of education "done wrong" -- that my disabilities ought to have been better supported.  They're right, and I'm sure that in many places education is "done right."  But the point remains: Early education is non-consensual.  It's just more obvious when it's done wrong.  If the system doesn't work for you, you're out of luck.  As a child, you don't have a say in the matter and don't have the vocabulary to critique the system.
+
+But here we are, on the cusp of a future in which a one-size-fits-all education might soon be as antiquated as penmanship classes.  Who knows?  Maybe a universally consensual education system is on the horizon too.`,
+
+ (extraProps) => <GPT prompt="Beginning with pre-history, give a brief history of human education systems.  Use short bullet points." {...extraProps}/> 
+
+,` 2.  
+
+<<Can this book escape the one-size-fits-all model?  Let's try it.  Goal: Learn something -- but you get to pick what it is.>>
+
+<<Education systems are powerful tools.  An educated workforce/citizenship is one of those rare things that economy and state agree upon.  Competition with China (or Russia in decades past) is as much a force on the American education system as Microsoft and Amazon's need to have future software engineers (e.g., who funds code.org??)>>
+
 
 ---
 
@@ -228,6 +262,12 @@ let footnotes = {
   "change-is-hard": `You can:`,
   "hallucinations": `For more information, I'd recommend [the wikipedia article on AI hallucinations](https://en.wikipedia.org/wiki/Hallucination_(artificial_intelligence)).`,
   "context-window": `You can:`,
+  "domestication-references": `
+* **"Guns, Germs, and Steel: The Fates of Human Societies"** by Jared Diamond.  Diamond's Pulitzer-winning work argues that environmental factors, including the availability and domestication of animals, played a vital role in the uneven distribution of global resources and power.
+* **"The Horse, the Wheel, and Language: How Bronze-Age Riders from the Eurasian Steppes Shaped the Modern World"** by David W. Anthony. This book discusses the domestication of horses and the role they played in the spread of language, culture, and technology from the Eurasian steppes.
+* **"The Dog: A Natural History"** by Ádám Miklósi. While focusing mainly on the evolution and behavior of dogs, this book also touches on the profound effects that the domestication of dogs had on human societies.`,
+  "computer-is-a-fad": `See the 1985 article called [The Executive Computer](https://www.nytimes.com/1985/12/08/business/the-executive-computer.html)
+  `,
   "contact-me": `You can:
 * Open a [GitHub issue](https://github.com/srfoster/ai-is-here/issues)
 * Or email me: [stephen@thoughtstem.com](mailto:stephen@thoughtstem.com)`,
