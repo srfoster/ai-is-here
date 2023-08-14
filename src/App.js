@@ -210,9 +210,9 @@ Education is a human invention; learning is not.  Likewise, although many animal
 
 I would [not be the first to argue](/#/footnote/domestication-references) that these systems for domesticating and training animals were instrumental to our success as a species.  A trained animal is a powerful tool.  Or to put it another way: an animal whose brain has been rewired to something useful is a powerful tool.  
 
-Admittedly, it might seem strange to start off a conversation about education by talking about animal training.  The systems we build around untrained animals and the systems we build around not-yet-educated citizens are, after all, only superficially similar: we build an environment, carefully control behaviors, and the outcome is a brain with key differences from the one we started with.  
+Admittedly, it might seem strange to start off a conversation about education by talking about animal training.  The systems we build around untrained animals and the systems we build around not-yet-educated citizens are, after all, only superficially similar: we build an environment, carefully control behaviors, and the outcome is a brain in which learning has occurred.
 
-The key difference, of course, is that humans are (ideally) willing participants in the whole process.  Whereas not much work goes into convincing a dog, horse, or dolphin that the outcome of getting trained is in its best interest, we do make an effort to this effect with humans.  This takes many forms but is most classically illustrated by our general willingness to answer the never-ending stream of questions that boil down to: "When am I ever going to use this?"  
+The key difference, of course, is that humans are (ideally) willing participants in the whole process.  Whereas not much work goes into convincing a dog, horse, or dolphin that the outcome of getting trained is in its best interest, we do make an effort with humans.  This is most classically illustrated by our general willingness to answer the never-ending stream of questions that boil down to: "When am I ever going to use this?"  
 
 I get asked this on a daily basis, and I always answer.  It's part of my job.
 
