@@ -1,5 +1,7 @@
 
 /*TODO
+  * Add customization demo
+    - Consider making customized text styled slightly differently -- react-markdown probably has a way
   * Fix the flashing
   * Missing footnotes  
   * Chapter 1
@@ -8,7 +10,7 @@
 import * as React from 'react';
 import './App.css';
 import Typography from '@mui/material/Typography';
-import { EReader, Benchmark, ClickToReveal, GPT} from './EReader';
+import { EReader, Benchmark, ClickToReveal, GPT, CustomizationWidget, CustomizedText} from './EReader';
 
 let fullText = [
   <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">Education and AI</Typography>,
@@ -20,7 +22,7 @@ let fullText = [
 
 #### 0.
 
-This is a book about AI and education.  I wrote it for my present and future students and for my fellow educators.  But I hope it will be useful to anyone who is interested in the future of knowledge work.  It's a wild world.
+This is a book about AI and education.  I wrote it for my present and future students and for my fellow educators.  But I hope it will be useful to anyone who is interested in the future of education in a post-AI world.
 
 #### 1.
 
@@ -208,23 +210,53 @@ In this book, we'll make a distinction between learning and education.
 
 Education is a human invention; learning is not.  Likewise, although many animals learn, only humans build education systems.  In fact, we even sometimes build them for other animals.  For example, we adopt dogs, train them to sit, stay, roll over, etc.  We train horses to be saddled, wear shoes, and carry loads.  We even teach dophins to do military operations.  There are various techniques for accomplishing these aims, and they have been refined over the course of human history.  But the basic idea is the same: we build an environment around the animal, carefully control the behaviors in which they engage, and the outcome is a trained animal.
 
-I would [not be the first to argue](/#/footnote/domestication-references) that these systems for domesticating and training animals were instrumental to our success as a species.  A trained animal is a powerful tool.  Or to put it another way: an animal whose brain has been rewired to something useful is a powerful tool.  
+I would [not be the first to argue](/#/footnote/domestication-references) that these systems for domesticating and training animals were instrumental to our success as a species.  A trained animal is a powerful tool.  Or to put it another way: an animal whose brain has been rewired to do something useful is a powerful tool.  
 
-Admittedly, it might seem strange to start off a conversation about education by talking about animal training.  The systems we build around untrained animals and the systems we build around not-yet-educated citizens are, after all, only superficially similar: we build an environment, carefully control behaviors, and the outcome is a brain in which learning has occurred.
+Admittedly, it might seem strange to start off a conversation about education by talking about animal training.  
 
-The key difference, of course, is that humans are (ideally) willing participants in the whole process.  Whereas not much work goes into convincing a dog, horse, or dolphin that the outcome of getting trained is in its best interest, we do make an effort with humans.  This is most classically illustrated by our general willingness to answer the never-ending stream of questions that boil down to: "When am I ever going to use this?"  
+One key difference, of course, is that humans are (ideally) willing participants in the whole process.  Whereas not much work goes into convincing a dog, horse, or dolphin that getting trained is in its best interest, we do make an effort for human students.  Our first line of defense in this regard is that learning should be fun -- an end in itself.
 
-I get asked this on a daily basis, and I always answer.  It's part of my job.
+When this line of defense crumbles (as it all too often does), all is not lost.  There is a second line of defense:  to justify the system to students by way of philosophical argument.  This process is most classically illustrated when a student Socratically demands to know "When am I ever going to use this?" and receives one of the classic answers:
 
-Consent in edcuation is a dicey topic though -- because at the end of the day, education in most first world countries is compusory.  You can't really opt out. 
+* **The economic one:** You need this to get a job. (The economy needs this of you.)
+  - **Example:** You should learn to code if you want to become a software engineer.
+* **The social one:** You need this to be a good citizen. (Society needs this of you.)
+  - **Example:** You should learn about the American Civil War to better understand political tensions in the United States.
+* **The personal one:** You'll be happy you learned this.  (You need this of you.)
+  - **Example:** You should learn to read literature because you'll find lifelong joy in it.
 
-I have vivid memories of learning this first-hand.  In fact, I hated school from the moment I arrived.  As a child with crippling anxiety and a penchant for daydreaming, I was constantly in trouble for not paying attention, for not doing my homework, for not following directions, and for not being able to sit still.  Also, having a minor disability in my hands, I experienced excruciating cramps when writing by hand -- a pain that 1) I was forced to engage in despite my protests, and for which 2) I recieved no obvious results, aside from my own barely legible pencil scrawls and poor grades for penmanship.
+If one or more of the above arguments resonates with the student (and sometimes it does), all is well.  Tedium, unpleasantness, and even pain do sometimes become endurable when there is faith in long-term payoffs. 
+
+But sometimes philosophical arguments fail to instill such faith.  What happens in cases like these depends on where you live and how old you are.  In America, education is compulsory up to a [certain age](/#/footnote/compulsory-education-ages) -- so the result is that students are forced to learn even when the process is painful and no long-term benefit is perceivable.  Above the age of compulsory education, students are free to opt out, but the result is that they are also opting out of the economic, social, and personal benefits that education provides.  Not exactly a great success story for education, in either case.
+
+As a student, if you've had the misfortune of experiencing this crumbling of the system's ability to justify itself, it probably sucked.  (I know it did for me.)  You were forced to do something unpleasant for what probably sounded like really dumb reasons.  I wouldn't blame you if it made you a bit jaded about the education system in general.
+
+I've heard people try to defend the education system's "occasional" failures in this regard by appealing to the fact that the education system has a lot of people to serve.  The bigger a system gets, the more it simply can't work for everyone.  For one thing, it becomes hard to make learning fun or even painless for everyone, because everyone learns differently.  For another, it becomes hard to justify the system to everyone, because everyone has different goals in life.
+
+And prior to the arrival of AI, it was certainly true that one-size-fits-all services or products were easier to mass produce and deliver at scale than customized ones.  Now, though, AI has the ability to start customizing both the *how* and the *why* of education from pre-K to higher ed.
+
+To get a sense of what this means, let's try to imagine a system in which every student gets different textbooks, different curricula, and different justifications for why they have the textbooks and curricula they have.  (Whether or not they get different standardized tests and assessments is an interesting question that we'll come back to in the next chapter.)
+
+To make this thought experiment concrete, I've decided to do something radical: write a textbook that's different for everyone who reads it. 
+
+#### 2.
+
+Using the widget below, you can begin to customize this textbook to your liking.  (Don't worry too much about this; you can always change it later.) `,
+
+  (extraProps) => <CustomizationWidget />, 
+
+`#### 3.`,
+
+  (extraProps) => <CustomizedText {...extraProps}>
+    {`Like many of you, I have vivid memories of experiencing first-hand education at its worst.  
+
+As a child with crippling anxiety and a penchant for daydreaming, I was constantly in trouble for not paying attention, for not doing my homework, for not following directions, and for not being able to sit still.  Also, having a minor disability in my hands, I experienced excruciating cramps when writing by hand -- a pain that 1) I was forced to engage in despite my protests, and for which 2) I recieved no obvious results, aside from my own barely legible pencil scrawls and poor grades for penmanship.
 
 This was in the early 1990s, so if I'd asked "When am I ever going to use this?" I'm sure I would have been told that penmanship was still quite important for getting a job.  (Less than a decade earlier, the New York Times was still [claiming that the personal computer might be a fad](/#/footnote/computer-is-a-fad).)  Learning to write by hand was something that well-meaning educators of the time still believed to be crucial for educated citizens.  This lofty goal justified 1) overriding my lack of consent and 2) subjecting me to physical pain.
 
 When I share this story with educators today, they are quick to point out that this is an example of education "done wrong" -- that my disabilities ought to have been better supported.  They're right, and in many places education is indeed "done right."  But the point remains: Done right or done wrong, early education is legally permitted to be a non-consensual arrangement.  It's just that this state of affairs is more obvious when education is "done wrong" because students are more likely to be vocal about it.  If the system doesn't work for you, too bad.
 
-But here we are, on the cusp of a future in which a one-size-fits-all education might soon be as antiquated as penmanship classes.  Who knows?  Maybe a universally consensual education system is on the horizon too.`,
+But here we are, on the cusp of a future in which a one-size-fits-all education might soon be as antiquated as penmanship classes.  Who knows?  Maybe a universally consensual education system is on the horizon too.`}</CustomizedText>,
 
  (extraProps) => <GPT prompt="Beginning with pre-history, give a brief history of human education systems.  Use short bullet points." {...extraProps}/> 
 
@@ -235,6 +267,8 @@ But here we are, on the cusp of a future in which a one-size-fits-all education 
 ##
 
 #### 2.  
+
+<<Higher ed -- things change.  Students get to pick -- but from a carefully curated set of options.  And is it really a benefit?  If you happened to pick __ in year ___, you were in for a rough life.  It's almost as if after 12 years of mandated education, we ease off for 4 years so that we don't have to take responsibility for student success after they leave the education system.  Sorry, buddy, YOU chose art history, so it's not MY fault you're unemployed...>>
 
 <<Learning is non-consensual too...  You don't get to opt out of learning any more than you get to opt out of thinking or being.  You're alive, and learning is part of it.   You'll learn SOMETHING no matter what you do...  Brains change.  You can't stop them.  They are as in motion as a river -- always adapting to the ongoing changes of experience and the phenomena that surround us.  Reality is a river, and our brains are but reflections of reality.>>
 
@@ -288,6 +322,7 @@ let footnotes = {
 * Open a [GitHub issue](https://github.com/srfoster/ai-is-here/issues)
 * Or email me: [stephen@thoughtstem.com](mailto:stephen@thoughtstem.com)`,
   "attention-is-all-you-need": "You can find the full paper [here](https://arxiv.org/abs/1706.03762).",
+  "compulsory-education-ages": `This differs from state to state but begins between ages 5 and 8 and ends between ages 16 and 18.  See [here for details by state](https://nces.ed.gov/programs/statereform/tab5_1.asp).`,
 }
 
 /*

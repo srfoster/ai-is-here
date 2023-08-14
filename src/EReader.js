@@ -410,3 +410,29 @@ export let GPT = ({prompt, repaginate}) => {
     </CardContent>
   </Card>
 }
+
+
+export let CustomizationWidget = ({ }) => {
+  return <Card style={{marginBottom: 20, border: "1px solid black"}}>
+    <CardContent>
+      <ReactMarkdown>{`TODO...`}
+      </ReactMarkdown>
+    </CardContent>
+  </Card>
+}
+
+export let CustomizedText = ({ children}) => {
+  return <>
+    <Card
+      style={{ marginBottom: 20, border: "1px solid black" }}>
+      <CardHeader
+        subheader="The text below has been customized according to your preferences..."
+      ></CardHeader>
+      {/* <CardContent>
+        <ReactMarkdown>
+        </ReactMarkdown>
+      </CardContent> */}
+    </Card>
+    <ReactMarkdown>{children}</ReactMarkdown>
+  </>
+}
