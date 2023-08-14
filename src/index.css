@@ -29,9 +29,21 @@ ul{
   padding-top: 5px;
 }
 
+ul li ul{
+  margin: 0px;
+  padding-bottom: 0px;
+  padding-top: 5px;
+}
+
 ol{
   margin: 0px;
   padding-bottom: 20px;
+  padding-top: 5px;
+}
+
+ol li ol{
+  margin: 0px;
+  padding-bottom: 0px;
   padding-top: 5px;
 }
 

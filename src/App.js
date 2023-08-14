@@ -210,15 +210,41 @@ Education is a human invention; learning is not.  Likewise, although many animal
 
 I would [not be the first to argue](/#/footnote/domestication-references) that these systems for domesticating and training animals were instrumental to our success as a species.  A trained animal is a powerful tool.  Or to put it another way: an animal whose brain has been rewired to something useful is a powerful tool.  
 
-Admittedly, it might seem strange to start off a conversation about education by talking about animal training.  The systems we build around untrained animals and the systems we build around not-yet-educated citizens are, after all, only superficially similar: we build an environment, carefully control behaviors, and the outcome is a brain with key differences from the one we started with.  
+Admittedly, it might seem strange to start off a conversation about education by talking about animal training.  
 
-The key difference, of course, is that humans are (ideally) willing participants in the whole process.  Whereas not much work goes into convincing a dog, horse, or dolphin that the outcome of getting trained is in its best interest, we do make an effort to this effect with humans.  This takes many forms but is most classically illustrated by our general willingness to answer the never-ending stream of questions that boil down to: "When am I ever going to use this?"  
+One key difference, of course, is that humans are (ideally) willing participants in the whole process.  Whereas not much work goes into convincing a dog, horse, or dolphin that getting trained is in its best interest, we do make an effort to this effect for humans.  Most of my seasoned colleagues are well-prepared for the classic "When am I ever going to use this?" with one or more classic answers:
 
-I get asked this on a daily basis, and I always answer.  It's part of my job.
+* **The economic one:** You need this to get a job. (The economy needs this of you.)
+  - **Example:** You should learn to code if you want to become a software engineer.
+* **The social one:** You need this to be a good citizen. (Society needs this of you.)
+  - **Example:** You should learn about the American Civil War to better understand political tensions in the United States.
+* **The personal one:** You'll be happy you learned this.
+  - **Example:** You should learn to read because you'll find lifelong joy in it.
 
-Consent in edcuation is a dicey topic though -- because at the end of the day, education in most first world countries is compusory.  You can't really opt out. 
+I should also note that if the conversation is revolving around *any* of the above arguments, then it's because the first line of defense has already crumbled.  Namely: Learning is fun.  
 
-I have vivid memories of learning this first-hand.  In fact, I hated school from the moment I arrived.  As a child with crippling anxiety and a penchant for daydreaming, I was constantly in trouble for not paying attention, for not doing my homework, for not following directions, and for not being able to sit still.  Also, having a minor disability in my hands, I experienced excruciating cramps when writing by hand -- a pain that 1) I was forced to engage in despite my protests, and for which 2) I recieved no obvious results, aside from my own barely legible pencil scrawls and poor grades for penmanship.
+What happens then, when both lines of defense crumble: when the subject matter is not fun, *and* when the economic, social, and personal arguments are not compelling?  As a student, if you've had the misfortune of experiencing this crumbling of the system's ability to justify itself, it probably sucked.  (I know it did for me.)
+
+* You did something unpleasant,
+* For no good reason,
+* And you were forced to do it.
+
+The more non-consensual the learning, the more it begins to resemble the training of animals: we place the subject within an environment, carefully control its behaviors, and the result is learning -- a brain that differs from the one that went in.  I've heard people try to defend the education system's "occasional" failures in this regard by appealing to the fact that the education system has a lot of people to serve.  The bigger a system gets, the more it simply can't work for everyone.  It's almost a "law of physics" some will argue: 
+
+> *Any one-size-fits-all service or product is easier to mass produce and scale than a customized one.*
+
+That's where we'll begin our investigation of AI's impact on education -- with its potential to make *education at its worst better.*  There are three ways AI can begin doing this at every level of education from pre-K to higher ed: 
+
+1) Making education more fun for students, 
+2) Offering students personalized justifications for "When am I ever going to use this?"
+3) Personalizing what was once a one-size-fits-all model. 
+
+
+#### 2.
+
+Like many of you, I have vivid memories of experiencing first-hand education at its worst.  
+
+As a child with crippling anxiety and a penchant for daydreaming, I was constantly in trouble for not paying attention, for not doing my homework, for not following directions, and for not being able to sit still.  Also, having a minor disability in my hands, I experienced excruciating cramps when writing by hand -- a pain that 1) I was forced to engage in despite my protests, and for which 2) I recieved no obvious results, aside from my own barely legible pencil scrawls and poor grades for penmanship.
 
 This was in the early 1990s, so if I'd asked "When am I ever going to use this?" I'm sure I would have been told that penmanship was still quite important for getting a job.  (Less than a decade earlier, the New York Times was still [claiming that the personal computer might be a fad](/#/footnote/computer-is-a-fad).)  Learning to write by hand was something that well-meaning educators of the time still believed to be crucial for educated citizens.  This lofty goal justified 1) overriding my lack of consent and 2) subjecting me to physical pain.
 
@@ -235,6 +261,8 @@ But here we are, on the cusp of a future in which a one-size-fits-all education 
 ##
 
 #### 2.  
+
+<<Higher ed -- things change.  Students get to pick -- but from a carefully curated set of options.  And is it really a benefit?  If you happened to pick __ in year ___, you were in for a rough life.  It's almost as if after 12 years of mandated education, we ease off for 4 years so that we don't have to take responsibility for student success after they leave the education system.  Sorry, buddy, YOU chose art history, so it's not MY fault you're unemployed...>>
 
 <<Learning is non-consensual too...  You don't get to opt out of learning any more than you get to opt out of thinking or being.  You're alive, and learning is part of it.   You'll learn SOMETHING no matter what you do...  Brains change.  You can't stop them.  They are as in motion as a river -- always adapting to the ongoing changes of experience and the phenomena that surround us.  Reality is a river, and our brains are but reflections of reality.>>
 
