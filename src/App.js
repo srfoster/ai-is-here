@@ -241,14 +241,15 @@ To make this thought experiment concrete, I've decided to do something radical: 
 
 #### 2.
 
-Using the widget below, you can begin to customize this textbook to your liking.  (Don't worry too much about this; you can always change it later.) `,
+Using the widget below, you can begin to customize the textbook.  (Don't stress too much about this; you can always change it later.) 
 
-  (extraProps) => <CustomizationWidget />, 
-
-`#### 3.`,
+#### 3.`,
 
   (extraProps) => <CustomizedText {...extraProps}>
-    {`Like many of you, I have vivid memories of experiencing first-hand education at its worst.  
+    {`You can click any of these paragraphs (including this one) to rewrite it according to the preferences you've selected in the box above.
+
+
+Like many of you, I have vivid memories of experiencing first-hand education at its worst.  
 
 As a child with crippling anxiety and a penchant for daydreaming, I was constantly in trouble for not paying attention, for not doing my homework, for not following directions, and for not being able to sit still.  Also, having a minor disability in my hands, I experienced excruciating cramps when writing by hand -- a pain that 1) I was forced to engage in despite my protests, and for which 2) I recieved no obvious results, aside from my own barely legible pencil scrawls and poor grades for penmanship.
 
@@ -258,9 +259,18 @@ When I share this story with educators today, they are quick to point out that t
 
 But here we are, on the cusp of a future in which a one-size-fits-all education might soon be as antiquated as penmanship classes.  Who knows?  Maybe a universally consensual education system is on the horizon too.`}</CustomizedText>,
 
+
  (extraProps) => <GPT prompt="Beginning with pre-history, give a brief history of human education systems.  Use short bullet points." {...extraProps}/> 
 
 ,`
+
+
+##  
+##  
+##  
+##  
+
+#### 4.
 
 ##
 ##

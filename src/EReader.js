@@ -1,6 +1,8 @@
 /*TODO
   * Fix pagination:  What if element is too long?  Also, can we get put on the wrong page?  Or on a non-existent page?
   * More content!
+  * Notes for next revision:
+    - Context window applies to large code bases, not just novels
 */
 
 import * as React from 'react';
@@ -13,7 +15,12 @@ import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
+import Checkbox from '@mui/material/Checkbox';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Stack from '@mui/material/Stack';
+import Switch from '@mui/material/Switch';
+
 import '@fontsource/roboto/400.css';
 
 import {useLocalStorage} from 'react-use'
@@ -24,6 +31,8 @@ import {
 import { useSwipeable } from "react-swipeable";
 
 import Modal from '@mui/material/Modal';
+import remarkGfm from 'remark-gfm'
+
 
 const modalStyle = {
   position: 'absolute',
@@ -374,13 +383,13 @@ export let Benchmark = ({ name, goal, modelsTested, result }) => {
   </Card>
 }
 
-export let GPT = ({prompt, repaginate}) => {
+let useGpt = ({prompt, onParagraph}) => {
   let url = "https://anx45lyxrwvwwu55z3zj67ndzy0naqal.lambda-url.us-east-1.on.aws/"
   let [response, setResponse] = React.useState("")
   //TODO: When response is complete, store full output in localstorage.
 
   React.useEffect(() => {
-    repaginate({anchor: response.substring(response.length - 100) })
+    onParagraph()
   },[response.split("\n").length]);
 
   let startStreaming = async () => {
@@ -400,6 +409,13 @@ export let GPT = ({prompt, repaginate}) => {
     }
   }
 
+  return [response, startStreaming]
+}
+
+export let GPT = ({prompt, repaginate}) => {
+  let [response, startStreaming] = useGpt({prompt, onParagraph: ()=> repaginate({anchor: response.substring(response.length - 100) })
+  })
+
   return <Card style={{border: "1px solid black", maxHeight: "50%", overflowY: "scroll"}}>
     <CardContent>
       <CardHeader subheader={prompt}
@@ -411,28 +427,86 @@ export let GPT = ({prompt, repaginate}) => {
   </Card>
 }
 
+let useReaderPrefersBullets = () => {
+  let key = "I prefer bullets to paragraphs" 
 
-export let CustomizationWidget = ({ }) => {
-  return <Card style={{marginBottom: 20, border: "1px solid black"}}>
-    <CardContent>
-      <ReactMarkdown>{`TODO...`}
-      </ReactMarkdown>
-    </CardContent>
-  </Card>
+  let [getter, setter] = useLocalStorage(key, false)
+
+  return [getter, setter, key]
 }
 
-export let CustomizedText = ({ children}) => {
+let useReaderPrefersShortSentences = () => {
+  let key = "I prefer short sentences" 
+
+  let [getter, setter] = useLocalStorage(key, false)
+
+  return [getter, setter, key]
+}
+
+let useReaderPreferences = () => {
+  let [likesBullets, setLikesBullets, likesBulletsKey] = useReaderPrefersBullets()
+
+  let [likesShortSentences, setLikesShortSentences, likesShortSentencesKey] = useReaderPrefersShortSentences()
+  
+  return {[likesBulletsKey]: likesBullets, [likesShortSentencesKey]: likesShortSentences}
+}
+
+export let CustomizationWidget = ({ }) => {
+  let [likesBullets, setLikesBullets, likesBulletsKey] = useReaderPrefersBullets()
+
+  let [likesShortSentences, setLikesShortSentences, likesShortSentencesKey] = useReaderPrefersShortSentences()
+
+  let checkBoxForPref = (pref, setPref, key) => {
+      return <FormControlLabel
+          control={
+
+            <Checkbox
+              checked={!!(pref)}
+              onChange={(e) => { setPref(e.target.checked) }}
+            />}
+          label={key} />
+  }
+
+  return <>
+      <FormGroup>
+        
+        {checkBoxForPref(likesBullets, 
+          setLikesBullets, 
+          likesBulletsKey)}
+
+        {checkBoxForPref(likesShortSentences,
+          setLikesShortSentences,
+          likesShortSentencesKey)}
+      </FormGroup>
+  </>
+}
+
+export let CustomizedText = ({ children, repaginate}) => {
   return <>
     <Card
       style={{ marginBottom: 20, border: "1px solid black" }}>
       <CardHeader
-        subheader="The text below has been customized according to your preferences..."
+        subheader="The text below can be rewritten  according to your preferences:"
       ></CardHeader>
-      {/* <CardContent>
-        <ReactMarkdown>
-        </ReactMarkdown>
-      </CardContent> */}
+      <CardContent>
+        <CustomizationWidget />
+      </CardContent>
     </Card>
-    <ReactMarkdown>{children}</ReactMarkdown>
+    {children.split("\n\n").map((x, i) => <RewritableParagraph 
+      repaginate={repaginate}
+      key={i}>{x}</RewritableParagraph>)}
+  </>
+}
+
+export let RewritableParagraph= ({ children, repaginate}) => {
+  let prefs = useReaderPreferences()
+
+  let [response, startStreaming] = useGpt({prompt: "Rewrite each of the following paragraphs for a reader who prefers bullet points and short sentences```" + children + "```", onParagraph: ()=> repaginate({anchor: response.substring(response.length - 100) })
+  })
+
+  return <>
+    <span style={{border: "1px solid red"}} onClick={startStreaming}>
+      <ReactMarkdown>{response || children}</ReactMarkdown> 
+    </span>
   </>
 }
