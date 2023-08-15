@@ -1,10 +1,15 @@
 
 /*TODO
-  * Add customization demo
-    - Consider making customized text styled slightly differently -- react-markdown probably has a way
-  * Fix the flashing
+  * Bugs with customization
+    - Prefs don't update until refresh.  Need to propagate state or use context
+    - Consider making customized text styled slightly differently
+    - Fix the flashing
+    - Can't click footnote links
   * Missing footnotes  
   * Chapter 1
+  * Demo ideas: 
+    - Flash card app embedded
+    - English to code to UI?  Make buttons and stuff?
 */
 
 import * as React from 'react';
@@ -249,7 +254,7 @@ Using the widget below, you can begin to customize the textbook.  (Don't stress 
     {`You can click any of these paragraphs (including this one) to rewrite it according to the preferences you've selected in the box above.
 
 
-Like many of you, I have vivid memories of experiencing first-hand education at its worst.  
+Like many of you, I have vivid memories of experiencing first-hand education at its worst.
 
 As a child with crippling anxiety and a penchant for daydreaming, I was constantly in trouble for not paying attention, for not doing my homework, for not following directions, and for not being able to sit still.  Also, having a minor disability in my hands, I experienced excruciating cramps when writing by hand -- a pain that 1) I was forced to engage in despite my protests, and for which 2) I recieved no obvious results, aside from my own barely legible pencil scrawls and poor grades for penmanship.
 

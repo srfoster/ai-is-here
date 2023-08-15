@@ -393,6 +393,7 @@ let useGpt = ({prompt, onParagraph}) => {
   },[response.split("\n").length]);
 
   let startStreaming = async () => {
+    console.log("prompt", prompt)
     let response = await fetch(url, { method: "POST", body: JSON.stringify({ credits: "ABXLDLE", role: "user", content: prompt}) });
     let streamResponse = response.body;
     let reader = streamResponse.getReader();
@@ -428,7 +429,7 @@ export let GPT = ({prompt, repaginate}) => {
 }
 
 let useReaderPrefersBullets = () => {
-  let key = "I prefer bullets to paragraphs" 
+  let key = "Rewrite paragraphs as bullets" 
 
   let [getter, setter] = useLocalStorage(key, false)
 
@@ -436,7 +437,7 @@ let useReaderPrefersBullets = () => {
 }
 
 let useReaderPrefersShortSentences = () => {
-  let key = "I prefer short sentences" 
+  let key = "Rewrite sentences to be as short as possible" 
 
   let [getter, setter] = useLocalStorage(key, false)
 
@@ -449,6 +450,17 @@ let useReaderPreferences = () => {
   let [likesShortSentences, setLikesShortSentences, likesShortSentencesKey] = useReaderPrefersShortSentences()
   
   return {[likesBulletsKey]: likesBullets, [likesShortSentencesKey]: likesShortSentences}
+}
+
+let stringifyPrefs = (prefs)=>{
+  console.log("prefs", prefs)
+  let s = [];
+ 
+  for(let key of Object.keys(prefs)){
+    if(prefs[key]) s.push(key)
+  }
+
+  return s.join(". ") + "."
 }
 
 export let CustomizationWidget = ({ }) => {
@@ -501,12 +513,13 @@ export let CustomizedText = ({ children, repaginate}) => {
 export let RewritableParagraph= ({ children, repaginate}) => {
   let prefs = useReaderPreferences()
 
-  let [response, startStreaming] = useGpt({prompt: "Rewrite each of the following paragraphs for a reader who prefers bullet points and short sentences```" + children + "```", onParagraph: ()=> repaginate({anchor: response.substring(response.length - 100) })
+  let [response, startStreaming] = useGpt({prompt: stringifyPrefs(prefs) + "  Rewrite the following accordingly ```" +  children + "```", onParagraph: ()=> repaginate({anchor: response.substring(response.length - 100) })
   })
 
   return <>
-    <span style={{border: "1px solid red"}} onClick={startStreaming}>
-      <ReactMarkdown>{response || children}</ReactMarkdown> 
+    <span style={{cursor: "pointer"}} onClick={startStreaming}>
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{response ? "~" + children.trim() + "~" : children}</ReactMarkdown> 
+      <ReactMarkdown>{response}</ReactMarkdown> 
     </span>
   </>
 }
