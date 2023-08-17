@@ -59,6 +59,7 @@ export function EReader({ content, footnotes }) {
   const [windowWidth, windowHeight] = useWindowSize()
 
   const outerRef = React.useRef(null);
+  const middleRef = React.useRef(null);
   const ref = React.useRef(null);
 
   const previousPage = React.useRef(-1);
@@ -123,10 +124,11 @@ export function EReader({ content, footnotes }) {
   React.useEffect(() => {
     if (ref.current) {
       let nodes = [...ref.current.childNodes].filter(x => x.style)
-      let parentRect = ref.current.getBoundingClientRect()
+      let parentRect = outerRef.current.getBoundingClientRect()
       let maxPagePixelHeight = parentRect.height 
 
       setReaderHeight(maxPagePixelHeight)
+      console.log("Reader Height", maxPagePixelHeight)
       setReaderWidth(outerRef.current.getBoundingClientRect().width)
 
       let lengths = []
@@ -168,11 +170,18 @@ export function EReader({ content, footnotes }) {
       if(numElementsOnCurrentPage > 0)
         lengths.push(numElementsOnCurrentPage)
 
+      console.log("calculated lengths", lengths)
       setPageLengths(lengths)
     }
   }, [lastRecalc]);
 
+  /*
+  React.useEffect(() => {
+  }, [pageLengths])
+  */
+
   const repaginate = ({anchor})=> {
+
     setLastRecalc(new Date()) 
   }
 
@@ -226,12 +235,15 @@ export function EReader({ content, footnotes }) {
         <Box
           ref={outerRef}
           style={{
-            width: "100%", height: "100vh", display: "flex", flexDirection: "column", overflowX: "hidden"
+            width: "100%", height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden"
       }}>
           <animated.div ref={ref} style={{
             overflow: "hidden", 
-            width: "1000%",
+            height: readerHeight,
+            width: "1000%", 
             columnCount: 10,
+            //width: (pageLengths.length * 100) + "%",
+            //columnCount: pageLengths.length,
             ... animatedPageMarginOffsetProps,
           }} >
             {content.map(
