@@ -33,6 +33,8 @@ import { useSwipeable } from "react-swipeable";
 import Modal from '@mui/material/Modal';
 import remarkGfm from 'remark-gfm'
 
+import { animated, useSpring } from '@react-spring/web'
+
 
 const modalStyle = {
   position: 'absolute',
@@ -50,35 +52,42 @@ export function EReader({ content, footnotes }) {
   let [textAnchor, setTextAnchor] = React.useState(null)
   let [page, setPage] = useLocalStorage("current-page",1)
   let [pageLengths, setPageLengths] = React.useState([])
+  let [readerHeight, setReaderHeight] = React.useState(undefined)
+  let [readerWidth, setReaderWidth] = React.useState(undefined)
   let [lastRecalc, setLastRecalc] = React.useState(new Date())
   let [showFootnote, setShowFootnote] = React.useState(null)
   const [windowWidth, windowHeight] = useWindowSize()
 
+  const outerRef = React.useRef(null);
   const ref = React.useRef(null);
+
+  const previousPage = React.useRef(-1);
+  let [pageMarginOffset, setPageMarginOffset] = React.useState(0)
+  let [pageMarginOffsetTarget, setPageMarginOffsetTarget] = React.useState(0)
+
+  const [animatedPageMarginOffsetProps, api] = useSpring(() => ({
+    from: {
+      marginLeft: isNaN(pageMarginOffset) ? 0 : pageMarginOffset,
+    },
+    to: {
+      marginLeft: isNaN(pageMarginOffsetTarget) ? 0 : pageMarginOffsetTarget,
+    },
+  }), [pageMarginOffset, pageMarginOffsetTarget])
+
 
   const nextPage = () => {
     if (page < pageLengths.length){
-      //Anchor some text whenever we turn the page,
-      // helps us find our place again after repagination
-      let nodes = pageNodes(page+1,pageLengths)
-      /*
-      if(nodes)
-        setTextAnchor(nodes[0].textContent.substring(0,100))
-        */
+      previousPage.current = page;
       setPage(page + 1)
+      setPageMarginOffsetTarget(pageMarginOffsetTarget - readerWidth)
     }
   }
 
   const prevPage = () => {
     if (page > 1){
-      //Anchor some text whenever we turn the page,
-      // helps us find our place again after repagination
-      let nodes = pageNodes(page-1,pageLengths)
-      /*
-      if(nodes)
-        setTextAnchor(nodes[0].textContent.substring(0,100))
-        */
+      previousPage.current = page;
       setPage(page - 1)
+      setPageMarginOffsetTarget(pageMarginOffsetTarget + readerWidth)
     }
   }
 
@@ -88,27 +97,27 @@ export function EReader({ content, footnotes }) {
   });
 
 
-    React.useEffect(() => {
-      if(!ref.current) return
+  React.useEffect(() => {
+    if (!ref.current) return
 
-        let as = ref.current.querySelectorAll("a")
+    let as = ref.current.querySelectorAll("a")
 
-        for (let a of as) {
-            let parts = a.getAttribute("href").split("/")
-            let footnoteKey = parts[parts.length - 1]
-            a.style.cursor = "pointer"
-            a.style.color = "blue"
-            a.style.textDecoration = "underline"
-            a.addEventListener("click", (e) => {
-                if (!showFootnote) {
-                    setShowFootnote(footnoteKey) 
-                } else {
-                    setShowFootnote(null)
-                }
-                e.preventDefault()
-            })
+    for (let a of as) {
+      let parts = a.getAttribute("href").split("/")
+      let footnoteKey = parts[parts.length - 1]
+      a.style.cursor = "pointer"
+      a.style.color = "blue"
+      a.style.textDecoration = "underline"
+      a.addEventListener("click", (e) => {
+        if (!showFootnote) {
+          setShowFootnote(footnoteKey)
+        } else {
+          setShowFootnote(null)
         }
-  },[])
+        e.preventDefault()
+      })
+    }
+  }, [])
 
   //Get off the ground: Calculate page lengths
   React.useEffect(() => {
@@ -117,8 +126,8 @@ export function EReader({ content, footnotes }) {
       let parentRect = ref.current.getBoundingClientRect()
       let maxPagePixelHeight = parentRect.height 
 
-      //console.log("Max page height", maxPagePixelHeight)
-
+      setReaderHeight(maxPagePixelHeight)
+      setReaderWidth(outerRef.current.getBoundingClientRect().width)
 
       let lengths = []
       let numElementsOnCurrentPage = 0 
@@ -140,16 +149,6 @@ export function EReader({ content, footnotes }) {
         let rect = element.getBoundingClientRect()
         let currentElementPixelHeight = rect.height 
 
-        //Ensures we don't have any unpaginatable elements
-        if(currentElementPixelHeight > maxPagePixelHeight - fuzz) {
-          currentElementPixelHeight = maxPagePixelHeight - fuzz
-
-          //setting the height is weird if the element's content goes away (e.g. user regenerates some GPT text).  But on the other hand, it has the nice property that it keeps the user on the same page (because the element doesn't get any smaller).  Least of two evils.
-          element.style.height = (maxPagePixelHeight - fuzz) + "px"
-          element.style.maxHeight = (maxPagePixelHeight - fuzz) + "px"
-          element.style.overflowY = "scroll"
-        }
-
         if (currentPagePixelHeight + currentElementPixelHeight <= maxPagePixelHeight - fuzz) {
          // console.log("Adding",currentPagePixelHeight, element)
           numElementsOnCurrentPage += 1
@@ -169,26 +168,12 @@ export function EReader({ content, footnotes }) {
       if(numElementsOnCurrentPage > 0)
         lengths.push(numElementsOnCurrentPage)
 
-      //console.log("Elements assigned to pages", lengths.reduce((sum, x) => sum + x, 0))
-      //console.log("Page lengths", lengths)
       setPageLengths(lengths)
-
-      /*
-      if(textAnchor){
-        let i = pageIndexContaining(textAnchor, lengths)
-        //console.log("Page with anchor", textAnchor, "is", i)
-        if(i)
-          setPage(i + 1)
-      }
-      */
     }
   }, [lastRecalc]);
 
-
   const repaginate = ({anchor})=> {
     setLastRecalc(new Date()) 
-    if(anchor)
-      setTextAnchor(anchor)
   }
 
   const pageNodes = (pageI, pageLengths) => {
@@ -238,13 +223,16 @@ export function EReader({ content, footnotes }) {
       <Container maxWidth="sm"
           {...swipeHandlers} 
       >
-        <Box style={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column", 
+        <Box
+          ref={outerRef}
+          style={{
+            width: "100%", height: "100vh", display: "flex", flexDirection: "column", overflowX: "hidden"
       }}>
-          <Box ref={ref} style={{
+          <animated.div ref={ref} style={{
             overflow: "hidden", 
-            marginTop: 20,
-            columnCount: 2, 
-            columnWidth: 1200
+            width: "1000%",
+            columnCount: 10,
+            ... animatedPageMarginOffsetProps,
           }} >
             {content.map(
               (x, i) => {
@@ -257,7 +245,7 @@ export function EReader({ content, footnotes }) {
 
                 return x
               })}
-          </Box>
+          </animated.div>
           <Box style={
             {
               display: "flex",
