@@ -61,8 +61,10 @@ export function EReader({ content, footnotes }) {
       //Anchor some text whenever we turn the page,
       // helps us find our place again after repagination
       let nodes = pageNodes(page+1,pageLengths)
+      /*
       if(nodes)
         setTextAnchor(nodes[0].textContent.substring(0,100))
+        */
       setPage(page + 1)
     }
   }
@@ -72,8 +74,10 @@ export function EReader({ content, footnotes }) {
       //Anchor some text whenever we turn the page,
       // helps us find our place again after repagination
       let nodes = pageNodes(page-1,pageLengths)
+      /*
       if(nodes)
         setTextAnchor(nodes[0].textContent.substring(0,100))
+        */
       setPage(page - 1)
     }
   }
@@ -85,6 +89,8 @@ export function EReader({ content, footnotes }) {
 
 
     React.useEffect(() => {
+      if(!ref.current) return
+
         let as = ref.current.querySelectorAll("a")
 
         for (let a of as) {
@@ -111,13 +117,8 @@ export function EReader({ content, footnotes }) {
       let parentRect = ref.current.getBoundingClientRect()
       let maxPagePixelHeight = parentRect.height 
 
-      //Hide all elements
-      for(let i = 0; i < nodes.length; i++) {
-        let element = nodes[i]
-        element.style.display = "block"
-        element.style.visibility = "hidden"
+      //console.log("Max page height", maxPagePixelHeight)
 
-      }
 
       let lengths = []
       let numElementsOnCurrentPage = 0 
@@ -126,6 +127,8 @@ export function EReader({ content, footnotes }) {
       //console.log("Total elements", nodes.length)
 
       let fuzz = 20 // Keeps things from being clipped (I guess this is currently a magic number that equals the top padding of the text container.  Should de-magic it.)
+
+      //console.log("calc page lengths", nodes)
 
       let iters = 0
       for(let i = 0; i < nodes.length; i++) {
@@ -148,11 +151,11 @@ export function EReader({ content, footnotes }) {
         }
 
         if (currentPagePixelHeight + currentElementPixelHeight <= maxPagePixelHeight - fuzz) {
-          //console.log("Adding",element)
+         // console.log("Adding",currentPagePixelHeight, element)
           numElementsOnCurrentPage += 1
           currentPagePixelHeight += currentElementPixelHeight
         } else {
-          //console.log("Heights", currentPagePixelHeight + currentElementPixelHeight, maxPagePixelHeight)
+         // console.log("Heights", currentPagePixelHeight + currentElementPixelHeight, maxPagePixelHeight)
           lengths.push(numElementsOnCurrentPage)
 
           numElementsOnCurrentPage = 0
@@ -170,60 +173,17 @@ export function EReader({ content, footnotes }) {
       //console.log("Page lengths", lengths)
       setPageLengths(lengths)
 
+      /*
       if(textAnchor){
         let i = pageIndexContaining(textAnchor, lengths)
         //console.log("Page with anchor", textAnchor, "is", i)
         if(i)
           setPage(i + 1)
       }
+      */
     }
   }, [lastRecalc]);
 
-
-  React.useEffect(() => {
-    if(!pageLengths) return
-
-    if (ref.current) {
-      let nodes = [...ref.current.childNodes].filter(x => x.style)
-
-      let pageIndex = page - 1
-
-      let startElement; 
-
-      startElement = pageLengths.slice(0, pageIndex).reduce((sum, x) => sum + x, 0) 
-
-      let endElement
-      endElement = startElement + pageLengths[pageIndex]
-
-      //console.log("page turn", pageIndex, startElement, endElement, pageLengths)
-
-      //Hide everything before the page
-      for (let i = 0; i < startElement; i++) {
-        let element = nodes[i]
-        //console.log("Hiding", i,  element)
-        element.style.display = "none"
-        element.style.visibility = "hidden"
-      }
-
-      //Show everything on the page
-      for (let i = startElement; i < endElement; i++) {
-        let element = nodes[i]
-        //console.log("Showing", i, element)
-
-        element.style.display = "block"
-        element.style.visibility = "visible"
-      }
-
-      //Hide everything after the page
-      for (let i = endElement; i < nodes.length; i++) {
-        let element = nodes[i]
-        //console.log("Hiding", i, element)
-
-        element.style.display = "none"
-        element.style.visibility = "hidden"
-      }
-    }
-  }, [pageLengths, page])
 
   const repaginate = ({anchor})=> {
     setLastRecalc(new Date()) 
@@ -231,19 +191,23 @@ export function EReader({ content, footnotes }) {
       setTextAnchor(anchor)
   }
 
-  const pageNodes = (page, pageLengths) => {
+  const pageNodes = (pageI, pageLengths) => {
+    if(!ref.current) return []
+    if(!pageLengths) return []
+
     let nodes = [...ref.current.childNodes].filter(x => x.style)
     for(let i = 0; i < pageLengths.length; i++) {
       let length = pageLengths[i]
       let slice = nodes.slice(0, length)
       nodes.splice(0, length)
 
-      if(i == page - 1) {
+      if(i == pageI - 1) {
         return slice
       }
     }
 
-    return undefined;
+
+    return [];
   }
 
   const pageIndexContaining = (text, lengths) => {
@@ -274,23 +238,23 @@ export function EReader({ content, footnotes }) {
       <Container maxWidth="sm"
           {...swipeHandlers} 
       >
-        <Box style={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column"}}>
-          <Box ref={ref}  style={{
-            flexGrow: 1, overflow: "hidden", textOverflow: "ellipsis", display: "block", width: "100%",
-            whiteSpace: "unset",
+        <Box style={{ width: "100%", height: "100vh", display: "flex", flexDirection: "column", 
+      }}>
+          <Box ref={ref} style={{
+            overflow: "hidden", 
             marginTop: 20,
-          }}
-          
-          >
+            columnCount: 2, 
+            columnWidth: 1200
+          }} >
             {content.map(
               (x, i) => {
                 //console.log(x)
                 if (typeof (x) == "string")
                   return <ReactMarkdown key={i}>{x}</ReactMarkdown>
-                
+
                 if (typeof (x) == "function")
                   return x({ repaginate })
-                
+
                 return x
               })}
           </Box>
@@ -453,7 +417,7 @@ let useReaderPreferences = () => {
 }
 
 let stringifyPrefs = (prefs)=>{
-  console.log("prefs", prefs)
+  //console.log("prefs", prefs)
   let s = [];
  
   for(let key of Object.keys(prefs)){

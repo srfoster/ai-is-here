@@ -5,6 +5,7 @@
     - Consider making customized text styled slightly differently
     - Fix the flashing
     - Can't click footnote links
+  * Another section showing an edgier use of AI (to censor and rewrite certain things accoring to overarching dystopian worldviews...  Flat earth.  Racism.  Alt-right.  Newspeak.)  
   * Missing footnotes  
   * Chapter 1
   * Demo ideas: 
