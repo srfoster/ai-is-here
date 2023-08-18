@@ -1,5 +1,5 @@
 /*TODO
-  * Fix pagination:  What if element is too long?  Also, can we get put on the wrong page?  Or on a non-existent page?
+  * Fix repagination.  How to calculate the new height of the text?  If we knew what element was added, we could add its height to total height.  But if an element grew, we would need to know its previous height.  Maybe we can store this on the nodes themselves?  Then a recalculation pass can look at all the previous heights, detect differences, and update the total height. 
   * More content!
   * Notes for next revision:
     - Context window applies to large code bases, not just novels
@@ -49,22 +49,27 @@ const modalStyle = {
 };
 
 export function EReader({ content, footnotes }) {
-  let [textAnchor, setTextAnchor] = React.useState(null)
   let [page, setPage] = useLocalStorage("current-page",1)
-  let [pageLengths, setPageLengths] = React.useState([])
   let [readerHeight, setReaderHeight] = React.useState(undefined)
   let [readerWidth, setReaderWidth] = React.useState(undefined)
   let [lastRecalc, setLastRecalc] = React.useState(new Date())
   let [showFootnote, setShowFootnote] = React.useState(null)
+  let [totalTextHeight, setTotalTextHeight] = React.useState(null)
   const [windowWidth, windowHeight] = useWindowSize()
 
   const outerRef = React.useRef(null);
-  const middleRef = React.useRef(null);
+  const pageCalcDivRef = React.useRef(null);
   const ref = React.useRef(null);
 
   const previousPage = React.useRef(-1);
   let [pageMarginOffset, setPageMarginOffset] = React.useState(0)
   let [pageMarginOffsetTarget, setPageMarginOffsetTarget] = React.useState(0)
+
+  React.useEffect(() => {
+    if(page > 1 && readerWidth){
+      setPageMarginOffsetTarget((page - 1) * -readerWidth)
+    }
+  },[readerWidth])
 
   const [animatedPageMarginOffsetProps, api] = useSpring(() => ({
     from: {
@@ -77,12 +82,14 @@ export function EReader({ content, footnotes }) {
 
 
   const nextPage = () => {
-    if (page < pageLengths.length){
+    if (page < totalPages()){
       previousPage.current = page;
       setPage(page + 1)
       setPageMarginOffsetTarget(pageMarginOffsetTarget - readerWidth)
     }
   }
+
+
 
   const prevPage = () => {
     if (page > 1){
@@ -122,58 +129,18 @@ export function EReader({ content, footnotes }) {
 
   //Get off the ground: Calculate page lengths
   React.useEffect(() => {
-    if (ref.current) {
-      let nodes = [...ref.current.childNodes].filter(x => x.style)
-      let parentRect = outerRef.current.getBoundingClientRect()
-      let maxPagePixelHeight = parentRect.height 
-
-      setReaderHeight(maxPagePixelHeight)
-      console.log("Reader Height", maxPagePixelHeight)
-      setReaderWidth(outerRef.current.getBoundingClientRect().width)
-
-      let lengths = []
-      let numElementsOnCurrentPage = 0 
-      let currentPagePixelHeight = 0 
-
-      //console.log("Total elements", nodes.length)
-
-      let fuzz = 20 // Keeps things from being clipped (I guess this is currently a magic number that equals the top padding of the text container.  Should de-magic it.)
-
-      //console.log("calc page lengths", nodes)
-
-      let iters = 0
-      for(let i = 0; i < nodes.length; i++) {
-        iters++;
-        if(iters> 1000) break; //To ease develpment: Infinite loop protection
-
-        let element = nodes[i]
-
-        let rect = element.getBoundingClientRect()
-        let currentElementPixelHeight = rect.height 
-
-        if (currentPagePixelHeight + currentElementPixelHeight <= maxPagePixelHeight - fuzz) {
-         // console.log("Adding",currentPagePixelHeight, element)
-          numElementsOnCurrentPage += 1
-          currentPagePixelHeight += currentElementPixelHeight
-        } else {
-         // console.log("Heights", currentPagePixelHeight + currentElementPixelHeight, maxPagePixelHeight)
-          lengths.push(numElementsOnCurrentPage)
-
-          numElementsOnCurrentPage = 0
-          currentPagePixelHeight = 0
-
-          //console.log("**********NEXT PAGE**********")
-          i--; //Current element will be on next page.  Process it again.
-        }
-      }
-
-      if(numElementsOnCurrentPage > 0)
-        lengths.push(numElementsOnCurrentPage)
-
-      console.log("calculated lengths", lengths)
-      setPageLengths(lengths)
+    if (!pageCalcDivRef.current) {
+      return
     }
-  }, [lastRecalc]);
+    let parentRect = outerRef.current.getBoundingClientRect()
+    let maxPagePixelHeight = parentRect.height 
+
+    setReaderHeight(maxPagePixelHeight)
+    console.log("Reader Height", maxPagePixelHeight)
+    setReaderWidth(outerRef.current.getBoundingClientRect().width)
+
+    setTotalTextHeight(pageCalcDivRef.current.getBoundingClientRect().height)
+  }, [pageCalcDivRef.current]);
 
   /*
   React.useEffect(() => {
@@ -227,6 +194,22 @@ export function EReader({ content, footnotes }) {
      repaginate({})
   }, [windowWidth, windowHeight])
 
+  let totalPages = () => {
+    let fudgeFactor = 2 // Column-count will nudge content onto the next page, so we need to add a little extra.  Not sure how to calculate this ahead of time.  5 extra pages should be plenty...
+    return Math.floor(totalTextHeight / readerHeight) + fudgeFactor
+  }
+  
+  let stuff = content.map((x, i) => {
+                //console.log(x)
+                if (typeof (x) == "string")
+                  return <ReactMarkdown key={i}>{x}</ReactMarkdown>
+
+                if (typeof (x) == "function")
+                  return x({ repaginate })
+
+                return x
+              })
+
   return (
     <>
       <Container maxWidth="sm"
@@ -237,27 +220,25 @@ export function EReader({ content, footnotes }) {
           style={{
             width: "100%", height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden"
       }}>
-          <animated.div ref={ref} style={{
-            overflow: "hidden", 
-            height: readerHeight,
-            width: "1000%", 
-            columnCount: 10,
-            //width: (pageLengths.length * 100) + "%",
-            //columnCount: pageLengths.length,
-            ... animatedPageMarginOffsetProps,
-          }} >
-            {content.map(
-              (x, i) => {
-                //console.log(x)
-                if (typeof (x) == "string")
-                  return <ReactMarkdown key={i}>{x}</ReactMarkdown>
-
-                if (typeof (x) == "function")
-                  return x({ repaginate })
-
-                return x
-              })}
-          </animated.div>
+          {totalTextHeight == undefined ?
+            //Put it in a big long div to calculate the pages
+            <div ref={pageCalcDivRef} >
+              Calculating...
+              {stuff}
+            </div> :
+            //Then put it in the fancy animated reader
+            <animated.div ref={ref} style={{
+              overflow: "hidden",
+              height: readerHeight,
+              width: (totalPages()*100)+"%",
+              columnCount: totalPages(),
+              //width: (pageLengths.length * 100) + "%",
+              //columnCount: pageLengths.length,
+              ...animatedPageMarginOffsetProps,
+            }} >
+              {stuff}
+            </animated.div>
+          }
           <Box style={
             {
               display: "flex",
@@ -266,7 +247,7 @@ export function EReader({ content, footnotes }) {
               borderTop: "1px solid gray",
               padding: 5
             }}>
-            <SimplePagination count={pageLengths.length}
+            <SimplePagination count={totalPages()}
               page={page}
               prev={prevPage}
               next={nextPage}
