@@ -309,7 +309,7 @@ We are watching the educational "big bang" unfold -- an explosion in slow motion
 
 **That's all for now!**
 
-If you'd like to be notified when I update this book, please [email me](mailto:stephen@thoughtstem.com) and I'll add you to my mailing list.  Althernatively, you can subscribe to the [GitHub repo](https://github.com/srfoster/ai-is-here), although I can't promise that I'll only push updates to the book.  I'm a programmer, so I'll be pushing code to the repo as well.
+If you'd like to be notified when I update this book, please [email me](mailto:stephen@thoughtstem.com) and I'll add you to my mailing list.  Althernatively, you can subscribe to the [GitHub repo](https://github.com/srfoster/ai-is-here) to get notified of updates to the text or the underlying code.
 
 **Acknolwedgements**
 
@@ -318,6 +318,8 @@ Special thanks to the following people for their contributions to this book:
 * **Lindsey Handley**, for being generally awesome and for helping me edit this book.
 
 
+
+## The End
   `]
 
 let footnotes = {

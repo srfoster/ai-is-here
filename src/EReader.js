@@ -33,7 +33,7 @@ import { useSwipeable } from "react-swipeable";
 import Modal from '@mui/material/Modal';
 import remarkGfm from 'remark-gfm'
 
-import { animated, useSpring } from '@react-spring/web'
+import { animated, to, useSpring } from '@react-spring/web'
 
 
 const modalStyle = {
@@ -52,7 +52,8 @@ export function EReader({ content, footnotes }) {
   let [page, setPage] = useLocalStorage("current-page",1)
   let [readerHeight, setReaderHeight] = React.useState(undefined)
   let [readerWidth, setReaderWidth] = React.useState(undefined)
-  let [lastRecalc, setLastRecalc] = React.useState(new Date())
+  let [lastExpandRecalc, setLastExpandRecalc] = React.useState(new Date())
+  let [lastShrinkRecalc, setLastShrinkRecalc] = React.useState(new Date())
   let [showFootnote, setShowFootnote] = React.useState(null)
   let [totalTextHeight, setTotalTextHeight] = React.useState(null)
   const [windowWidth, windowHeight] = useWindowSize()
@@ -89,8 +90,6 @@ export function EReader({ content, footnotes }) {
     }
   }
 
-
-
   const prevPage = () => {
     if (page > 1){
       previousPage.current = page;
@@ -103,7 +102,6 @@ export function EReader({ content, footnotes }) {
     onSwipedRight: (eventData) => prevPage(),
     onSwipedLeft: (eventData) => nextPage(),
   });
-
 
   React.useEffect(() => {
     if (!ref.current) return
@@ -140,6 +138,7 @@ export function EReader({ content, footnotes }) {
     setReaderWidth(outerRef.current.getBoundingClientRect().width)
 
     setTotalTextHeight(pageCalcDivRef.current.getBoundingClientRect().height)
+
   }, [pageCalcDivRef.current]);
 
   /*
@@ -148,9 +147,72 @@ export function EReader({ content, footnotes }) {
   */
 
   const repaginate = ({anchor})=> {
+    if(!ref.current) return
 
-    setLastRecalc(new Date()) 
+    setLastShrinkRecalc(new Date())
+
   }
+
+  React.useEffect(() => {
+    //Kick off the recalculation process
+    let timeout = setTimeout(() => {
+      setLastShrinkRecalc(new Date())
+
+      let nodes = [...ref.current.childNodes].filter(x => x.style)
+      let lastNodeOnFirstPage;
+      for(let i = 0; i < nodes.length; i++){
+        if(nodes[i].getBoundingClientRect().x > nodes[0].getBoundingClientRect().x){
+          lastNodeOnFirstPage = nodes[i-1]
+          break
+        }
+      }
+      
+      let lastNodeOnFirstPageRect = lastNodeOnFirstPage.getBoundingClientRect()
+
+      if(readerHeight - (lastNodeOnFirstPageRect.y + lastNodeOnFirstPage.height) > 10){
+        //We have too many pages
+        setTotalTextHeight(totalTextHeight - readerHeight)
+        setLastShrinkRecalc(new Date())
+      } else {
+        //We've shrunk enough, so start expanding
+        //setLastExpandRecalc(new Date())
+      }
+
+    }, 10)
+
+    return () => { clearTimeout(timeout) }
+
+  }, [lastShrinkRecalc])
+
+  React.useEffect(() => {
+    if(!ref.current) return
+
+    //Now we need to determine if this node would be off the screen if we were on the last page...
+
+    let timeout = setTimeout(() => {
+
+    let pagesRemaining = totalPages() - page
+    let pageWidth = readerWidth
+    let marginLeft = outerRef.current.getBoundingClientRect().x
+
+    let nodes = [...ref.current.childNodes].filter(x => x.style)
+    let lastNode = nodes[nodes.length - 1]
+    let lastNodeX = lastNode.getBoundingClientRect().x
+    //console.log({lastNodeX, pagesRemaining, marginLeft, lastPageX: (pageWidth * pagesRemaining) + marginLeft})
+    let lastNodeIsOffLastPage = lastNodeX > (pageWidth * pagesRemaining) + marginLeft + pageWidth
+
+    if(lastNodeIsOffLastPage){
+      setTotalTextHeight(
+        totalTextHeight + readerHeight 
+      )
+      setLastExpandRecalc(new Date()) 
+    }
+  },10)
+
+    return ()=>{clearTimeout(timeout)}
+
+  }, [lastExpandRecalc])
+
 
   const pageNodes = (pageI, pageLengths) => {
     if(!ref.current) return []
