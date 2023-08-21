@@ -18,22 +18,24 @@ import CardHeader from '@mui/material/CardHeader';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import Stack from '@mui/material/Stack';
-import Switch from '@mui/material/Switch';
+import Fade from '@mui/material/Fade';
+import Modal from '@mui/material/Modal';
 
 import '@fontsource/roboto/400.css';
 
 import {useLocalStorage} from 'react-use'
 import Confetti from 'react-confetti'
+
+import remarkGfm from 'remark-gfm'
+import { useThemeProps } from '@mui/material';
+
+/*
 import {
   useWindowSize,
 } from '@react-hook/window-size'
 import { useSwipeable } from "react-swipeable";
-
-import Modal from '@mui/material/Modal';
-import remarkGfm from 'remark-gfm'
-
 import { animated, to, useSpring } from '@react-spring/web'
+*/
 
 
 const modalStyle = {
@@ -48,63 +50,52 @@ const modalStyle = {
   p: 4,
 };
 
-export function EReader({ content, footnotes }) {
-  let [page, setPage] = useLocalStorage("current-page",1)
-  let [readerHeight, setReaderHeight] = React.useState(undefined)
-  let [readerWidth, setReaderWidth] = React.useState(undefined)
-  let [lastExpandRecalc, setLastExpandRecalc] = React.useState(new Date())
-  let [lastShrinkRecalc, setLastShrinkRecalc] = React.useState(new Date())
-  let [showFootnote, setShowFootnote] = React.useState(null)
-  let [totalTextHeight, setTotalTextHeight] = React.useState(null)
-  const [windowWidth, windowHeight] = useWindowSize()
+export default function useOnScreen(ref) {
+  const [isIntersecting, setIntersecting] = React.useState(false)
 
-  const outerRef = React.useRef(null);
-  const pageCalcDivRef = React.useRef(null);
-  const ref = React.useRef(null);
+  const observer = React.useMemo(() => new IntersectionObserver(
+    ([entry]) => {
+      setIntersecting(entry.isIntersecting)
+    }
+  ), [ref])
 
-  const previousPage = React.useRef(-1);
-  let [pageMarginOffset, setPageMarginOffset] = React.useState(0)
-  let [pageMarginOffsetTarget, setPageMarginOffsetTarget] = React.useState(0)
 
   React.useEffect(() => {
-    if(page > 1 && readerWidth){
-      setPageMarginOffsetTarget((page - 1) * -readerWidth)
-    }
-  },[readerWidth])
+    observer.observe(ref.current)
+    return () => observer.disconnect()
+  }, [])
 
-  const [animatedPageMarginOffsetProps, api] = useSpring(() => ({
-    from: {
-      marginLeft: isNaN(pageMarginOffset) ? 0 : pageMarginOffset,
-    },
-    to: {
-      marginLeft: isNaN(pageMarginOffsetTarget) ? 0 : pageMarginOffsetTarget,
-    },
-  }), [pageMarginOffset, pageMarginOffsetTarget])
+  return isIntersecting
+}
 
+export function FadeInOnDiscover({ children}) {
+  const ref = React.useRef(null);
+  const isIntersecting = useOnScreen(ref);
+  const [doFun, setDoFun] = React.useState(false)
 
-  const nextPage = () => {
-    if (page < totalPages()){
-      previousPage.current = page;
-      setPage(page + 1)
-      setPageMarginOffsetTarget(pageMarginOffsetTarget - readerWidth)
-    }
-  }
+  React.useEffect(() => {
+    if(!isIntersecting) return
 
-  const prevPage = () => {
-    if (page > 1){
-      previousPage.current = page;
-      setPage(page - 1)
-      setPageMarginOffsetTarget(pageMarginOffsetTarget + readerWidth)
-    }
-  }
+    setTimeout(() => { 
+      setDoFun(true) 
+    }, 1000)
+  },[isIntersecting])
 
-  const swipeHandlers = useSwipeable({
-    onSwipedRight: (eventData) => prevPage(),
-    onSwipedLeft: (eventData) => nextPage(),
-  });
+  return <Fade in={doFun}>
+    <div ref={ref}>{ children}</div>
+  </Fade>
+}
+
+export function EReader({ content, footnotes }) {
+  let [page, setPage] = useLocalStorage("current-page",1)
+  let [showFootnote, setShowFootnote] = React.useState(null)
+
+  const outerRef = React.useRef(null);
+  const ref = React.useRef(null);
 
   React.useEffect(() => {
     if (!ref.current) return
+    console.log("Transforming footnote links")
 
     let as = ref.current.querySelectorAll("a")
 
@@ -123,199 +114,35 @@ export function EReader({ content, footnotes }) {
         e.preventDefault()
       })
     }
-  }, [])
 
-  //Get off the ground: Calculate page lengths
-  React.useEffect(() => {
-    if (!pageCalcDivRef.current) {
-      return
-    }
-    let parentRect = outerRef.current.getBoundingClientRect()
-    let maxPagePixelHeight = parentRect.height 
+  }, [ref.current])
 
-    setReaderHeight(maxPagePixelHeight)
-    console.log("Reader Height", maxPagePixelHeight)
-    setReaderWidth(outerRef.current.getBoundingClientRect().width)
-
-    setTotalTextHeight(pageCalcDivRef.current.getBoundingClientRect().height)
-
-  }, [pageCalcDivRef.current]);
-
-  /*
-  React.useEffect(() => {
-  }, [pageLengths])
-  */
-
-  const repaginate = ({anchor})=> {
-    if(!ref.current) return
-
-    setLastShrinkRecalc(new Date())
-
-  }
-
-  React.useEffect(() => {
-    //Kick off the recalculation process
-    let timeout = setTimeout(() => {
-      setLastShrinkRecalc(new Date())
-
-      let nodes = [...ref.current.childNodes].filter(x => x.style)
-      let lastNodeOnFirstPage;
-      for(let i = 0; i < nodes.length; i++){
-        if(nodes[i].getBoundingClientRect().x > nodes[0].getBoundingClientRect().x){
-          lastNodeOnFirstPage = nodes[i-1]
-          break
-        }
-      }
-      
-      let lastNodeOnFirstPageRect = lastNodeOnFirstPage.getBoundingClientRect()
-
-      if(readerHeight - (lastNodeOnFirstPageRect.y + lastNodeOnFirstPage.height) > 10){
-        //We have too many pages
-        setTotalTextHeight(totalTextHeight - readerHeight)
-        setLastShrinkRecalc(new Date())
-      } else {
-        //We've shrunk enough, so start expanding
-        //setLastExpandRecalc(new Date())
-      }
-
-    }, 10)
-
-    return () => { clearTimeout(timeout) }
-
-  }, [lastShrinkRecalc])
-
-  React.useEffect(() => {
-    if(!ref.current) return
-
-    //Now we need to determine if this node would be off the screen if we were on the last page...
-
-    let timeout = setTimeout(() => {
-
-    let pagesRemaining = totalPages() - page
-    let pageWidth = readerWidth
-    let marginLeft = outerRef.current.getBoundingClientRect().x
-
-    let nodes = [...ref.current.childNodes].filter(x => x.style)
-    let lastNode = nodes[nodes.length - 1]
-    let lastNodeX = lastNode.getBoundingClientRect().x
-    //console.log({lastNodeX, pagesRemaining, marginLeft, lastPageX: (pageWidth * pagesRemaining) + marginLeft})
-    let lastNodeIsOffLastPage = lastNodeX > (pageWidth * pagesRemaining) + marginLeft + pageWidth
-
-    if(lastNodeIsOffLastPage){
-      setTotalTextHeight(
-        totalTextHeight + readerHeight 
-      )
-      setLastExpandRecalc(new Date()) 
-    }
-  },10)
-
-    return ()=>{clearTimeout(timeout)}
-
-  }, [lastExpandRecalc])
-
-
-  const pageNodes = (pageI, pageLengths) => {
-    if(!ref.current) return []
-    if(!pageLengths) return []
-
-    let nodes = [...ref.current.childNodes].filter(x => x.style)
-    for(let i = 0; i < pageLengths.length; i++) {
-      let length = pageLengths[i]
-      let slice = nodes.slice(0, length)
-      nodes.splice(0, length)
-
-      if(i == pageI - 1) {
-        return slice
-      }
-    }
-
-
-    return [];
-  }
-
-  const pageIndexContaining = (text, lengths) => {
-    let nodes = [...ref.current.childNodes].filter(x => x.style)
-
-    for(let i = 0; i < lengths.length; i++) {
-      let length = lengths[i]
-      let slice = nodes.slice(0, length)
-      nodes.splice(0, length)
-
-      let sliceText = slice.reduce((t, x) => t + "\n" + x.textContent, "")
-      //console.log("Slice contains?", text, sliceText, sliceText.match(text))
-
-      if(sliceText.includes(text)) {
-        return i;
-      }
-    }
-
-    return undefined
-  }
-
-  React.useEffect(() => {
-     repaginate({})
-  }, [windowWidth, windowHeight])
-
-  let totalPages = () => {
-    let fudgeFactor = 2 // Column-count will nudge content onto the next page, so we need to add a little extra.  Not sure how to calculate this ahead of time.  5 extra pages should be plenty...
-    return Math.floor(totalTextHeight / readerHeight) + fudgeFactor
-  }
-  
   let stuff = content.map((x, i) => {
                 //console.log(x)
                 if (typeof (x) == "string")
                   return <ReactMarkdown key={i}>{x}</ReactMarkdown>
 
                 if (typeof (x) == "function")
-                  return x({ repaginate })
+                  return x({ })
 
                 return x
               })
 
   return (
     <>
-      <Container maxWidth="sm"
-          {...swipeHandlers} 
-      >
+      <Container maxWidth="sm" >
         <Box
           ref={outerRef}
           style={{
-            width: "100%", height: "100vh", display: "flex", flexDirection: "column", overflow: "hidden"
+            width: "100%", display: "flex", flexDirection: "column", overflow: "hidden"
       }}>
-          {totalTextHeight == undefined ?
-            //Put it in a big long div to calculate the pages
-            <div ref={pageCalcDivRef} >
-              Calculating...
+            <div ref={ref} >
               {stuff}
-            </div> :
-            //Then put it in the fancy animated reader
-            <animated.div ref={ref} style={{
-              overflow: "hidden",
-              height: readerHeight,
-              width: (totalPages()*100)+"%",
-              columnCount: totalPages(),
-              //width: (pageLengths.length * 100) + "%",
-              //columnCount: pageLengths.length,
-              ...animatedPageMarginOffsetProps,
-            }} >
-              {stuff}
-            </animated.div>
-          }
-          <Box style={
-            {
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderTop: "1px solid gray",
-              padding: 5
-            }}>
-            <SimplePagination count={totalPages()}
-              page={page}
-              prev={prevPage}
-              next={nextPage}
-            />
-            {/* <Button onClick={repaginate}>Repaginate</Button> */}
-          </Box>
+            </div> 
+        </Box>
+        <Box style={{height:50, width: "100vw", backgroundColor:"white", position: "fixed", bottom: 0, left: 0, borderTop: "1px solid gray", paddingTop: 5}}>
+           <Container maxWidth="sm" >
+           </Container>
         </Box>
 
               <Footnote toShow={footnotes[showFootnote]}
@@ -325,33 +152,26 @@ export function EReader({ content, footnotes }) {
   );
 }
 
-let SimplePagination = ({ count, page, prev, next, anchor }) => {
-//}
-  return <Stack direction="row">
-    <Button onClick={ prev }>Prev</Button>
-    <Button disabled>Page {page} of { count }</Button>
-    <Button onClick={ next }>Next</Button>
-    {anchor}
-  </Stack>
-}
-
-export let ClickToReveal = ({contents, repaginate}) => {
+export let ClickToReveal = ({contents}) => {
   let [open, setOpen] = React.useState(false)
   let [count, setCount] = React.useState(-1)
 
-  return <Card style={{marginBottom: 15}}>
+  let ref = React.useRef(null)
+
+  return <Card ref={ref} style={{marginBottom: 15, position: "relative"}}>
     <CardContent>
       <Button onClick={() => { 
         setOpen(!open); 
         if(!open)
           setCount(count => (count + 1) % contents.length)
-        repaginate({}) }}>
+         }}>
         Press this button
       </Button>
       {open && <>
         <Confetti
             recycle={false}
-            numberOfPieces={200}
+            numberOfPieces={1000}
+            initialVelocityY={{min: 5, max: 5}}
         />
         <Typography>{[contents[count]]}</Typography>
       </>}
@@ -420,11 +240,10 @@ let useGpt = ({prompt, onParagraph}) => {
   return [response, startStreaming]
 }
 
-export let GPT = ({prompt, repaginate}) => {
-  let [response, startStreaming] = useGpt({prompt, onParagraph: ()=> repaginate({anchor: response.substring(response.length - 100) })
-  })
+export let GPT = ({prompt}) => {
+  let [response, startStreaming] = useGpt({ prompt, onParagraph: () => { } })
 
-  return <Card style={{border: "1px solid black", maxHeight: "50%", overflowY: "scroll"}}>
+  return <Card style={{border: "1px solid black"}}>
     <CardContent>
       <CardHeader subheader={prompt}
         action={
@@ -500,7 +319,7 @@ export let CustomizationWidget = ({ }) => {
   </>
 }
 
-export let CustomizedText = ({ children, repaginate}) => {
+export let CustomizedText = ({ children}) => {
   return <>
     <Card
       style={{ marginBottom: 20, border: "1px solid black" }}>
@@ -512,15 +331,16 @@ export let CustomizedText = ({ children, repaginate}) => {
       </CardContent>
     </Card>
     {children.split("\n\n").map((x, i) => <RewritableParagraph 
-      repaginate={repaginate}
       key={i}>{x}</RewritableParagraph>)}
   </>
 }
 
-export let RewritableParagraph= ({ children, repaginate}) => {
+export let RewritableParagraph= ({ children }) => {
   let prefs = useReaderPreferences()
 
-  let [response, startStreaming] = useGpt({prompt: stringifyPrefs(prefs) + "  Rewrite the following accordingly ```" +  children + "```", onParagraph: ()=> repaginate({anchor: response.substring(response.length - 100) })
+  let [response, startStreaming] = useGpt({
+    prompt: stringifyPrefs(prefs) + "  Rewrite the following accordingly ```" + children + "```", onParagraph: () => { } 
+  
   })
 
   return <>

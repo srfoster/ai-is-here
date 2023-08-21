@@ -16,7 +16,8 @@
 import * as React from 'react';
 import './App.css';
 import Typography from '@mui/material/Typography';
-import { EReader, Benchmark, ClickToReveal, GPT, CustomizationWidget, CustomizedText} from './EReader';
+import { EReader, Benchmark, ClickToReveal, GPT, CustomizedText,FadeInOnDiscover} from './EReader';
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 
 let fullText = [
   <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">Education and AI</Typography>,
@@ -52,24 +53,26 @@ Even if I could somehow convince you I wrote this myself ("Look, Ma!  No ChatGPT
 
 Lately, as an educator and writer (of much software and even a few books), I've begun using AI in my lectures and professional writing.  The more it increases my productivity, the more I find myself mulling heavy questions as I lay awake at night.  (Who will lose their jobs?  If writing can be automated, what else can?  And how must education adapt?)
 
-What follows are the answers I've found, prepared in a way that I hope will be useful to other writers, educators, students (including mine), and even just the average worrier. 
+What follows are the answers I've found, prepared in a way that I hope will be useful to other writers, educators, students (including mine), and even just the average worrier.`,
 
-#### 2.
+<FadeInOnDiscover>
+  <ReactMarkdown>{`#### 2.
 
 I understand that these topics can be heavy.  How about a quick break?
 
-If you've made it this far, then I want to let you in on a secret.  Click below to find out what it is!`,
+If you've made it this far, then I want to let you in on a secret.  Click below to find out what it is!`}
+    </ReactMarkdown>
 
-  (extraProps) => <ClickToReveal
+  <ClickToReveal
     contents={[
       `This book is interactive (so be on the lookout for Easter eggs).`,
       `You found an Easter Egg!`,
       `Okay, you can stop clicking now.  I promise there are no more Easter eggs.`
     ]}
-    {...extraProps}
-  />,
+  /></FadeInOnDiscover>,
 
-`#### 3.
+<FadeInOnDiscover>
+  <ReactMarkdown>{`#### 3.
 
 In the conversations around AI and education, many are quick to point out one of the big weaknesses of AI-writing, namely [its tendency to hallucinate and lie](/#/footnote/hallucinations).  It's true: You can't trust everything an AI says.  And it's true that educators and students should learn to look critically at the output of AI-writing tools, cross-checking as necessary.
 
@@ -80,15 +83,15 @@ Rather, of the two big flaws in AI-writing (hallucinations and incoherence), I t
 > The more text an AI generates, the less coherent it becomes.
 
 Here, for example, is a benchmark that I've been using to track the coherence of AI-writing tools:
-`,
-
-  (extraProps) => <Benchmark
+`}</ReactMarkdown>
+  <Benchmark
      name="Write a Novel" 
      goal="Get an AI to write a novel that I'd actually want to read."
      modelsTested="GPT 3.5 and GPT 4.0"
      result="FAILED"
-      {...extraProps}
-  />,
+  />
+ </FadeInOnDiscover>
+  ,
 
 `I'll admit, this benchmark might seem unfair at first glance.  Maybe I don't even like novels.  Maybe I have unreasonably high standards.  Who am I to appoint myself judge?  Look, these are valid concerns.   But if I may:
 
