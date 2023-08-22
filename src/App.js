@@ -16,30 +16,31 @@
 import * as React from 'react';
 import './App.css';
 import Typography from '@mui/material/Typography';
-import { EReader, Benchmark, ClickToReveal, GPT, CustomizedText,FadeInOnDiscover} from './EReader';
+import { EReader, Benchmark, ClickToReveal, GPT, CustomizedText,GatedSection} from './EReader';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 
 let fullText = [
-  <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">Education and AI</Typography>,
+  <>
+  <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">Education and AI</Typography>
 
-  <Typography pt={1} style={{ textAlign: "center" }} component="h2" variant="h5">By Stephen R. Foster, Ph.D. </Typography>,
+  <Typography pt={1} style={{ textAlign: "center" }} component="h2" variant="h5">By Stephen R. Foster, Ph.D. </Typography>
 
-  `
-### Introduction
+<ReactMarkdown>
+  {`### Introduction
 
 #### 0.
 
-This is a book about AI and education.  I wrote it for my present and future students and for my fellow educators.  But I hope it will be useful to anyone who is interested in the future of education in a post-AI world.
+This is a book about AI and education.  I wrote it for my present and future students and for my fellow educators.  But I hope it will be useful to anyone interested in post-AI education.  It's a wild world.
 
 #### 1.
 
-The impact of AI-assisted writing is best understood in context of two other famous technological arrivals – of machines in general and of computers in particular.
+The arrival of AI-assisted writing is best understood in the context of two other famous technological arrivals – of machines in general and of computers in particular.  Once upon a time, as the story goes, labor was something done exclusively by human hands.  Then came the factories – not all of a sudden, but pretty quickly once they got going.  The Luddites of the early 1800s did try to resist, managing to burn down a few of them.  But in the end, the factories won. 
 
-Once upon a time, as the story goes, labor was something done exclusively by human hands.  Then came the machines – not all of a sudden, but pretty quickly once they got going.  The Luddites of the early 1800s did try to resist, managing to burn down a few factories.  But in the end, the machines won.  
+Still, there were forms of human labor that were hard to mechanize.  
 
-Next (after much economic upheaval and a couple of big wars) came a very special kind of machine called the computer.  Unlike your run-of-the-mill machine, the computer could do something very important – something that had previously been a human-only form of labor: namely, **math.**
+In the mid 1900s (after much economic upheaval and a couple of big wars) came the computer, which could do something that had previously been a human-only form of labor: namely, **math.** As it turns out, a lot of cool stuff boils down to "fast math on binary numbers" – everything from putting pixels on your screen, to reading the mouse and keyboard, to making the internet work, to *Fortnite*.  Bit by bit (byte by byte), the computers secured their place in history too.
 
-To make a long story short, the digital revolution proved that a lot of cool stuff actually boiled down to "really fast math on binary numbers" – everything from putting pixels on your screen, to reading the mouse and keyboard, to making the internet work, to *Fortnite*.  Bit by bit (byte by byte), the computers won.
+Still, there were forms of human labor that were hard to mechanize.
 
 Now, [AI](/#/footnote/ai-informal) has arrived.  And by "arrived" – I mean that AI can, at times, perform what was once believed to be another human-only kind of labor: namely, **writing.**  AI-writing isn't perfect, and it can't write everything – but admit it, dear reader: 
 
@@ -51,16 +52,15 @@ Even if I could somehow convince you I wrote this myself ("Look, Ma!  No ChatGPT
 * New types of automation tend to change the nature of work.
 * When the nature of work changes, systems of education must adapt.
 
-Lately, as an educator and writer (of much software and even a few books), I've begun using AI in my lectures and professional writing.  The more it increases my productivity, the more I find myself mulling heavy questions as I lay awake at night.  (Who will lose their jobs?  If writing can be automated, what else can?  And how must education adapt?)
+Lately, as an educator and writer (of much software and even a few books), I've begun using AI in my lectures and professional writing.  The more it increases my productivity, the more I find myself mulling heavy questions as I lay awake at night.  (Who will lose their jobs?  And how must education adapt?)
 
-What follows are the answers I've found, prepared in a way that I hope will be useful to other writers, educators, students (including mine), and even just the average worrier.`,
+In my quest to find answers and present them to others, I've ended up writing the textbook you're currently reading.  I firmly believe that AI in education is here to stay -- so I hope you'll take away from this book concrete ways of using AI to enhance your life, both as a student and as an educator.  I also hope you'll take away a deeper understanding of the big picture, including the ways in which AI will disrupt the nature of human labor and the world beyond our hallowed halls.`}</ReactMarkdown>
+</>,
 
-<FadeInOnDiscover>
+<GatedSection>
   <ReactMarkdown>{`#### 2.
 
-I understand that these topics can be heavy.  How about a quick break?
-
-If you've made it this far, then I want to let you in on a secret.  Click below to find out what it is!`}
+We're still in the introduction, but how about a quick break?  If you've made it this far, then I want to let you in on a secret.  Click below to find out!`}
     </ReactMarkdown>
 
   <ClickToReveal
@@ -69,9 +69,19 @@ If you've made it this far, then I want to let you in on a secret.  Click below 
       `You found an Easter Egg!`,
       `Okay, you can stop clicking now.  I promise there are no more Easter eggs.`
     ]}
-  /></FadeInOnDiscover>,
+  />
+  
+  <ReactMarkdown>{`
+  ##
+  ##
+  
+  In fact, the intereactions in this book aren't just trivial ones.  I've built ChatGPT into it, and we'll use this to explore AI's ability to power interactive textbooks.  When you see a section like the one below, try clicking the "Ask GPT" button.`}
+    </ReactMarkdown>
+ <GPT prompt="If everything computer hardware does is actually just 'fast math on binary numbers,' is AI-writing really just math?" /> 
+  
+  </GatedSection>,
 
-<FadeInOnDiscover>
+<GatedSection>
   <ReactMarkdown>{`#### 3.
 
 In the conversations around AI and education, many are quick to point out one of the big weaknesses of AI-writing, namely [its tendency to hallucinate and lie](/#/footnote/hallucinations).  It's true: You can't trust everything an AI says.  And it's true that educators and students should learn to look critically at the output of AI-writing tools, cross-checking as necessary.
@@ -90,10 +100,8 @@ Here, for example, is a benchmark that I've been using to track the coherence of
      modelsTested="GPT 3.5 and GPT 4.0"
      result="FAILED"
   />
- </FadeInOnDiscover>
-  ,
-
-`I'll admit, this benchmark might seem unfair at first glance.  Maybe I don't even like novels.  Maybe I have unreasonably high standards.  Who am I to appoint myself judge?  Look, these are valid concerns.   But if I may:
+  <ReactMarkdown>{`
+  I'll admit, this benchmark might seem unfair at first glance.  Maybe I don't even like novels.  Maybe I have unreasonably high standards.  Who am I to appoint myself judge?  Look, these are valid concerns.   But if I may:
 
 * I'm not subjecting AI to harsher criticism than human writers have been since the birth of writing (3400 BCE).  Writing is good if readers like it.
 * Moreover, I'm not publishing these benchmarks in hopes that you'll accept my results; rather, I'm asking you to evaluate such benchmarks for yourself.
@@ -108,17 +116,14 @@ This is a living document, as any meaningful text about a moving target must ine
 
 We'll look at a lot of benchmarks in the coming pages – some easy, some hard, some passed, some failed – all of them relevant to students, educators, and humanity in general.  The reason I started with the novel-writing benchmark is that it illustrates the incoherence problem and shows us something important about the underlying technology of AI-writing – namely that the number of words a model like GPT 4.0 can "think about" is 8,000.  This is also known as its "context window."
 
-Want to test the context window for yourself?  Here's a benchmark for that:`,
-
-  (extraProps) => <Benchmark
+Want to test the context window for yourself?  Here's a benchmark for that:`}</ReactMarkdown>
+  <Benchmark
      name="Context Window" 
      goal="Get an AI to remember your name after pasting in 8,000 words of nonsense."
      modelsTested="GPT 3.5 and GPT 4.0"
      result="FAILED"
-      {...extraProps}
   />
-
-,`I mention this because it gives a sense of why the novel-writing benchmark is so hard for AI-writing tools.  To put the 8,000-word context window into perspective, the first Harry Potter novel is about 77,000 words.  An AI-writing tool that attempts to write such a book will, after the first 8000 words, begin to forget what it previously wrote.
+<ReactMarkdown>{`I mention this because it gives a sense of why the novel-writing benchmark is so hard for AI-writing tools.  To put the 8,000-word context window into perspective, the first Harry Potter novel is about 77,000 words.  An AI-writing tool that attempts to write such a book will, after the first 8000 words, begin to forget what it previously wrote.
 
 It's an open question whether an AI model's context window can be circumvented (either now or in the future). Optimists would point out that human authors don't keep every previous word in mind while writing new ones.  Thus, perhaps a clever prompter could simulate a human writing process by continually supplying the AI with a running 500-word "summary-thus-far," while asking it to generate 7,500 words at a time.  Do this 10 times and... *bam!* – you have a novel!
 
@@ -133,21 +138,21 @@ Again, maybe it's me.  Or maybe (just maybe) the labor of authoring book-length 
 This means that if I'm wrong, then two things will become instantly true:
 
 * I'll have to re-write much of this book.
-* I won't be the one doing the work.
+* I won't be the one doing the work.`
+}</ReactMarkdown>
+ </GatedSection>,
 
-#### 4.
+ <GatedSection>
+  <ReactMarkdown>{`#### 4.
 
-With one unfair benchmark out of the way, let's balance things out with a benchmark where AI performs extremely well -- namely translation.  For example, here's a benchmark that can be passed with flying colors:`,
-
-  (extraProps) => <Benchmark
+With one unfair benchmark out of the way, let's balance things out with a benchmark where AI performs extremely well -- namely translation.  For example, here's a benchmark that can be passed with flying colors:`}</ReactMarkdown>
+  <Benchmark
       name="Translate a Sentence to a New Language"
       goal="Get an AI to translate a novel from English to Spanish."
       modelsTested="GPT 3.5 and GPT 4.0" 
       result="PASSED"
       />
-
-,
-`In fact machine translation is the OG benchmark.  Back in 2017, the ground-breaking "transformer" neural network archetecture was introduced in a paper called ["Attention Is All You Need"](/#/footnote/attention-is-all-you-need).  This paper was a breakthrough in the field of natural language processing (NLP) because it showed that AI (using transformers) could translate between languages better than techniques like recurrent neural networks, which had been used for decades.  As it turned out, the same technology that performed so well at translation also performed well at many other benchmarks that boil down to "say this, but different." As a quick demonstration, here's a sentence I wrote earlier:
+<ReactMarkdown>{`In fact machine translation is the OG benchmark.  Back in 2017, the ground-breaking "transformer" neural network archetecture was introduced in a paper called ["Attention Is All You Need"](/#/footnote/attention-is-all-you-need).  This paper was a breakthrough in the field of natural language processing (NLP) because it showed that AI (using transformers) could translate between languages better than techniques like recurrent neural networks, which had been used for decades.  As it turned out, the same technology that performed so well at translation also performed well at many other benchmarks that boil down to "say this, but different." As a quick demonstration, here's a sentence I wrote earlier:
 
 > Next (after much economic upheaval and a couple of big wars) came a very special kind of machine called the computer. 
 
@@ -184,24 +189,30 @@ But education is also a form of work.  And writing (or rewriting, or transformin
 I think we can do it.  But I also think it's not going to be easy, partly because making quick adaptations has [historically been a weakness of education systems](/#/footnote/my-grandfathers-thesis), and partly because making quick adaptations is [psychologically difficult for humans in general](/#/footnote/change-is-hard).  I think it's going to be difficult for educators and for students alike and that many in both groups will resist.  But in the end, AI will win -- just as machines and computers won their respective revolutions. 
 
 The nice thing is that AI winning doesn't mean education losing.  
-AI's victory *can* be a victory for education as well.  But this is by no means guaranteed.  
-
-#### 5.
+AI's victory *can* be a victory for education as well.  But this is by no means guaranteed.`}</ReactMarkdown>
+</GatedSection>,
+<GatedSection>
+  <ReactMarkdown>{`#### 5.
 
 I'll close the introduction of this book by summarizing: 
 
 1. AI is here, and things are going to change
 2. AI has trouble coherently writing long texts, but it can translate them just fine
 
-We'll pick up these threads in the rest of the book and, hopefully, carve out a solid understanding of what the future of knowledge work will look like -- along with some clarity about what we need to do to prepare.
+We'll pick up these threads in the rest of the book and, hopefully, carve out a solid understanding of what the future of knowledge work will look like -- along with some clarity about what we need to do to prepare.`}
+</ReactMarkdown>
+</GatedSection>,
 
-#### 6.
+<GatedSection>
+  <ReactMarkdown>{`#### 6.
 
 Oh, and one last thing for the introduction.  As you can see below, this book has GPT built into it.  We'll be using this to explore AI's ability to power interactive textbooks.  As the saying goes, "The best way to predict the future is to build it." 
 
-`,
- (extraProps) => <GPT prompt="If everything a computer does is actually just 'really fast math on binary numbers,' is AI text generation really just math underneath the hood?" {...extraProps}/> 
-  ,`
+`}</ReactMarkdown>
+</GatedSection>,
+
+<GatedSection>
+<ReactMarkdown>{`
 
 ##
 ##
@@ -246,17 +257,12 @@ And prior to the arrival of AI, it was certainly true that one-size-fits-all ser
 
 To get a sense of what this means, let's try to imagine a system in which every student gets different textbooks, different curricula, and different justifications for why they have the textbooks and curricula they have.  (Whether or not they get different standardized tests and assessments is an interesting question that we'll come back to in the next chapter.)
 
-To make this thought experiment concrete, I've decided to do something radical: write a textbook that's different for everyone who reads it. 
-
-#### 2.
-
-Using the widget below, you can begin to customize the textbook.  (Don't stress too much about this; you can always change it later.) 
-
-#### 3.`,
-
-  (extraProps) => <CustomizedText {...extraProps}>
+To make this thought experiment concrete, I've decided to do something radical: write a textbook that's different for everyone who reads it.`}</ReactMarkdown>
+</GatedSection>,
+<GatedSection>
+  <ReactMarkdown>{`#### 2.`}</ReactMarkdown>
+  <CustomizedText>
     {`You can click any of these paragraphs (including this one) to rewrite it according to the preferences you've selected in the box above.
-
 
 Like many of you, I have vivid memories of experiencing first-hand education at its worst.
 
@@ -266,15 +272,12 @@ This was in the early 1990s, so if I'd asked "When am I ever going to use this?"
 
 When I share this story with educators today, they are quick to point out that this is an example of education "done wrong" -- that my disabilities ought to have been better supported.  They're right, and in many places education is indeed "done right."  But the point remains: Done right or done wrong, early education is legally permitted to be a non-consensual arrangement.  It's just that this state of affairs is more obvious when education is "done wrong" because students are more likely to be vocal about it.  If the system doesn't work for you, too bad.
 
-But here we are, on the cusp of a future in which a one-size-fits-all education might soon be as antiquated as penmanship classes.  Who knows?  Maybe a universally consensual education system is on the horizon too.`}</CustomizedText>,
+But here we are, on the cusp of a future in which a one-size-fits-all education might soon be as antiquated as penmanship classes.  Who knows?  Maybe a universally consensual education system is on the horizon too.`}</CustomizedText>
+</GatedSection>,
 
-
- (extraProps) => <GPT prompt="Beginning with pre-history, give a brief history of human education systems.  Use short bullet points." {...extraProps}/> 
-
-,`
-
-
-##  
+<GatedSection>
+ <GPT prompt="Beginning with pre-history, give a brief history of human education systems.  Use short bullet points." /> 
+ <ReactMarkdown>{`##  
 ##  
 ##  
 ##  
@@ -322,8 +325,10 @@ Special thanks to the following people for their contributions to this book:
 
 
 
-## The End
-  `]
+## The End`}
+  </ReactMarkdown>
+</GatedSection>
+]
 
 let footnotes = {
   "bigger-context-window": `I say this knowing full well that OpenAI is already offering (for a steep price tag) a model with a [context-window of 32,000 words](https://community.openai.com/t/it-looks-like-gpt-4-32k-is-rolling-out/194615/3).  Will this solve the incoherence problem?  Maybe.  But I doubt it.`,

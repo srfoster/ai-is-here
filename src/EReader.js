@@ -20,6 +20,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Fade from '@mui/material/Fade';
 import Modal from '@mui/material/Modal';
+import Stack from '@mui/material/Stack';
 
 import '@fontsource/roboto/400.css';
 
@@ -68,6 +69,12 @@ export default function useOnScreen(ref) {
   return isIntersecting
 }
 
+export function GatedSection({children}){
+  return <div style={{paddingTop: 10}}>
+    {children}
+  </div>
+}
+
 export function FadeInOnDiscover({ children}) {
   const ref = React.useRef(null);
   const isIntersecting = useOnScreen(ref);
@@ -87,11 +94,15 @@ export function FadeInOnDiscover({ children}) {
 }
 
 export function EReader({ content, footnotes }) {
-  let [page, setPage] = useLocalStorage("current-page",1)
+  let [currentSectionIndex, setCurrentSectionIndex] = useLocalStorage("current-section",0)
   let [showFootnote, setShowFootnote] = React.useState(null)
 
   const outerRef = React.useRef(null);
   const ref = React.useRef(null);
+
+  React.useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [currentSectionIndex])
 
   React.useEffect(() => {
     if (!ref.current) return
@@ -115,18 +126,7 @@ export function EReader({ content, footnotes }) {
       })
     }
 
-  }, [ref.current])
-
-  let stuff = content.map((x, i) => {
-                //console.log(x)
-                if (typeof (x) == "string")
-                  return <ReactMarkdown key={i}>{x}</ReactMarkdown>
-
-                if (typeof (x) == "function")
-                  return x({ })
-
-                return x
-              })
+  }, [currentSectionIndex])
 
   return (
     <>
@@ -137,19 +137,29 @@ export function EReader({ content, footnotes }) {
             width: "100%", display: "flex", flexDirection: "column", overflow: "hidden"
       }}>
             <div ref={ref} >
-              {stuff}
+              {content[currentSectionIndex]}
+              <NavBar 
+                prev={()=>setCurrentSectionIndex(currentSectionIndex-1)}
+                next={()=>setCurrentSectionIndex(currentSectionIndex+1)}
+              /> 
             </div> 
         </Box>
-        {/* <Box style={{height:50, width: "100vw", backgroundColor:"white", position: "fixed", bottom: 0, left: 0, borderTop: "1px solid gray", paddingTop: 5}}>
-           <Container maxWidth="sm" >
-           </Container>
-        </Box> */}
-
               <Footnote toShow={footnotes[showFootnote]}
                   handleClose={ ()=>setShowFootnote(null)} />
       </Container>
     </>
   );
+}
+
+let NavBar = ({prev, next}) => {
+  return <>
+    <FadeInOnDiscover>
+      <Stack direction="row" style={{justifyContent: "center"}}>
+        <Button onClick={prev}>Prev</Button>
+        <Button onClick={next}>Next</Button>
+      </Stack>
+    </FadeInOnDiscover>
+  </>
 }
 
 export let ClickToReveal = ({contents}) => {
@@ -158,7 +168,7 @@ export let ClickToReveal = ({contents}) => {
 
   let ref = React.useRef(null)
 
-  return <Card ref={ref} style={{marginBottom: 15, position: "relative"}}>
+  return <Card ref={ref} style={{marginBottom: 15, position: "relative", border: "1px solid black"}}>
     <CardContent>
       <Button onClick={() => { 
         setOpen(!open); 
@@ -170,7 +180,7 @@ export let ClickToReveal = ({contents}) => {
       {open && <>
         <Confetti
             recycle={false}
-            numberOfPieces={1000}
+            numberOfPieces={500}
             initialVelocityY={{min: 5, max: 5}}
         />
         <Typography>{[contents[count]]}</Typography>
