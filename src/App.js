@@ -16,7 +16,7 @@
 import * as React from 'react';
 import './App.css';
 import Typography from '@mui/material/Typography';
-import { EReader, Benchmark, ClickToReveal, GPT, CustomizedText,GatedSection} from './EReader';
+import { EReader, Benchmark, ClickToReveal, GPT, CustomizedText,GatedSection, AvatarSays, AVATARS} from './EReader';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 
 let fullText = [
@@ -77,11 +77,30 @@ We're still in the introduction, but how about a quick break?  If you've made it
   
   In fact, the intereactions in this book aren't just trivial ones.  I've built ChatGPT into it, and we'll use this to explore AI's ability to power interactive textbooks.  When you see a section like the one below, try clicking the "Ask GPT" button.`}
     </ReactMarkdown>
- <GPT prompt="If everything computer hardware does is actually just 'fast math on binary numbers,' is AI-writing really just math?" /> 
-  
+ <GPT prompt="If everything a computer does is just math on binary numbers, can AI-writing be considered math-powered language production?" /> 
   </GatedSection>,
 
 <GatedSection>
+  <ReactMarkdown>{`#### 3.
+  
+  Also, let's remember that models like GPT are capable of taking on various "roles" or "voices" when they produce text.   
+  `}</ReactMarkdown>
+  <AvatarSays avatar={AVATARS.teacher1} say="Hi!  I'm a teacher." />
+  <AvatarSays avatar={AVATARS.student1} say="Hi!  I'm a student." direction={"row-reverse"} />
+  <ReactMarkdown>{`When this is the case, I'll denote it with avatars like the ones above, so you'll know how to interpret the text being generated.`}</ReactMarkdown>
+  
+  <GPT
+    avatar={AVATARS.teacher1}
+    hiddenPrompt="Answer this question as a teacher would."
+    prompt="If everything a computer does is just math on binary numbers, can AI-writing be considered math-powered language production?" /> 
+
+  <GPT
+    avatar={AVATARS.student1}
+    hiddenPrompt="Answer this question as a weak, uniformed, incorrect student might."
+    prompt="If everything a computer does is just math on binary numbers, can AI-writing be considered math-powered language production?" /> 
+</GatedSection>
+
+,<GatedSection>
   <ReactMarkdown>{`#### 3.
 
 In the conversations around AI and education, many are quick to point out one of the big weaknesses of AI-writing, namely [its tendency to hallucinate and lie](/#/footnote/hallucinations).  It's true: You can't trust everything an AI says.  And it's true that educators and students should learn to look critically at the output of AI-writing tools, cross-checking as necessary.

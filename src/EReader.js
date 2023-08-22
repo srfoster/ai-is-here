@@ -13,6 +13,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import Checkbox from '@mui/material/Checkbox';
@@ -21,6 +22,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Fade from '@mui/material/Fade';
 import Modal from '@mui/material/Modal';
 import Stack from '@mui/material/Stack';
+import Grid from '@mui/material/Grid';
 
 import '@fontsource/roboto/400.css';
 
@@ -29,6 +31,8 @@ import Confetti from 'react-confetti'
 
 import remarkGfm from 'remark-gfm'
 import { useThemeProps } from '@mui/material';
+import Avatar, { genConfig } from 'react-nice-avatar'
+import Tooltip from '@mui/material/Tooltip';
 
 /*
 import {
@@ -250,17 +254,22 @@ let useGpt = ({prompt, onParagraph}) => {
   return [response, startStreaming]
 }
 
-export let GPT = ({prompt}) => {
-  let [response, startStreaming] = useGpt({ prompt, onParagraph: () => { } })
+export let GPT = ({prompt, avatar, hiddenPrompt}) => {
+  let [response, startStreaming] = useGpt({ prompt:  hiddenPrompt + " " + prompt, onParagraph: () => { } })
 
-  return <Card style={{border: "1px solid black"}}>
+  return <Card style={{ border: "1px solid black" }}>
     <CardContent>
       <CardHeader subheader={prompt}
-        action={
-          <Button variant="contained" onClick={startStreaming}>Ask GPT</Button>
-        }/>
+      />
       {response.split("\n").map((x, i) => <ReactMarkdown key={i}>{x}</ReactMarkdown>)}
     </CardContent>
+    <CardActions>
+      {avatar ?
+        <div onClick={startStreaming}>
+          <Avatar style={{ width: 50, height: 50, cursor: "pointer" }} {...avatar} />
+        </div> : <Button onClick={startStreaming}>Ask GPT</Button>
+      }
+    </CardActions>
   </Card>
 }
 
@@ -358,5 +367,55 @@ export let RewritableParagraph= ({ children }) => {
       <ReactMarkdown remarkPlugins={[remarkGfm]}>{response ? "~" + children.trim() + "~" : children}</ReactMarkdown> 
       <ReactMarkdown>{response}</ReactMarkdown> 
     </span>
+  </>
+}
+
+export let AVATARS = {
+  student1: genConfig({
+  "sex": "man",
+  "faceColor": "#AC6651",
+  "earSize": "small",
+  "eyeStyle": "oval",
+  "noseStyle": "round",
+  "mouthStyle": "smile",
+  "shirtStyle": "hoody",
+  //"glassesStyle": "square",
+  "hairColor": "#000",
+  "hairStyle": "normal",
+  "hatStyle": "none",
+  "hatColor": "#fff",
+  "eyeBrowStyle": "up",
+  "shirtColor": "#F4D150",
+  "bgColor": "#E0DDFF"
+  }),
+  teacher1: genConfig({
+  "sex": "man",
+  "faceColor": "#F9C9B6",
+  "earSize": "big",
+  "eyeStyle": "circle",
+  "noseStyle": "short",
+  "mouthStyle": "smile",
+  "shirtStyle": "short",
+  "glassesStyle": "square",
+  "hairColor": "#000",
+  "hairStyle": "thick",
+  "hatStyle": "none",
+  "hatColor": "#D2EFF3",
+  "eyeBrowStyle": "up",
+  "shirtColor": "#77311D",
+  "bgColor": "linear-gradient(45deg, #56b5f0 0%, #45ccb5 100%)"
+  })
+}
+
+export let AvatarSays = ({avatar, say, direction}) => {
+  return <>
+    <Grid container alignItems={"center"} direction={direction || "row"}>
+      <Grid item>
+        <Avatar style={{ width: 100, height: 100 }} {...avatar} />
+      </Grid>
+      <Grid item>
+        <div style={{ margin: 20, fontSize: 18, fontFamily: '"Comic Sans MS", "Comic Sans", cursive', color: "gray"}}>"{say}"</div>
+      </Grid>
+    </Grid>
   </>
 }

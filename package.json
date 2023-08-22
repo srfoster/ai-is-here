@@ -17,6 +17,7 @@
     "react-confetti": "^6.1.0",
     "react-dom": "^18.2.0",
     "react-markdown": "^8.0.7",
+    "react-nice-avatar": "^1.4.1",
     "react-scripts": "5.0.1",
     "react-swipeable": "^7.0.1",
     "react-use": "^17.4.0",
