@@ -140,10 +140,10 @@ export function EReader({ content, footnotes }) {
               {stuff}
             </div> 
         </Box>
-        <Box style={{height:50, width: "100vw", backgroundColor:"white", position: "fixed", bottom: 0, left: 0, borderTop: "1px solid gray", paddingTop: 5}}>
+        {/* <Box style={{height:50, width: "100vw", backgroundColor:"white", position: "fixed", bottom: 0, left: 0, borderTop: "1px solid gray", paddingTop: 5}}>
            <Container maxWidth="sm" >
            </Container>
-        </Box>
+        </Box> */}
 
               <Footnote toShow={footnotes[showFootnote]}
                   handleClose={ ()=>setShowFootnote(null)} />
