@@ -134,9 +134,17 @@ export let Chapter1 = [
 
 ## Part One: The Currency of Words
 
-#### 1.
+#### 1.  The Two Elephants
 
-Reading has a cost.
+Every word has a cost.  In fact, let's begin our discourse on that topic by addressing the two elephants in the room: it costs me money when you read this book, and it costs you time.  
+
+If this were a normal book (without embedded AI), then it wouldn't cost me anything, aside from the time it took to write my part.  But because parts of this textbook are written on the fly, **someone** has to pay the per-word cost to OpenAI (the creators of the GPT model).  
+
+It's worth mentioning that it's not free for OpenAI to generate words either.  GPT is a neural network that runs on computing hardware.  Like any software, it cannot escape the laws of physics.  Computers run on electricity, and that isn't free -- nor are the resources required to build the computers in the first place and to replace their parts when they fail.  Economists have a saying, "There's no such thing as a free lunch" -- and there's no such thing as free cloud computing either.  Someone always pays something. 
+
+OpenAI charges me about $0.06 per word generated.  By all means, though, don't let that stop you from trying the widget below to get a sense of how quickly the cost per word adds up.
+
+
 
 <<AI's biggest strength is its biggest weakness -- it generates text.>>
 

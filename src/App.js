@@ -1,6 +1,6 @@
 
 /*TODO
-  * Add token/cost counter context
+  * Get token/cost calculation to work with backend.  Authenticate people with gmail?  Credit wallet?
   * Add history push (links to sections), 
   * Chapter 1
     - On Reading (speed and cost)
