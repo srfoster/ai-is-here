@@ -97,8 +97,37 @@ export function FadeInOnDiscover({ children}) {
   </Fade>
 }
 
+export const UsageContext = React.createContext();
+
+export const wordsToTokens = (words)=>{
+  // Multiple models, each with different capabilities and price points. Prices are per 1,000 tokens. You can think of tokens as pieces of words, where 1,000 tokens is about 750 words. This paragraph is 35 tokens. 
+
+  //1000t = 750w
+  //(1000/750)t = 1w
+
+  return words * (1000/750) 
+}
+
+export const tokensToDollars = (tokens) => {
+  //8K context	$0.03 / 1K tokens	$0.06 / 1K tokens
+  //32K context	$0.06 / 1K tokens	$0.12 / 1K tokens
+ 
+  let num = (tokens/1000) * 0.06
+  return Math.round(num * 100) / 100
+}
+
+export const wordsToDollars = (words) => {
+  return tokensToDollars(wordsToTokens(words))
+}
+
 export function EReader({ content, footnotes }) {
   let [currentSectionIndex, setCurrentSectionIndex] = useLocalStorage("current-section",0)
+  let [usageData, setUsageData] = React.useState({
+     gptWords: 0
+  })
+  let increaseGPTWords = (more)=>{
+    setUsageData((ud) => ({...ud, gptWords: ud.gptWords + more}))
+  }
   let [showFootnote, setShowFootnote] = React.useState(null)
 
   const outerRef = React.useRef(null);
@@ -134,23 +163,25 @@ export function EReader({ content, footnotes }) {
 
   return (
     <>
-      <Container maxWidth="sm" >
-        <Box
-          ref={outerRef}
-          style={{
-            width: "100%", display: "flex", flexDirection: "column", overflow: "hidden"
-      }}>
+      <UsageContext.Provider value={{usageData,increaseGPTWords}}>
+        <Container maxWidth="sm" >
+          <Box
+            ref={outerRef}
+            style={{
+              width: "100%", display: "flex", flexDirection: "column", overflow: "hidden"
+            }}>
             <div ref={ref} >
               {content[currentSectionIndex]}
-              <NavBar 
-                prev={()=>setCurrentSectionIndex(currentSectionIndex-1)}
-                next={()=>setCurrentSectionIndex(currentSectionIndex+1)}
-              /> 
-            </div> 
-        </Box>
-              <Footnote toShow={footnotes[showFootnote]}
-                  handleClose={ ()=>setShowFootnote(null)} />
-      </Container>
+              <NavBar
+                prev={() => setCurrentSectionIndex(currentSectionIndex - 1)}
+                next={() => setCurrentSectionIndex(currentSectionIndex + 1)}
+              />
+            </div>
+          </Box>
+          <Footnote toShow={footnotes[showFootnote]}
+            handleClose={() => setShowFootnote(null)} />
+        </Container>
+      </UsageContext.Provider>
     </>
   );
 }
@@ -227,14 +258,17 @@ export let Benchmark = ({ name, goal, modelsTested, result }) => {
 let useGpt = ({prompt, onParagraph}) => {
   let url = "https://anx45lyxrwvwwu55z3zj67ndzy0naqal.lambda-url.us-east-1.on.aws/"
   let [response, setResponse] = React.useState("")
-  //TODO: When response is complete, store full output in localstorage.
+  //TODO: Response caching to reduce costs?
+
+  const {usageData, increaseGPTWords} = React.useContext(UsageContext);
+
 
   React.useEffect(() => {
     onParagraph()
   },[response.split("\n").length]);
 
   let startStreaming = async () => {
-    console.log("prompt", prompt)
+    //console.log("prompt", prompt)
     let response = await fetch(url, { method: "POST", body: JSON.stringify({ credits: "ABXLDLE", role: "user", content: prompt}) });
     let streamResponse = response.body;
     let reader = streamResponse.getReader();
@@ -246,6 +280,7 @@ let useGpt = ({prompt, onParagraph}) => {
       let { value, done: doneReading } = await reader.read();
       done = doneReading;
       let chunkValue = decoder.decode(value);
+      increaseGPTWords(chunkValue.length)
       setResponse((response) => response + chunkValue)
 
     }
@@ -253,6 +288,7 @@ let useGpt = ({prompt, onParagraph}) => {
 
   return [response, startStreaming]
 }
+
 
 export let GPT = ({prompt, avatar, hiddenPrompt}) => {
   let [response, startStreaming] = useGpt({ prompt:  hiddenPrompt + " " + prompt, onParagraph: () => { } })

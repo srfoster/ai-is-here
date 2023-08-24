@@ -1,6 +1,6 @@
 
 /*TODO
-  * Finish rewrite of introduction
+  * Add token/cost counter context
   * Add history push (links to sections), 
   * Chapter 1
     - On Reading (speed and cost)
