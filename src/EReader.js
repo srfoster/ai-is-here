@@ -414,7 +414,7 @@ export let AvatarSays = ({avatar, say, direction}) => {
         <Avatar style={{ width: 100, height: 100 }} {...avatar} />
       </Grid>
       <Grid item>
-        <div style={{ margin: 20, fontSize: 18, fontFamily: '"Comic Sans MS", "Comic Sans", cursive', color: "gray"}}>"{say}"</div>
+        <div style={{ margin: 20, fontSize: 18, color: "gray" }}>"{say}"</div>
       </Grid>
     </Grid>
   </>
