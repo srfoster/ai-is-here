@@ -1,6 +1,16 @@
 
 /*TODO
   * Get token/cost calculation to work with backend.  Authenticate people with gmail?  Credit wallet?
+     - Authentication url works: https://ai-is-here.auth.us-east-1.amazoncognito.com/oauth2/authorize?client_id=2vs918871e1lh19ump5oblk25v&response_type=token&scope=email+openid+phone&redirect_uri=https%3A%2F%2Fsrfoster.github.io%2Fai-is-here%2F
+     - Directs back to:  https://srfoster.github.io/ai-is-here/#id_token=<<>>&access_token=<<>>&expires_in=3600&token_type=Bearer
+
+
+
+
+     - Need to store this in local storage, send it along with lambda requests
+     - Need to check it on the "backend" along with available credits
+     - Update credits when used
+     - Send back error message when out of credits
   * Add history push (links to sections), 
   * Chapter 1
     - On Reading (speed and cost)
@@ -22,6 +32,11 @@ import './App.css';
 import { EReader, Benchmark, ClickToReveal, GPT, CustomizedText,GatedSection, AvatarSays, AVATARS} from './EReader';
 import { Introduction,  Chapter1, Acknowledgements, } from './Sections';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
+import { useLocation,
+  HashRouter as Router,
+  Routes,
+  Route,
+  Link } from 'react-router-dom';
 
 let fullText = [
   ...Introduction, 
@@ -53,7 +68,14 @@ let footnotes = {
 function App() {
   return (
     <>
-      <EReader content={fullText} footnotes={footnotes} />
+      <Router>
+        <Routes>
+          <Route path="*" element={
+            <EReader content={fullText} footnotes={footnotes} />
+          }>
+          </Route>
+        </Routes>
+      </Router>
     </>
   );
 }

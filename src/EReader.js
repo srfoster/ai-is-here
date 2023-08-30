@@ -33,6 +33,7 @@ import remarkGfm from 'remark-gfm'
 import { useThemeProps } from '@mui/material';
 import Avatar, { genConfig } from 'react-nice-avatar'
 import Tooltip from '@mui/material/Tooltip';
+import { CognitoJwtVerifier } from "aws-jwt-verify";
 
 /*
 import {
@@ -42,6 +43,36 @@ import { useSwipeable } from "react-swipeable";
 import { animated, to, useSpring } from '@react-spring/web'
 */
 
+import { useLocation,
+  HashRouter as Router,
+  Routes,
+  Route,
+  Link } from 'react-router-dom';
+// custom hook to get the current pathname in React
+
+const usePathname = () => {
+  const location = useLocation();
+  return location.pathname;
+}
+
+const decodeToken = async (type,token) => {
+  // Verifier that expects valid access tokens:
+  const verifier = CognitoJwtVerifier.create({
+    userPoolId: "us-east-1_5eFNzSJSY",
+    tokenUse: type,
+    clientId: "2vs918871e1lh19ump5oblk25v",
+  });
+
+  try {
+    const payload = await verifier.verify(
+      token
+    );
+    console.log("Token is valid. Payload:", payload);
+    return payload
+  } catch(e) {
+    console.log("Token not valid!",e);
+  }
+}
 
 const modalStyle = {
   position: 'absolute',
@@ -129,6 +160,8 @@ export function EReader({ content, footnotes }) {
     setUsageData((ud) => ({...ud, gptWords: ud.gptWords + more}))
   }
   let [showFootnote, setShowFootnote] = React.useState(null)
+  let [idToken, setIdToken] = useLocalStorage("id_token", null)
+  let [username, setUsername] = React.useState(null) //Comes from id_token
 
   const outerRef = React.useRef(null);
   const ref = React.useRef(null);
@@ -161,15 +194,47 @@ export function EReader({ content, footnotes }) {
 
   }, [currentSectionIndex])
 
+  let pathname = usePathname();
+
+  React.useEffect(() => {
+    async function func() {
+      if (pathname.startsWith("/id_token")) {
+        let { id_token, access_token } = parseOutToken(pathname)
+        setIdToken(id_token)
+        let payload = await decodeToken("id",id_token)
+        if(payload){
+          setUsername(payload["cognito:username"])
+        }
+      }
+    }
+    func()
+  }, [])
+
+  React.useEffect(() => {
+    console.log("HERE", idToken)
+    if(!idToken) return 
+
+    async function func() {
+      let payload = await decodeToken("id", idToken)
+      if (payload) {
+        setUsername(payload["cognito:username"])
+      }
+    }
+
+    func()
+  }, [idToken])
+
+
   return (
     <>
-      <UsageContext.Provider value={{usageData,increaseGPTWords}}>
+      <UsageContext.Provider value={{ usageData, increaseGPTWords }}>
         <Container maxWidth="sm" >
           <Box
             ref={outerRef}
             style={{
               width: "100%", display: "flex", flexDirection: "column", overflow: "hidden"
             }}>
+            {username && "You're logged in as " + username}
             <div ref={ref} >
               {content[currentSectionIndex]}
               <NavBar
@@ -184,6 +249,13 @@ export function EReader({ content, footnotes }) {
       </UsageContext.Provider>
     </>
   );
+}
+
+let parseOutToken = (path)=>{
+  let parts = path.replace("/id_token=","").split("&")
+  let id_token = parts[0]
+  let access_token = parts[1].replace("access_token=","")
+  return {id_token,access_token}
 }
 
 let NavBar = ({prev, next}) => {
