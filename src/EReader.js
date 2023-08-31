@@ -16,6 +16,7 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
+import Chip from '@mui/material/Chip';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -33,6 +34,7 @@ import remarkGfm from 'remark-gfm'
 import { useThemeProps } from '@mui/material';
 import Avatar, { genConfig } from 'react-nice-avatar'
 import Tooltip from '@mui/material/Tooltip';
+import { CognitoJwtVerifier } from "aws-jwt-verify";
 
 /*
 import {
@@ -42,6 +44,36 @@ import { useSwipeable } from "react-swipeable";
 import { animated, to, useSpring } from '@react-spring/web'
 */
 
+import { useLocation,
+  HashRouter as Router,
+  Routes,
+  Route,
+  Link } from 'react-router-dom';
+// custom hook to get the current pathname in React
+
+const usePathname = () => {
+  const location = useLocation();
+  return location.pathname;
+}
+
+const decodeToken = async (type,token) => {
+  // Verifier that expects valid access tokens:
+  const verifier = CognitoJwtVerifier.create({
+    userPoolId: "us-east-1_5eFNzSJSY",
+    tokenUse: type,
+    clientId: "2vs918871e1lh19ump5oblk25v",
+  });
+
+  try {
+    const payload = await verifier.verify(
+      token
+    );
+    console.log("Token is valid. Payload:", payload);
+    return payload
+  } catch(e) {
+    console.log("Token not valid!",e);
+  }
+}
 
 const modalStyle = {
   position: 'absolute',
@@ -97,9 +129,40 @@ export function FadeInOnDiscover({ children}) {
   </Fade>
 }
 
+export const UsageContext = React.createContext();
+
+export const wordsToTokens = (words)=>{
+  // Multiple models, each with different capabilities and price points. Prices are per 1,000 tokens. You can think of tokens as pieces of words, where 1,000 tokens is about 750 words. This paragraph is 35 tokens. 
+
+  //1000t = 750w
+  //(1000/750)t = 1w
+
+  return words * (1000/750) 
+}
+
+export const tokensToDollars = (tokens) => {
+  //8K context	$0.03 / 1K tokens	$0.06 / 1K tokens
+  //32K context	$0.06 / 1K tokens	$0.12 / 1K tokens
+ 
+  let num = (tokens/1000) * 0.06
+  return Math.round(num * 100) / 100
+}
+
+export const wordsToDollars = (words) => {
+  return tokensToDollars(wordsToTokens(words))
+}
+
 export function EReader({ content, footnotes }) {
   let [currentSectionIndex, setCurrentSectionIndex] = useLocalStorage("current-section",0)
+  let [usageData, setUsageData] = React.useState({
+     gptWords: 0
+  })
+  let increaseGPTWords = (more)=>{
+    setUsageData((ud) => ({...ud, gptWords: ud.gptWords + more}))
+  }
   let [showFootnote, setShowFootnote] = React.useState(null)
+  let [idToken, setIdToken] = useLocalStorage("id_token", null)
+  let [username, setUsername] = React.useState(null) //Comes from id_token
 
   const outerRef = React.useRef(null);
   const ref = React.useRef(null);
@@ -132,27 +195,68 @@ export function EReader({ content, footnotes }) {
 
   }, [currentSectionIndex])
 
+  let pathname = usePathname();
+
+  React.useEffect(() => {
+    async function func() {
+      if (pathname.startsWith("/id_token")) {
+        let { id_token, access_token } = parseOutToken(pathname)
+        setIdToken(id_token)
+        let payload = await decodeToken("id",id_token)
+        if(payload){
+          setUsername(payload["cognito:username"])
+        }
+      }
+    }
+    func()
+  }, [])
+
+  React.useEffect(() => {
+    console.log("HERE", idToken)
+    if(!idToken) return 
+
+    async function func() {
+      let payload = await decodeToken("id", idToken)
+      if (payload) {
+        setUsername(payload["cognito:username"])
+      }
+    }
+
+    func()
+  }, [idToken])
+
+
   return (
     <>
-      <Container maxWidth="sm" >
-        <Box
-          ref={outerRef}
-          style={{
-            width: "100%", display: "flex", flexDirection: "column", overflow: "hidden"
-      }}>
+      <UsageContext.Provider value={{ usageData, increaseGPTWords }}>
+        <Container maxWidth="sm" >
+          <Box
+            ref={outerRef}
+            style={{
+              width: "100%", display: "flex", flexDirection: "column", overflow: "hidden"
+            }}>
+            {username && "You're logged in as " + username}
             <div ref={ref} >
               {content[currentSectionIndex]}
-              <NavBar 
-                prev={()=>setCurrentSectionIndex(currentSectionIndex-1)}
-                next={()=>setCurrentSectionIndex(currentSectionIndex+1)}
-              /> 
-            </div> 
-        </Box>
-              <Footnote toShow={footnotes[showFootnote]}
-                  handleClose={ ()=>setShowFootnote(null)} />
-      </Container>
+              <NavBar
+                prev={() => setCurrentSectionIndex(currentSectionIndex - 1)}
+                next={() => setCurrentSectionIndex(currentSectionIndex + 1)}
+              />
+            </div>
+          </Box>
+          <Footnote toShow={footnotes[showFootnote]}
+            handleClose={() => setShowFootnote(null)} />
+        </Container>
+      </UsageContext.Provider>
     </>
   );
+}
+
+let parseOutToken = (path)=>{
+  let parts = path.replace("/id_token=","").split("&")
+  let id_token = parts[0]
+  let access_token = parts[1].replace("access_token=","")
+  return {id_token,access_token}
 }
 
 let NavBar = ({prev, next}) => {
@@ -227,14 +331,17 @@ export let Benchmark = ({ name, goal, modelsTested, result }) => {
 let useGpt = ({prompt, onParagraph}) => {
   let url = "https://anx45lyxrwvwwu55z3zj67ndzy0naqal.lambda-url.us-east-1.on.aws/"
   let [response, setResponse] = React.useState("")
-  //TODO: When response is complete, store full output in localstorage.
+  //TODO: Response caching to reduce costs?
+
+  const {usageData, increaseGPTWords} = React.useContext(UsageContext);
+
 
   React.useEffect(() => {
     onParagraph()
   },[response.split("\n").length]);
 
   let startStreaming = async () => {
-    console.log("prompt", prompt)
+    //console.log("prompt", prompt)
     let response = await fetch(url, { method: "POST", body: JSON.stringify({ credits: "ABXLDLE", role: "user", content: prompt}) });
     let streamResponse = response.body;
     let reader = streamResponse.getReader();
@@ -246,6 +353,7 @@ let useGpt = ({prompt, onParagraph}) => {
       let { value, done: doneReading } = await reader.read();
       done = doneReading;
       let chunkValue = decoder.decode(value);
+      increaseGPTWords(chunkValue.replace(/\S/g, "").length)
       setResponse((response) => response + chunkValue)
 
     }
@@ -254,8 +362,12 @@ let useGpt = ({prompt, onParagraph}) => {
   return [response, startStreaming]
 }
 
-export let GPT = ({prompt, avatar, hiddenPrompt}) => {
+
+export let GPT = ({prompt, avatar, hiddenPrompt, showCosts}) => {
+  let { usageData } = React.useContext(UsageContext)
   let [response, startStreaming] = useGpt({ prompt:  hiddenPrompt + " " + prompt, onParagraph: () => { } })
+
+  let words = response.split(" ").length
 
   return <Card style={{ border: "1px solid black" }}>
     <CardContent>
@@ -264,11 +376,17 @@ export let GPT = ({prompt, avatar, hiddenPrompt}) => {
       {response.split("\n").map((x, i) => <ReactMarkdown key={i}>{x}</ReactMarkdown>)}
     </CardContent>
     <CardActions>
-      {avatar ?
-        <div onClick={startStreaming}>
+      <Button variant="outlined" onClick={startStreaming}>Ask GPT</Button>
+      {avatar &&
+        <div style={{marginLeft: 5}} onClick={startStreaming}>
           <Avatar style={{ width: 50, height: 50, cursor: "pointer" }} {...avatar} />
-        </div> : <Button onClick={startStreaming}>Ask GPT</Button>
-      }
+        </div> }
+      {showCosts && (
+        <>
+          <Chip label={<span>Words: {words} | ${wordsToDollars(words)}</span>}/>
+          <Chip label={<span>Total: ${wordsToDollars(usageData.gptWords)}</span>} />
+        </>
+      )}
     </CardActions>
   </Card>
 }
@@ -370,6 +488,12 @@ export let RewritableParagraph= ({ children }) => {
   </>
 }
 
+export let BookCard = (props) =>{
+  return <Card style={{marginBottom: 15, position: "relative", border: "1px solid black"}}><CardContent>{props.children}</CardContent></Card>
+}
+
+
+
 export let AVATARS = {
   student1: genConfig({
   "sex": "man",
@@ -388,6 +512,23 @@ export let AVATARS = {
   "shirtColor": "#F4D150",
   "bgColor": "#E0DDFF"
   }),
+  student2: genConfig({
+  "sex": "man",
+  "faceColor": "#F9C9B6",
+  "earSize": "big",
+  "eyeStyle": "oval",
+  "noseStyle": "long",
+  "mouthStyle": "laugh",
+  "shirtStyle": "hoody",
+  "glassesStyle": "none",
+  "hairColor": "#FC909F",
+  "hairStyle": "thick",
+  "hatStyle": "none",
+  "hatColor": "#D2EFF3",
+  "eyeBrowStyle": "up",
+  "shirtColor": "#6BD9E9",
+  "bgColor": "linear-gradient(45deg, #ff1717 0%, #ffd368 100%)"
+}),
   teacher1: genConfig({
   "sex": "man",
   "faceColor": "#F9C9B6",
@@ -414,7 +555,7 @@ export let AvatarSays = ({avatar, say, direction}) => {
         <Avatar style={{ width: 100, height: 100 }} {...avatar} />
       </Grid>
       <Grid item>
-        <div style={{ margin: 20, fontSize: 18, fontFamily: '"Comic Sans MS", "Comic Sans", cursive', color: "gray"}}>"{say}"</div>
+        <div style={{ margin: 20, fontSize: 18, color: "gray" }}>"{say}"</div>
       </Grid>
     </Grid>
   </>
