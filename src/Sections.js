@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { UsageContext, Benchmark, ClickToReveal, GPT, CustomizedText,GatedSection, AvatarSays, AVATARS, wordsToDollars} from './EReader';
+import { UsageContext, Benchmark, ClickToReveal, GPT, CustomizedText,GatedSection, AvatarSays, AVATARS, wordsToDollars, BookCard} from './EReader';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 
 import Typography from '@mui/material/Typography';
@@ -106,7 +106,7 @@ In addition to an investigation of costs, we'll also investigate how words gener
 
 In **Part Two: The Market of Expertise**, we'll examine how the value of human expertise is changing in the age of AI.  Some forms of human expertise will inevitably decrease in value, in much the same way that spelling skills became less valuable with the arrival of ubiquitous spellchecking.  Other forms of human expertise will increase in value -- in particular the kinds of expertise that help offset the costs and maximize the value of AI-writing.  This will help set the stage for a deep look at the challenges facing educational institutions.
 
-In **Part Three: The Economy of Education**, we'll discus how the challenge of preparing individuals to thrive in the new expertise market can potentially be met by AI's ability to automate the production of textbooks, assessments, and tutoring sessions -- three paradigm shifts in the tools and techniques for expertise acquisition.  The good news is that the age of one-size-fits all education is largely over, with AI-writing poised to personalize everything from K-12 to higher ed, disrupting not only how educators and students have operated for centuries, but also the organizational structure of educational institutions as we know them.  
+In **Part Three: The Economy of Education**, we'll discuss how AI's disruption of the expertise market creates problems for education systems that only AI can solve -- namely by automating the production of textbooks, assessments, and tutoring sessions.  The good news is that the age of one-size-fits all education is largely over, with AI-writing poised to personalize several key areas of instruction from K-12 to higher ed, disrupting not only how educators and students have operated for centuries, but also the organizational structure of educational institutions as we know them.  
 
 ~Stephen R. Foster, Ph.D.
 `}
@@ -122,10 +122,12 @@ export let Introduction = [
     <EndOfIntroduction />
 ]
 
-export let Chapter1 = [
-<GatedSection>
-    {TitleAndAuthor}
-<ReactMarkdown>{`
+export let Chapter1Section1 = (props) => {
+    let { usageData } = React.useContext(UsageContext)
+
+    return <GatedSection>
+        {TitleAndAuthor}
+        <ReactMarkdown>{`
 
 ##
 ##
@@ -134,24 +136,123 @@ export let Chapter1 = [
 
 ## Part One: The Currency of Words
 
-#### 1.  The Two Elephants
+#### 1. 
 
-Every word has a cost.  In fact, let's begin our discourse on that topic by addressing the two elephants in the room: it costs me money when you read this book, and it costs you time.  
+Every word has a cost.  If this were a normal book (without embedded AI), then it would only have cost me time up front.  But because parts of this textbook are written while you're reading it, **someone** has to pay OpenAI, the owners of the GPT model that powers this book.  That person is me.
 
-If this were a normal book (without embedded AI), then it wouldn't cost me anything, aside from the time it took to write my part.  But because parts of this textbook are written on the fly, **someone** has to pay the per-word cost to OpenAI (the creators of the GPT model).  
+But please don't feel bad about it.  In fact, please take a moment to investigate the cost of words with the two AI personalities below.  Generate as much text as you like.
+`}</ReactMarkdown>
+  <BookCard>
+        <AvatarSays avatar={AVATARS.student2} say={<span>Hi!  I'm long-winded, wordy, verbose AI.  My AI friends and I have cost the author <span style={{color: "red"}}>${wordsToDollars(usageData.gptWords)}</span> so far</span>} />
+        <br />
+        <GPT
+            avatar={AVATARS.student2}
+            hiddenPrompt="Answer this question as a weak, uniformed, inarticulate, incorrect, and very verbose wordy student might."
+            prompt="What is the history of automation in education?" 
+            showCosts/>
+  </BookCard>
+  <BookCard>
+        <AvatarSays avatar={AVATARS.teacher1} say={<span>Hi! I omit needless words.</span>} />
+        <br />
+        <GPT
+            avatar={AVATARS.teacher1}
+            hiddenPrompt="Answer succinctly with a few short bullets."
+            prompt="What is the history of automation in education?"
+            showCosts />
+  </BookCard>
+</GatedSection>
+}
 
-It's worth mentioning that it's not free for OpenAI to generate words either.  GPT is a neural network that runs on computing hardware.  Like any software, it cannot escape the laws of physics.  Computers run on electricity, and that isn't free -- nor are the resources required to build the computers in the first place and to replace their parts when they fail.  Economists have a saying, "There's no such thing as a free lunch" -- and there's no such thing as free cloud computing either.  Someone always pays something. 
+export let Chapter1Section2 = (props) => {
+    let { usageData } = React.useContext(UsageContext)
 
-OpenAI charges me about $0.06 per word generated.  By all means, though, don't let that stop you from trying the widget below to get a sense of how quickly the cost per word adds up.
+    return <GatedSection>
+            <ReactMarkdown>{`
+#### 2. 
 
+It's worth mentioning that it's not free for OpenAI to generate words either.  GPT is a neural network that runs on computing hardware.  Like any software, it cannot escape the laws of physics.  Computers run on electricity, and that isn't free.  Neither are the resources required to build computers parts and to replace them when they fail.  Economists have a saying, "There's no such thing as a free lunch" -- and there's no such thing as free cloud computing either.  Someone always pays something. 
 
+OpenAI charges me about $0.06 per word generated.  <<Let's check this.  And also the estimator widgets.  Something feels off.>>
+
+A few observations:
+
+1. If the average reader of this book generates $10 in words, then acquiring 100 readers means that I must pay $1000 to OpenAI.
+2. If 1 reader clicks a GPT button that generates $1 in words and then clicks it 999 more times, I have to pay $1000 to OpenAI.
+
+This probably sounds like I'm leading up to a request that you buy this book -- but that's not true.  I'm just pointing out an economic reality that any creator of AI-powered software needs to take into account, whether they're making a video game, chat bot, or AI-powered textbook.  Anything that causes an AI to generate text is also generating income for whomever owns the AI model.
+
+When the owner of the model isn't you (and until open source models catch up to proprietary ones, it won't be), using AI to enhance an experience for your users places you in a dilemma: 1) pay the cost yourself, or 2) try to pass it on to your users.
+
+I know that many of my colleagues in education are already facing this same dilemma, so I've come up with a solution.  In fact, I've even implemented it in this textbook to avoid having to charge my readers and to avoid being charged unexpected amounts of money by OpenAI myself.  I call it the **Cached Response Trick**.
+`}</ReactMarkdown>
+<BookCard>
+  <ReactMarkdown>
+  {`**Cached Response Trick**
+
+**Use case** You have an experience that you're providing to others and you'd like to enhance it by allowing users to prompt an AI model and see the response.  (Examples: Teachers using AI in lessons, developers using AI in their software, authors using AI in their textbooks.)
+
+**Solution** For any such prompt your experience might send to an AI model on behalf of your users, send it yourself ahead of time and cache the response.  When a user is about to trigger one of these prompts, show them the cached response instead of fetching a new one from the model.
+
+**Pros** 
+
+* Makes any such cached prompt into a fixed cost instead of an ongoing cost.  
+* Don't have to do it to all your prompts
+
+**Cons** 
+
+* Reduces any such prompt to a static set of outputs instead of a dynamic set.  
+* Requires you to know ahead of time the prompts that a user will generate.  Won't work on prompts that a user comes up with themselves, unless you can somehow predict the future.
+* Requires some engineering work if you want to do this with a large number of prompts.
+  `}
+  </ReactMarkdown>
+</BookCard>
+<ReactMarkdown>{`
+It should come as no surprise that the prompts you've seen so far in this book have all been protected by the **Cached Prompt Trick**.  I mean, no offense but... I don't even know who you are; for all I know, you're a troll whose likes to press buttons a million times just for fun.
+
+Here are five of the prompts you've seen so far.  If you press the Ask GPT button enough times, you'll see the text on any given prompt begin to repeat -- evidence of the response caching trick.`}</ReactMarkdown>
+
+            <GPT prompt="If everything a computer does is just math on binary numbers, can AI-writing be considered math-powered language production?" />
+            <GPT
+                avatar={AVATARS.teacher1}
+                hiddenPrompt="Answer this question as a teacher would."
+                prompt="If everything a computer does is just math on binary numbers, can AI-writing be considered math-powered language production?" />
+
+            <GPT
+                avatar={AVATARS.student1}
+                hiddenPrompt="Answer this question as a weak, uniformed, incorrect student might."
+                prompt="If everything a computer does is just math on binary numbers, can AI-writing be considered math-powered language production?" />
+            <GPT
+                avatar={AVATARS.student2}
+                hiddenPrompt="Answer this question as a weak, uniformed, inarticulate, incorrect, and very verbose wordy student might."
+                prompt="What is the history of automation in education?"
+                showCosts />
+            <GPT
+                avatar={AVATARS.teacher1}
+                hiddenPrompt="Answer succinctly with a few short bullets."
+                prompt="What is the history of automation in education?"
+                showCosts />
+        <ReactMarkdown>{`To close this section, I'll mention two things:
+        
+1. Some of the above prompts like they're the same.  But the different "voices" are created by sending additional text to the AI model along with what is displayed to you.  More on this **Prompt Injection Trick** in the next section.
+2. When I said you'd spent $${wordsToDollars(usageData.gptWords)} -- that was virtual money.  Thankfully, for my sake.  A lot of people are reading this book.`}
+</ReactMarkdown>
+    </GatedSection>
+}
+
+export let Chapter1 = [
+        <Chapter1Section1/>,
+        <Chapter1Section2/>
+/*
+<<Segue to sign up...>>
+
+<<No such thing as a free lunch -- means what?>>
 
 <<AI's biggest strength is its biggest weakness -- it generates text.>>
 
 <<Coder are the world's highest paid writers.>>
-
-  `}</ReactMarkdown></GatedSection>
+*/
 ]
+
 
 
 export let Acknowledgements = <GatedSection>

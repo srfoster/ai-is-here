@@ -16,6 +16,7 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
+import Chip from '@mui/material/Chip';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -352,7 +353,7 @@ let useGpt = ({prompt, onParagraph}) => {
       let { value, done: doneReading } = await reader.read();
       done = doneReading;
       let chunkValue = decoder.decode(value);
-      increaseGPTWords(chunkValue.length)
+      increaseGPTWords(chunkValue.replace(/\S/g, "").length)
       setResponse((response) => response + chunkValue)
 
     }
@@ -362,8 +363,11 @@ let useGpt = ({prompt, onParagraph}) => {
 }
 
 
-export let GPT = ({prompt, avatar, hiddenPrompt}) => {
+export let GPT = ({prompt, avatar, hiddenPrompt, showCosts}) => {
+  let { usageData } = React.useContext(UsageContext)
   let [response, startStreaming] = useGpt({ prompt:  hiddenPrompt + " " + prompt, onParagraph: () => { } })
+
+  let words = response.split(" ").length
 
   return <Card style={{ border: "1px solid black" }}>
     <CardContent>
@@ -372,11 +376,17 @@ export let GPT = ({prompt, avatar, hiddenPrompt}) => {
       {response.split("\n").map((x, i) => <ReactMarkdown key={i}>{x}</ReactMarkdown>)}
     </CardContent>
     <CardActions>
-      {avatar ?
-        <div onClick={startStreaming}>
+      <Button variant="outlined" onClick={startStreaming}>Ask GPT</Button>
+      {avatar &&
+        <div style={{marginLeft: 5}} onClick={startStreaming}>
           <Avatar style={{ width: 50, height: 50, cursor: "pointer" }} {...avatar} />
-        </div> : <Button onClick={startStreaming}>Ask GPT</Button>
-      }
+        </div> }
+      {showCosts && (
+        <>
+          <Chip label={<span>Words: {words} | ${wordsToDollars(words)}</span>}/>
+          <Chip label={<span>Total: ${wordsToDollars(usageData.gptWords)}</span>} />
+        </>
+      )}
     </CardActions>
   </Card>
 }
@@ -478,6 +488,12 @@ export let RewritableParagraph= ({ children }) => {
   </>
 }
 
+export let BookCard = (props) =>{
+  return <Card style={{marginBottom: 15, position: "relative", border: "1px solid black"}}><CardContent>{props.children}</CardContent></Card>
+}
+
+
+
 export let AVATARS = {
   student1: genConfig({
   "sex": "man",
@@ -496,6 +512,23 @@ export let AVATARS = {
   "shirtColor": "#F4D150",
   "bgColor": "#E0DDFF"
   }),
+  student2: genConfig({
+  "sex": "man",
+  "faceColor": "#F9C9B6",
+  "earSize": "big",
+  "eyeStyle": "oval",
+  "noseStyle": "long",
+  "mouthStyle": "laugh",
+  "shirtStyle": "hoody",
+  "glassesStyle": "none",
+  "hairColor": "#FC909F",
+  "hairStyle": "thick",
+  "hatStyle": "none",
+  "hatColor": "#D2EFF3",
+  "eyeBrowStyle": "up",
+  "shirtColor": "#6BD9E9",
+  "bgColor": "linear-gradient(45deg, #ff1717 0%, #ffd368 100%)"
+}),
   teacher1: genConfig({
   "sex": "man",
   "faceColor": "#F9C9B6",
