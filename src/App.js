@@ -87,7 +87,10 @@ We're still in the introduction, but how about a quick break?  If you've made it
   `}</ReactMarkdown>
   <AvatarSays avatar={AVATARS.teacher1} say="Hi!  I'm a teacher." />
   <AvatarSays avatar={AVATARS.student1} say="Hi!  I'm a student." direction={"row-reverse"} />
-  <ReactMarkdown>{`When this is the case, I'll denote it with avatars like the ones above, so you'll know how to interpret the text being generated.`}</ReactMarkdown>
+  <ReactMarkdown>{`##
+##
+
+When this is the case, I'll denote it with avatars like the ones above, so you'll know how to interpret the text being generated.  Try clicking on the avatars in the GPT boxes below and compare the responses.`}</ReactMarkdown>
   
   <GPT
     avatar={AVATARS.teacher1}
@@ -96,7 +99,7 @@ We're still in the introduction, but how about a quick break?  If you've made it
 
   <GPT
     avatar={AVATARS.student1}
-    hiddenPrompt="Answer this question as a weak, uniformed, incorrect student might."
+    hiddenPrompt="Answer this question as might a dumb, incorrect 3rd grader."
     prompt="If everything a computer does is just math on binary numbers, can AI-writing be considered math-powered language production?" /> 
 </GatedSection>
 
