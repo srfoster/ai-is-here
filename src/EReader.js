@@ -329,19 +329,50 @@ export let Benchmark = ({ name, goal, modelsTested, result }) => {
 }
 
 let useGpt = ({prompt, onParagraph}) => {
+
   let url = "https://anx45lyxrwvwwu55z3zj67ndzy0naqal.lambda-url.us-east-1.on.aws/"
   let [response, setResponse] = React.useState("")
   //TODO: Response caching to reduce costs?
 
   const {usageData, increaseGPTWords} = React.useContext(UsageContext);
 
+  let [cachedPrompts, setCachedPrompts] = React.useState()
+
+  React.useEffect(()=>{
+    fetch("/ai-is-here/cached-prompts.json")
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Cached",data)
+        setCachedPrompts(data)
+      })
+  },[])
 
   React.useEffect(() => {
     onParagraph()
   },[response.split("\n").length]);
 
-  let startStreaming = async () => {
-    //console.log("prompt", prompt)
+  let startStreaming = React.useCallback(async () => {
+    console.log("Prompt", prompt, "Cached", cachedPrompts)
+    let availableResponses = cachedPrompts[prompt.trim()]
+    if(availableResponses){
+      //Cycle, rather than choosing randomly
+      if(availableResponses.count === undefined) availableResponses.count = -1
+      availableResponses.count = (availableResponses.count + 1) % availableResponses.length
+
+      //Fake stream it
+      let fullResponse = availableResponses[availableResponses.count].split(" "); 
+      setResponse("")
+
+      while (fullResponse.length > 0) {
+        let value = fullResponse.shift() 
+        await new Promise((resolve) => setTimeout(resolve, 20));
+        increaseGPTWords(1)
+        setResponse((response) => response + value + " ")
+      }
+
+      return
+    }
+    
     let response = await fetch(url, { method: "POST", body: JSON.stringify({ credits: "ABXLDLE", role: "user", content: prompt}) });
     let streamResponse = response.body;
     let reader = streamResponse.getReader();
@@ -357,7 +388,7 @@ let useGpt = ({prompt, onParagraph}) => {
       setResponse((response) => response + chunkValue)
 
     }
-  }
+  }, [cachedPrompts]);
 
   return [response, startStreaming]
 }
@@ -365,7 +396,8 @@ let useGpt = ({prompt, onParagraph}) => {
 
 export let GPT = ({prompt, avatar, hiddenPrompt, showCosts}) => {
   let { usageData } = React.useContext(UsageContext)
-  let [response, startStreaming] = useGpt({ prompt:  hiddenPrompt + " " + prompt, onParagraph: () => { } })
+  let [response, startStreaming] = useGpt({ prompt:  (hiddenPrompt || "") + " " + prompt, onParagraph: () => { } })
+
 
   let words = response.split(" ").length
 
@@ -480,6 +512,7 @@ export let RewritableParagraph= ({ children }) => {
   
   })
 
+
   return <>
     <span style={{cursor: "pointer"}} onClick={startStreaming}>
       <ReactMarkdown remarkPlugins={[remarkGfm]}>{response ? "~" + children.trim() + "~" : children}</ReactMarkdown> 
@@ -497,7 +530,7 @@ export let BookCard = (props) =>{
 export let AVATARS = {
   student1: genConfig({
   "sex": "man",
-  "faceColor": "#AC6651",
+  "faceColor": "#F9C9B6",
   "earSize": "small",
   "eyeStyle": "oval",
   "noseStyle": "round",
