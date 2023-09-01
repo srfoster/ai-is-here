@@ -3,6 +3,7 @@ import { UsageContext, Benchmark, ClickToReveal, GPT, CustomizedText,GatedSectio
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 
 import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 
 let TitleAndAuthor = <>
   <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">Education and AI</Typography>
@@ -143,7 +144,7 @@ Every word has a cost.  If this were a normal book (without embedded AI), then i
 But please don't feel bad about it.  In fact, please take a moment to investigate the cost of words with the two AI personalities below.  Generate as much text as you like.
 `}</ReactMarkdown>
   <BookCard>
-        <AvatarSays avatar={AVATARS.student2} say={<span>Hi!  I'm long-winded, wordy, verbose AI.  My AI friends and I have cost the author <span style={{color: "red"}}>${wordsToDollars(usageData.gptWords)}</span> so far</span>} />
+        <AvatarSays avatar={AVATARS.student2} say={<span>Hi!  I'm long-winded, wordy, verbose AI that is also kinda dumb.</span>} />
         <br />
         <GPT
             avatar={AVATARS.student2}
@@ -185,7 +186,7 @@ When the owner of the model isn't you (and until open source models catch up to 
 
 I know that many of my colleagues in education are already facing this same dilemma, so I've come up with a few tricks.  In fact, I've even implemented most of them in this textbook to avoid having to charge my readers and to avoid being charged myself.  
 
-The trick you've already seen (though you might not have realized it) is the **Cached Prompt Technique**.
+One you've already seen (though you might not have realized it) is the **Cached Prompt Technique**.
 `}</ReactMarkdown>
 <BookCard>
   <ReactMarkdown>
@@ -198,9 +199,9 @@ The trick you've already seen (though you might not have realized it) is the **C
 **Pros** 
 
 * Makes any such cached prompt into a fixed cost instead of an ongoing cost.  
-* Can cache multiple responses to give the illusion of a dynamic, realtime response.
+* Can cache many responses for a single prompt and cycle between them to give the illusion of dynamic, realtime responses.  
 * Can do this to any prompt that you can predict ahead of time.
-* Don't have to do it to all your prompts.
+* Don't have to do this for all your prompts.
 
 **Cons** 
 
@@ -214,7 +215,7 @@ The trick you've already seen (though you might not have realized it) is the **C
 It should come as no surprise that the prompts you've seen so far in this book have all been protected by the **Cached Prompt Technique**.  I mean, no offense but... I don't know you; for all I know, you're a troll who likes to mash buttons for fun.  `}</ReactMarkdown><span>And yes, when I said you'd spent <span style={{ color: "red" }}>${wordsToDollars(usageData.gptWords)}</span> of my hard-earned money -- that was virtual money.  (Thankfully, for my sake.)</span>
       
       <ReactMarkdown>{`#
-But obviously an AI-powered textbook that wants to provide a truly personalized experience to each user can't use the **Cached Prompt Technique** all the time.  So let's examine a few other techniques to help mitigate the cost of AI-writing and to increase the value of its output.`}</ReactMarkdown>
+But obviously an AI-powered textbook that wants to provide a truly personalized experience to each user can't use the **Cached Prompt Technique** all the time.`}</ReactMarkdown>
     </GatedSection>
 }
 
@@ -225,7 +226,7 @@ export let Chapter1Section3 = (props) => {
   return <GatedSection><ReactMarkdown>{`
 #### 3.
 
-Here are five of the prompts you've seen so far.  If you press the Ask GPT button enough times, you'll see the text on any given prompt begin to repeat -- evidence of the **cached response trick.**
+Let's pause so you have a moment to investigate the matter for yourself, here are five of the prompts you've seen so far.  If you press the Ask GPT button enough times, you'll see the text on any given prompt begin to repeat -- evidence of the **cached response trick.**
 
 `}</ReactMarkdown>
 
@@ -299,7 +300,7 @@ The technique at work here is called **Prompt Injection** -- where the prompt yo
 2. At the reader's preferred reading level
 3. With the reader's preferred style (e.g. formal vs. informal, verbose vs. succinct, with bullets vs. with long prose, etc.)
 
-I mention this because one of the things that makes AI-writing so powerful is its ability to write custom text in realtime.  This is not possible when a prompt is cached.
+I mention this to underscore that what makes AI-writing so powerful is its ability to write custom text in realtime.  Response caching makes it impossible to take advantage of all that AI has to offer.
 `}
 </ReactMarkdown>
 </GatedSection>}
@@ -312,11 +313,42 @@ export let Chapter1Section5 = (props) => {
     <ReactMarkdown>{`
 #### 5.
 
-What if we want to do something like this...
+In an effort to discuss the value and cost of words, I've demonstrated two key techniques:
 
+* **Prompt caching**, which lowers the cost of words by recycling them.
+* **Prompt injection**, which can (among other things) raise the value of words by tailoring them to the reader.
+
+We need these to understand the much more subtle technique that powers much of this textbook -- namely: 
+
+* **Word currency**, which introduces a virtual currency as a medium of exchange between the reader and the author. 
+
+This is easiest to understand if I just tell you how I've already been using word currency in this book, and how it affects you.  When I was still writing the first draft, I invited several of my colleagues to read it and give me feedback.  Obviously, since they were doing me a favor, I didn't want to charge them for the words they generated.  But I also didn't want them generating an unexpected number of words and inadvertently cutting into my coffee budget.  (Some professors get excited about proofreading.)
+
+So I built a system that allowed me to allocate a fixed number of free words to each proofreader.  Basically, I gifted them *unwritten* words -- the potential to generate words.  Much like a dollar is the potential to buy something; an unwritten word is the potential to write something.  
 `}</ReactMarkdown>
   </GatedSection>
 }
+
+export let Chapter1Section6 = (props) => {
+  let { usageData } = React.useContext(UsageContext)
+
+  return <GatedSection>
+    <ReactMarkdown>{`
+#### 6.
+
+If you want to see this in action yourself (which you are [by no means required to do](/#/footnotes/student-signup) in order to read this textbook).  You can click below and sign up.  You'll end up back here with a few thousand unwritten words to spend on any prompts that aren't cached.`}</ReactMarkdown>
+  <BookCard>
+    <a href="https://ai-is-here.auth.us-east-1.amazoncognito.com/oauth2/authorize?client_id=2vs918871e1lh19ump5oblk25v&response_type=token&scope=email+openid+phone&redirect_uri=https%3A%2F%2Fsrfoster.github.io%2Fai-is-here%2F">Sign In</a>
+  </BookCard>
+    <ReactMarkdown>{`
+#
+
+If you don't want to sign up now, it's okay.  You'll have chances later.
+`}</ReactMarkdown>
+
+</GatedSection>
+}
+
 
 export let Chapter1 = [
         <Chapter1Section1/>,
@@ -324,7 +356,11 @@ export let Chapter1 = [
         <Chapter1Section3/>,
         <Chapter1Section4/>,
         <Chapter1Section5/>,
+        <Chapter1Section6/>,
+
 /*
+<<Social stuff, personal pages, comments, user chips, and additional compelling reasons to sign up (in addition to the free words)>>
+
 <<Let's check the cost calc.  Something feels off.  BTW, we are using gpt3-turbo, right?  Need to redo the math>>
 
 <<Segue to sign up...>>

@@ -342,7 +342,6 @@ let useGpt = ({prompt, onParagraph}) => {
     fetch("/ai-is-here/cached-prompts.json")
       .then((response) => response.json())
       .then((data) => {
-        console.log("Cached",data)
         setCachedPrompts(data)
       })
   },[])
@@ -352,7 +351,7 @@ let useGpt = ({prompt, onParagraph}) => {
   },[response.split("\n").length]);
 
   let startStreaming = React.useCallback(async () => {
-    console.log("Prompt", prompt, "Cached", cachedPrompts)
+    //console.log("Prompt", prompt, "Cached", cachedPrompts)
     let availableResponses = cachedPrompts[prompt.trim()]
     if(availableResponses){
       //Cycle, rather than choosing randomly
@@ -365,7 +364,7 @@ let useGpt = ({prompt, onParagraph}) => {
 
       while (fullResponse.length > 0) {
         let value = fullResponse.shift() 
-        await new Promise((resolve) => setTimeout(resolve, 20));
+        await new Promise((resolve) => setTimeout(resolve, 30));
         increaseGPTWords(1)
         setResponse((response) => response + value + " ")
       }

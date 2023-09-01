@@ -1,16 +1,16 @@
 
 /*TODO
-  * Get token/cost calculation to work with backend.  Authenticate people with gmail?  Credit wallet?
+
+  * Authentication
+     * https://aws.amazon.com/blogs/security/use-the-hosted-ui-or-create-a-custom-ui-in-amazon-cognito/
+     * 
      - Authentication url works: https://ai-is-here.auth.us-east-1.amazoncognito.com/oauth2/authorize?client_id=2vs918871e1lh19ump5oblk25v&response_type=token&scope=email+openid+phone&redirect_uri=https%3A%2F%2Fsrfoster.github.io%2Fai-is-here%2F
      - Directs back to:  https://srfoster.github.io/ai-is-here/#id_token=<<>>&access_token=<<>>&expires_in=3600&token_type=Bearer
-
-
-
-
      - Need to store this in local storage, send it along with lambda requests
      - Need to check it on the "backend" along with available credits
      - Update credits when used
      - Send back error message when out of credits
+     - Decide on how much to give for free 
   * Add history push (links to sections), 
   * Chapter 1
     - On Reading (speed and cost)
@@ -64,6 +64,7 @@ let footnotes = {
   "attention-is-all-you-need": "You can find the full paper [here](https://arxiv.org/abs/1706.03762).",
   "compulsory-education-ages": `This differs from state to state but begins between ages 5 and 8 and ends between ages 16 and 18.  See [here for details by state](https://nces.ed.gov/programs/statereform/tab5_1.asp).`,
   "per-word": "Technically, they charge 'per token', which includes partial words.  But I'll say 'per word' for simplicity.",
+  "student-signup": "If you're one of my students, you **are** required to do this.  You will not be able to complete the homework for my class if you don't sign up."
 }
 
 function App() {
