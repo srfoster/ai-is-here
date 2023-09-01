@@ -63,6 +63,7 @@ let footnotes = {
 * Or email me: [stephen@thoughtstem.com](mailto:stephen@thoughtstem.com)`,
   "attention-is-all-you-need": "You can find the full paper [here](https://arxiv.org/abs/1706.03762).",
   "compulsory-education-ages": `This differs from state to state but begins between ages 5 and 8 and ends between ages 16 and 18.  See [here for details by state](https://nces.ed.gov/programs/statereform/tab5_1.asp).`,
+  "per-word": "Technically, they charge 'per token', which includes partial words.  But I'll say 'per word' for simplicity.",
 }
 
 function App() {
