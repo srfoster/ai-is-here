@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { UsageContext, Benchmark, ClickToReveal, GPT, CustomizedText,GatedSection, AvatarSays, AVATARS, wordsToDollars, BookCard} from './EReader';
+import { Benchmark, ClickToReveal, GPT, CustomizedText,GatedSection, AvatarSays, AVATARS, wordsToDollars, BookCard} from './EReader';
+import { UsageContext } from './useGpt';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 
 import Typography from '@mui/material/Typography';

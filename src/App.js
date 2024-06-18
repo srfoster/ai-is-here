@@ -29,14 +29,16 @@
 
 import * as React from 'react';
 import './App.css';
-import { EReader, Benchmark, ClickToReveal, GPT, CustomizedText,GatedSection, AvatarSays, AVATARS} from './EReader';
+import { EReader} from './EReader';
 import { Introduction,  Chapter1, Acknowledgements, } from './Sections';
+import { Tutor } from './Tutor';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 import { useLocation,
   HashRouter as Router,
   Routes,
   Route,
   Link } from 'react-router-dom';
+import { Card, CardContent, CardHeader, Container,Typography } from '@mui/material';
 
 let fullText = [
   ...Introduction, 
@@ -67,13 +69,50 @@ let footnotes = {
   "student-signup": "If you're one of my students, you **are** required to do this.  You will not be able to complete the homework for my class if you don't sign up."
 }
 
+function Home() {
+  return (
+    <Container maxWidth="sm" >
+      <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">AI for Education</Typography>
+
+      <HomePageTile title="Automated Tutor">
+       <p>A configurable AI tutor that can help you learn anything.
+            Click <Link to="/tutor">here</Link>.</p>
+      </HomePageTile>
+
+      <HomePageTile title="Book">
+       <p>I've written part of a sample textbook. 
+            Click <Link to="/book">here</Link> to start reading.</p>
+      </HomePageTile>
+    </Container>
+  ) 
+}
+
+function HomePageTile({title, children}) {
+  return (
+    <Card>
+      <CardHeader title={title}></CardHeader> 
+      <CardContent> 
+        {children}
+      </CardContent>
+    </Card>
+  )
+}
+
 function App() {
   return (
     <>
       <Router>
         <Routes>
-          <Route path="*" element={
+          <Route path="/book" element={
             <EReader content={fullText} footnotes={footnotes} />
+          }>
+          </Route>
+          <Route path="/tutor" element={
+            <Tutor />
+          }>
+          </Route>
+          <Route path="*" element={
+            <Home />
           }>
           </Route>
         </Routes>
