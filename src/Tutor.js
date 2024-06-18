@@ -1,3 +1,11 @@
+/*
+
+To get rid of the [GPT] flicker and send a proper conversation, need to fix up the backend to accept messages like [{role: "user", ...}, {role: "agent", ...}]:
+* https://github.com/srfoster/ai-is-here-backend/blob/main/js/main.js
+
+*/
+
+
 import * as React from 'react';
 import './App.css';
 import { Button, Container, Typography } from '@mui/material';
@@ -28,42 +36,59 @@ export function Tutor() {
 }
 
 function Chat(){
-    let hiddenPrompt = "You are an automated tutor for a lesson about the American Civil War.  Greet the user."
 
-    let prompt = ""
-    let [response, startStreaming] = useGpt({ prompt:  hiddenPrompt + " " + prompt, onParagraph: () => { } })
-
+    let [streaming, setStreaming] = React.useState(false)
+    let [shouldReply, setShouldReply] = React.useState(true)
     let [inputs, setInputs] = React.useState([])
 
     let [inputVal, setInputVal] = React.useState("")
     let inputRef = React.createRef()
 
+    let hiddenPrompt = "You are an automated tutor for a lesson about the American Civil War.  Greet the user once.  Then continually ask them one simple question at a time.  Use the Socratic method."
+    let [response, startStreaming] = useGpt({ prompt:  hiddenPrompt + " " + prompt, onParagraph: (p) => { console.log(p)} })
+
+
+    React.useEffect(()=>{
+        if(!shouldReply) return 
+        setShouldReply(false)
+        setStreaming(true);
+        let morePrompt = inputs.map((i)=>"["+i.user + "]:" + i.text).join("\n\n\n")
+        startStreaming(morePrompt, (finalResponse)=>{
+            setStreaming(false)
+            setInputs(inputs.concat({user: "GPT", text: finalResponse.replace(/\[GPT\]:/g, "")}))
+        })
+    }, [shouldReply])
+
     return <>
           <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">Tutor</Typography>
-          <Button onClick={startStreaming}>Start</Button>
-          <MessageBox
-            position={"left"}
-            type={"text"}
-            title={"Tutor"}
-            text={response}
-          />
           {inputs.map((i)=>{
             return <MessageBox
-                position={"right"}
+                position={i.user == "GPT" ? "left" : "right"}
                 type={"text"}
-                title={"User"}
-                text={i}
+                title={i.user}
+                text={i.text}
             />
           })}
+          {streaming && <MessageBox
+            position={"left"}
+            type={"text"}
+            title={"GPT"}
+            text={response}
+          />}
           <Input
             ref={inputRef}
             placeholder='Type here...'
-            multiline={true}
+            multiline={false}
             value={inputVal}
             onChange={(x)=>{setInputVal(x.target.value)}}
             rightButtons={
               <RCE.Button 
-              onClick={()=>{setInputs(inputs.concat(inputVal))}}
+              onClick={()=>{
+                setInputVal("")
+                setShouldReply(true)
+                setInputs(inputs.concat({user: "User", text: inputVal})); 
+                }
+              }
               color='white' backgroundColor='black' text='Send' />
             }
           />

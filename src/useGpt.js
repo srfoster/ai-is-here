@@ -25,7 +25,8 @@ export let useGpt = ({prompt, onParagraph}) => {
     onParagraph()
   },[response.split("\n").length]);
 
-  let startStreaming = React.useCallback(async () => {
+  let startStreaming = React.useCallback(async (morePrompt, onStreamComplete) => {
+    setResponse("")
     console.log("Prompt", prompt, "Cached", cachedPrompts)
     let availableResponses = cachedPrompts[prompt.trim()]
     if(availableResponses){
@@ -44,25 +45,28 @@ export let useGpt = ({prompt, onParagraph}) => {
         setResponse((response) => response + value + " ")
       }
 
+      onStreamComplete && onStreamComplete(response)
+
       return
     }
     
-    let response = await fetch(url, { method: "POST", body: JSON.stringify({ credits: "ABXLDLE", role: "user", content: prompt}) });
+    let response = await fetch(url, { method: "POST", body: JSON.stringify({ credits: "ABXLDLE", role: "user", content: prompt + (morePrompt || "")}) });
     let streamResponse = response.body;
     let reader = streamResponse.getReader();
     let decoder = new TextDecoder();
     let done = false;
+    let fullResponse = ""
     setResponse("")
 
-    console.log("Starting loop")
     while (!done) {
       let { value, done: doneReading } = await reader.read();
       done = doneReading;
       let chunkValue = decoder.decode(value);
       increaseGPTWords(chunkValue.replace(/\S/g, "").length)
+      fullResponse = fullResponse + chunkValue
       setResponse((response) => response + chunkValue)
-
     }
+    onStreamComplete && onStreamComplete(fullResponse)
   }, [cachedPrompts]);
 
   return [response, startStreaming]
