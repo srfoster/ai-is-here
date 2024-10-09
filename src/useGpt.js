@@ -1,11 +1,13 @@
 
 import * as React from 'react';
+import gptProxyData from "./gptProxyData.json";
 
 export const UsageContext = React.createContext();
 
 export let useGpt = ({prompt, onParagraph}) => {
 
-  let url = "https://anx45lyxrwvwwu55z3zj67ndzy0naqal.lambda-url.us-east-1.on.aws/"
+  //NOTE: Use terraform state show aws_lambda_function_url.openai_proxy to find the current url
+  let url = gptProxyData.url 
   let [response, setResponse] = React.useState("")
   //TODO: Response caching to reduce costs?
 
@@ -50,7 +52,7 @@ export let useGpt = ({prompt, onParagraph}) => {
       return
     }
     
-    let response = await fetch(url, { method: "POST", body: JSON.stringify({ credits: "ABXLDLE", role: "user", content: prompt + (morePrompt || "")}) });
+    let response = await fetch(url, { method: "POST", body: JSON.stringify({ credits: "ABCDE", role: "user", content: prompt + (morePrompt || "")}) });
     let streamResponse = response.body;
     let reader = streamResponse.getReader();
     let decoder = new TextDecoder();
