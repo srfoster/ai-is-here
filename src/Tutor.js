@@ -45,7 +45,7 @@ function Chat(){
     let inputRef = React.createRef()
 
     let hiddenPrompt = "You are an automated tutor for a lesson about the American Civil War.  Greet the user once.  Then continually ask them one simple question at a time.  Use the Socratic method."
-    let [response, startStreaming] = useGpt({ prompt:  hiddenPrompt + " " + prompt, onParagraph: (p) => { console.log(p)} })
+    let [response, startStreaming] = useGpt({ prompt:  hiddenPrompt, onParagraph: (p) => { console.log(p)} })
 
 
     React.useEffect(()=>{
