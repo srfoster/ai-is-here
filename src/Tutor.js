@@ -12,7 +12,7 @@ import { Button, Container, Typography } from '@mui/material';
 
 import "react-chat-elements/dist/main.css"
 import { MessageBox } from "react-chat-elements";
-import { useGpt, UsageContext } from "./useGpt";
+import { useGpt, UsageContext, OutOfCredits } from "./useGpt";
 
 import { Input } from 'react-chat-elements'
 import * as RCE from 'react-chat-elements'
@@ -35,6 +35,19 @@ export function Tutor() {
     )
 }
 
+function postProcessGPT(text, afterRefresh){
+  console.log("postProcessGPT", text, text.match(/\[OutOfCredits\]/))
+  let newText = text.replace(/\[GPT\]:/g, "")
+
+  if(newText.match(/\[OutOfCredits\]/)){
+    let newText = text.replace(/\[OutOfCredits\]/g, "")
+    return [newText, <OutOfCredits afterRefresh={afterRefresh} />]
+  }
+
+  return newText
+}
+
+
 function Chat(){
 
     let [streaming, setStreaming] = React.useState(false)
@@ -45,7 +58,11 @@ function Chat(){
     let inputRef = React.createRef()
 
     let hiddenPrompt = "You are an automated tutor for a lesson about the American Civil War.  Greet the user once.  Then continually ask them one simple question at a time.  Use the Socratic method."
-    let [response, startStreaming] = useGpt({ prompt:  hiddenPrompt, onParagraph: (p) => { console.log(p)} })
+    let [response, startStreaming] = useGpt({ prompt:  hiddenPrompt, 
+      onParagraph: (p) => { 
+        console.log("onParagraph", p)
+
+      } })
 
 
     React.useEffect(()=>{
@@ -53,9 +70,10 @@ function Chat(){
         setShouldReply(false)
         setStreaming(true);
         let morePrompt = inputs.map((i)=>"["+i.user + "]:" + i.text).join("\n\n\n")
+
         startStreaming(morePrompt, (finalResponse)=>{
             setStreaming(false)
-            setInputs(inputs.concat({user: "GPT", text: finalResponse.replace(/\[GPT\]:/g, "")}))
+            setInputs(inputs.concat({user: "GPT", text: postProcessGPT(finalResponse, ()=>{setShouldReply(true)})}))
         })
     }, [shouldReply])
 
@@ -73,7 +91,7 @@ function Chat(){
             position={"left"}
             type={"text"}
             title={"GPT"}
-            text={response}
+            text={postProcessGPT(response, ()=>{setShouldReply(true)})}
           />}
           <Input
             ref={inputRef}

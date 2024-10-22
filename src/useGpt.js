@@ -1,10 +1,36 @@
 
 import * as React from 'react';
 import gptProxyData from "./gptProxyData.json";
+import { Card, CardContent, Typography, TextField, Button } from '@mui/material';
+import {useLocalStorage} from 'react-use'
 
 export const UsageContext = React.createContext();
 
+export let OutOfCredits = ({afterRefresh}) => {
+  let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
+
+  //A material ui form for entering a credit string
+  return <Card>
+    <CardContent>
+      <Typography variant="h5" component="div">
+        Out of Credits
+      </Typography>
+      <Typography variant="body2">
+        Enter a new credit code:
+      </Typography>
+      <TextField id="outlined-basic" label="Credits" variant="outlined" 
+        value={currentCreditString} 
+        onChange={(e) => setCurrentCreditString(e.target.value)}
+      />
+      <br/>
+      <br/>
+      <Button variant="contained" onClick={() => afterRefresh ? afterRefresh() : console.log("No afterRefresh specified for OutOfCredits component")}>Submit</Button>
+    </CardContent>
+  </Card> 
+}
+
 export let useGpt = ({prompt, onParagraph}) => {
+  let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
 
   //NOTE: Use terraform state show aws_lambda_function_url.openai_proxy to find the current url
   let url = gptProxyData.url 
@@ -52,7 +78,7 @@ export let useGpt = ({prompt, onParagraph}) => {
       return
     }
     
-    let response = await fetch(url, { method: "POST", body: JSON.stringify({ credits: "ABCDE", role: "user", content: prompt + (morePrompt || "")}) });
+    let response = await fetch(url, { method: "POST", body: JSON.stringify({ credits: currentCreditString, role: "user", content: prompt + (morePrompt || "")}) });
     let streamResponse = response.body;
     let reader = streamResponse.getReader();
     let decoder = new TextDecoder();
