@@ -29,6 +29,7 @@
 
 import * as React from 'react';
 import './App.css';
+import { OutOfCreditsIfOutOfCredits } from './useGpt';
 import { EReader} from './EReader';
 import { Introduction,  Chapter1, Acknowledgements, } from './Sections';
 import { Tutor } from './Tutor';
@@ -73,6 +74,8 @@ function Home() {
   return (
     <Container maxWidth="sm" >
       <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">AI for Education</Typography>
+
+      <OutOfCreditsIfOutOfCredits afterRefresh={()=>{window.location.reload()}} />
 
       <HomePageTile title="Automated Tutor">
        <p>A configurable AI tutor that can help you learn anything.

@@ -6,6 +6,39 @@ import {useLocalStorage} from 'react-use'
 
 export const UsageContext = React.createContext();
 
+export let useCheckCredits = () => {
+  let [remainingCredits, setRemainingCredits] = React.useState(null);
+  let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
+
+  React.useEffect(()=>{
+    fetch(gptProxyData.get_credits+"?credits="+currentCreditString)
+      .then((response) => {
+         return response.json()
+      })
+      .then((data) => {
+        setRemainingCredits(JSON.parse(data.body).remainingCredits)
+      })
+  },[])
+
+  return remainingCredits 
+}
+
+export let OutOfCreditsIfOutOfCredits = ({afterRefresh}) => {
+  let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
+  
+  let remainingCredits = useCheckCredits()
+
+  console.log("Remaining Credits", remainingCredits)
+
+  if(remainingCredits === null) return <div>Checking credits...</div>
+
+  if(remainingCredits < 0){
+    return <OutOfCredits afterRefresh={afterRefresh} />
+  } else {
+    return <div>Credits: {remainingCredits}</div>
+  }
+}
+
 export let OutOfCredits = ({afterRefresh}) => {
   let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
 
