@@ -1,7 +1,7 @@
 
 import * as React from 'react';
 import gptProxyData from "./gptProxyData.json";
-import { Card, CardContent, Typography, TextField, Button } from '@mui/material';
+import { Alert, Button, Card, CardContent, Chip, Typography, TextField} from '@mui/material';
 import {useLocalStorage} from 'react-use'
 
 export const UsageContext = React.createContext();
@@ -32,11 +32,25 @@ export let OutOfCreditsIfOutOfCredits = ({afterRefresh}) => {
 
   if(remainingCredits === null) return <div>Checking credits...</div>
 
-  if(remainingCredits < 0){
+  if(remainingCredits < 0 || remainingCredits === undefined){
     return <OutOfCredits afterRefresh={afterRefresh} />
   } else {
-    return <div>Credits: {remainingCredits}</div>
+    return <Alert severity='info'>
+      <Chip label={"Remaining credits: " + remainingCredits} />
+      <br/>
+      <br/>
+      <Logout afterRefresh={afterRefresh} />
+    </Alert>
   }
+}
+
+export let Logout = ({afterRefresh}) => {
+  let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
+  return <Button variant="contained"
+                 onClick={() => {
+                   setCurrentCreditString("")
+                   afterRefresh()
+                 }}>Logout</Button>
 }
 
 export let OutOfCredits = ({afterRefresh}) => {
@@ -45,14 +59,12 @@ export let OutOfCredits = ({afterRefresh}) => {
   //A material ui form for entering a credit string
   return <Card>
     <CardContent>
-      <Typography variant="h5" component="div">
-        Out of Credits
-      </Typography>
       <Typography variant="body2">
-        Enter a new credit code:
+        Enter an access key
       </Typography>
-      <TextField id="outlined-basic" label="Credits" variant="outlined" 
+      <TextField id="outlined-basic" label="Access Key" variant="outlined" 
         value={currentCreditString} 
+        type="password"
         onChange={(e) => setCurrentCreditString(e.target.value)}
       />
       <br/>
@@ -87,6 +99,8 @@ export let useGpt = ({prompt, onParagraph}) => {
   },[response.split("\n").length]);
 
   let startStreaming = React.useCallback(async (morePrompt, onStreamComplete) => {
+    if(!prompt) return
+
     setResponse("")
     console.log("Prompt", prompt, "Cached", cachedPrompts)
     let availableResponses = cachedPrompts[prompt.trim()]

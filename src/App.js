@@ -32,7 +32,7 @@ import './App.css';
 import { OutOfCreditsIfOutOfCredits } from './useGpt';
 import { EReader} from './EReader';
 import { Introduction,  Chapter1, Acknowledgements, } from './Sections';
-import { Tutor } from './Tutor';
+import { Tutor, TutorManager } from './Tutor';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 import { useLocation,
   HashRouter as Router,
@@ -78,8 +78,8 @@ function Home() {
       <OutOfCreditsIfOutOfCredits afterRefresh={()=>{window.location.reload()}} />
 
       <HomePageTile title="Automated Tutor">
-       <p>A configurable AI tutor that can help you learn anything.
-            Click <Link to="/tutor">here</Link>.</p>
+       <p>Configurable AI tutoring bots.
+            Click <Link to="/bots">here</Link>.</p>
       </HomePageTile>
 
       <HomePageTile title="Book">
@@ -110,9 +110,15 @@ function App() {
             <EReader content={fullText} footnotes={footnotes} />
           }>
           </Route>
-          <Route path="/tutor" element={
-            <Tutor />
+          <Route path="/bots" element={
+            <TutorManager />
           }>
+          </Route>
+          <Route path="/bots/:documentId"
+            element={
+              <Tutor />
+            }
+          >
           </Route>
           <Route path="*" element={
             <Home />

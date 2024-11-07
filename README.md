@@ -10,6 +10,7 @@ TODO:
         - Ideally on an isolated terraform environment
     - creditString is a weird convention (accessKey?)
       - While we're at it -- there are other oddities (consider document_management as a resource and standardize everything...)
+      - documentId => just id
     
 * Tutor improvements
   - Make it possible to edit the prompt

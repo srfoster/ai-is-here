@@ -13,12 +13,35 @@ import { Button, Container, TextField, Typography } from '@mui/material';
 import "react-chat-elements/dist/main.css"
 import { MessageBox } from "react-chat-elements";
 import { useGpt, UsageContext, OutOfCredits } from "./useGpt";
+import { useDocuments, useDocument } from "./useDocuments";
 
 import { Input } from 'react-chat-elements'
 import * as RCE from 'react-chat-elements'
 
-export function Tutor() {
+import { Link, useParams } from 'react-router-dom';
 
+export function TutorManager() {
+  let [documents, setDocuments] = useDocuments()
+
+  return <>
+      <Container maxWidth="sm" >
+        <Typography variant="h2">Bots</Typography>
+        <ul>
+          {documents.map((d) => { 
+            return <li key={ d.documentId}>
+              <Link to={"/bots/"+d.documentId}>{d.title}</Link>
+            </li>
+          })}
+        </ul>
+        <Button onClick={() => { 
+          setDocuments(documents.concat({ title: "New Bot", contents: civilWarHiddenPrompt}))
+
+        }} >Add Bot</Button>
+      </Container>
+  </>
+}
+
+export function Tutor() {
     let [usageData, setUsageData] = React.useState({
         gptWords: 0
     })
@@ -58,7 +81,10 @@ function Chat(){
     let [inputVal, setInputVal] = React.useState("")
     let inputRef = React.createRef()
 
-    let [hiddenPrompt, setHiddenPrompt] = React.useState(civilWarHiddenPrompt)
+    let { documentId } = useParams()
+    let [doc, setDoc] = useDocument(documentId)
+
+    let [hiddenPrompt, setHiddenPrompt] = React.useState(undefined)
 
     let [editMode, setEditMode] = React.useState(false)
     let [nextPrompt, setNextPrompt] = React.useState(hiddenPrompt)
@@ -69,6 +95,13 @@ function Chat(){
 
       } })
 
+    React.useEffect(() => {
+      if(doc && doc.content){
+        setHiddenPrompt(doc.content)
+        setNextPrompt(doc.content)
+        setShouldReply(true)
+      } 
+    }, [JSON.stringify(doc)])
 
     React.useEffect(()=>{
         if(!shouldReply) return 
@@ -80,7 +113,7 @@ function Chat(){
             setStreaming(false)
             setInputs(inputs.concat({user: "GPT", text: postProcessGPT(finalResponse, ()=>{setShouldReply(true)})}))
         })
-    }, [shouldReply])
+    }, [hiddenPrompt, shouldReply])
 
     return <>
       <Button onClick={()=>{
@@ -93,7 +126,7 @@ function Chat(){
           setStreaming(false);
         }
         setEditMode(!editMode);
-      }}>Edit this Bot</Button>
+      }}>{!editMode ? "Edit this Bot" : "Done Editing"}</Button>
       {editMode ? 
         <EditMode setNextPrompt={setNextPrompt} 
                   nextPrompt={nextPrompt}  /> :
