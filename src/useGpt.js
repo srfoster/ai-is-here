@@ -128,7 +128,7 @@ export let useGpt = ({prompt, onParagraph}) => {
       setResponse((response) => response + chunkValue)
     }
     onStreamComplete && onStreamComplete(fullResponse)
-  }, [cachedPrompts]);
+  }, [prompt,cachedPrompts]);
 
   return [response, startStreaming]
 }

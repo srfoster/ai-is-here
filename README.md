@@ -1,10 +1,12 @@
 TODO:
 
-* OutOfCredits is a bit ugly on the homepage
-  - Make it more of a "Welcome" "Please enter credits" feel
-  - Consider: Running low on credits message...
-  - Make it display your current number of credits (possibly show a progress bar somewhere?)
     
+* Tutor improvements
+  - Make it possible to edit the prompt
+    * Store in backend?
+  - Make various tutor bots, tile them on the tutors index page
+  - Be able to assign avatars to the bots
+  - Do a UI/UX pass on the chat itself (bubbles, pressing enter, etc)
 
   
 * Next feature?  
@@ -13,6 +15,11 @@ TODO:
   - Maybe a "backend" for teachers bots?  (Could also be on s3?)
      s:///bucket/users/ABCDE/prompts/blah-bla-blah
   - CRUD operations on prompts (bots)?
+
+* OutOfCredits is a bit ugly on the homepage
+  - Make it more of a "Welcome" "Please enter credits" feel
+  - Consider: Running low on credits message...
+  - Make it display your current number of credits (possibly show a progress bar somewhere?)
 
 
 11/1/2024:

@@ -8,7 +8,7 @@ To get rid of the [GPT] flicker and send a proper conversation, need to fix up t
 
 import * as React from 'react';
 import './App.css';
-import { Button, Container, Typography } from '@mui/material';
+import { Button, Container, TextField, Typography } from '@mui/material';
 
 import "react-chat-elements/dist/main.css"
 import { MessageBox } from "react-chat-elements";
@@ -47,6 +47,7 @@ function postProcessGPT(text, afterRefresh){
   return newText
 }
 
+let civilWarHiddenPrompt = "You are an automated tutor for a lesson about the American Civil War.  Greet the user once.  Then continually ask them one simple question at a time.  Use the Socratic method."
 
 function Chat(){
 
@@ -57,7 +58,11 @@ function Chat(){
     let [inputVal, setInputVal] = React.useState("")
     let inputRef = React.createRef()
 
-    let hiddenPrompt = "You are an automated tutor for a lesson about the American Civil War.  Greet the user once.  Then continually ask them one simple question at a time.  Use the Socratic method."
+    let [hiddenPrompt, setHiddenPrompt] = React.useState(civilWarHiddenPrompt)
+
+    let [editMode, setEditMode] = React.useState(false)
+    let [nextPrompt, setNextPrompt] = React.useState(hiddenPrompt)
+
     let [response, startStreaming] = useGpt({ prompt:  hiddenPrompt, 
       onParagraph: (p) => { 
         console.log("onParagraph", p)
@@ -78,6 +83,21 @@ function Chat(){
     }, [shouldReply])
 
     return <>
+      <Button onClick={()=>{
+        if(editMode && nextPrompt != hiddenPrompt){
+          console.log("Setting hidden prompt", nextPrompt)
+          setHiddenPrompt(nextPrompt)
+          setInputs([]); 
+          setInputVal("");
+          setShouldReply(true);
+          setStreaming(false);
+        }
+        setEditMode(!editMode);
+      }}>Edit this Bot</Button>
+      {editMode ? 
+        <EditMode setNextPrompt={setNextPrompt} 
+                  nextPrompt={nextPrompt}  /> :
+          <>
           <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">Tutor</Typography>
           {inputs.map((i)=>{
             return <MessageBox
@@ -110,5 +130,21 @@ function Chat(){
               color='white' backgroundColor='black' text='Send' />
             }
           />
+          </>
+        }
         </>
+
+}
+
+function EditMode({setNextPrompt, nextPrompt}){
+    return <>
+      <Typography>You can edit the prompt below to configure the bot</Typography>
+      <TextField
+        style={{width: "100%"}}
+        multiline
+        maxRows={10}
+        value={nextPrompt} 
+        onChange={(e)=>{setNextPrompt(e.target.value)}
+        } />
+    </>
 }
