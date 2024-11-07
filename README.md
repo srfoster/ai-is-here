@@ -1,5 +1,15 @@
 TODO:
 
+* Document management features
+  - Purpose: Let users CRUDI documents so that they can (among other things) store documents that are used as bot prompts
+  - Need frontend for document management (or use the bot interface).  Somehow need to let bots be created, managed, and shared via URL.  Abstracting away the fact that documents are being managed.  Should feel like creating/managing bots.
+
+  - DEBT ACCRUED! 
+    - Tests!
+      - Have integration tests on document_management lambdas, but should really unit test common-js
+        - Ideally on an isolated terraform environment
+    - creditString is a weird convention (accessKey?)
+      - While we're at it -- there are other oddities (consider document_management as a resource and standardize everything...)
     
 * Tutor improvements
   - Make it possible to edit the prompt
