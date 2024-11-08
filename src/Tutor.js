@@ -119,9 +119,10 @@ function Chat(){
         if(!shouldReply) return 
         setShouldReply(false)
         setStreaming(true);
-        //let morePrompt = inputs.map((i)=>"["+i.user + "]:" + i.text).join("\n\n\n")
+
+        //Note: Filter because if the text is an object, it's some kind of react widget displayed in the chat bubble (e.g. OutOfCredits).  Don't want to send these back to GPT.  In the future, though, we might have to rethink this.
         let morePrompt = 
-           inputs.map(
+           inputs.filter((i)=>typeof(i.text)=="string").map(
             (i)=>{
               return {role: i.user == "GPT" ? "assistant" : "user", 
                       content: [{type: "text", text: i.text}]}

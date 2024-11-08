@@ -5,13 +5,14 @@ import { Alert, Button, Card, CardContent, Chip, Typography, TextField} from '@m
 import {useLocalStorage} from 'react-use'
 
 export const UsageContext = React.createContext();
+export const CreditStringContext = React.createContext();
 
 export let useCheckCredits = () => {
   let [remainingCredits, setRemainingCredits] = React.useState(null);
-  let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
+  const {creditString,setCreditString} = React.useContext(CreditStringContext);
 
   React.useEffect(()=>{
-    fetch(gptProxyData.get_credits+"?credits="+currentCreditString)
+    fetch(gptProxyData.get_credits+"?credits="+creditString)
       .then((response) => {
          return response.json()
       })
@@ -24,7 +25,6 @@ export let useCheckCredits = () => {
 }
 
 export let OutOfCreditsIfOutOfCredits = ({afterRefresh}) => {
-  let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
   
   let remainingCredits = useCheckCredits()
 
@@ -54,7 +54,7 @@ export let Logout = ({afterRefresh}) => {
 }
 
 export let OutOfCredits = ({afterRefresh}) => {
-  let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
+  const {creditString,setCreditString} = React.useContext(CreditStringContext);
 
   //A material ui form for entering a credit string
   return <Card>
@@ -63,9 +63,9 @@ export let OutOfCredits = ({afterRefresh}) => {
         Enter an access key
       </Typography>
       <TextField id="outlined-basic" label="Access Key" variant="outlined" 
-        value={currentCreditString} 
+        value={creditString} 
         type="password"
-        onChange={(e) => setCurrentCreditString(e.target.value)}
+        onChange={(e) => setCreditString(e.target.value)}
       />
       <br/>
       <br/>
@@ -75,12 +75,11 @@ export let OutOfCredits = ({afterRefresh}) => {
 }
 
 export let useGpt = ({prompt, onParagraph}) => {
-  let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
-
   let url = gptProxyData.url 
   let [response, setResponse] = React.useState("")
 
   const {usageData, increaseGPTWords} = React.useContext(UsageContext);
+  const {creditString,setCreditString} = React.useContext(CreditStringContext);
 
   React.useEffect(() => {
     onParagraph()
@@ -90,7 +89,7 @@ export let useGpt = ({prompt, onParagraph}) => {
 
   let startStreaming = React.useCallback(async (morePrompt, onStreamComplete) => {
     console.log({prompt, morePrompt})
-    if(!currentCreditString){
+    if(!creditString){
       console.log("No credit string")
       let ooc = "[OutOfCredits]" 
       setResponse(ooc)
@@ -131,7 +130,7 @@ export let useGpt = ({prompt, onParagraph}) => {
     let response = await fetch(url, 
       { method: "POST", 
         body: JSON.stringify(
-          { credits: currentCreditString, 
+          { credits: creditString, 
             content: finalPrompt
           })});
     let streamResponse = response.body;

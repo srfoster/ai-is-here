@@ -29,7 +29,7 @@
 
 import * as React from 'react';
 import './App.css';
-import { OutOfCreditsIfOutOfCredits } from './useGpt';
+import { CreditStringContext, OutOfCreditsIfOutOfCredits } from './useGpt';
 import { EReader} from './EReader';
 import { Introduction,  Chapter1, Acknowledgements, } from './Sections';
 import { Tutor, TutorManager } from './Tutor';
@@ -47,6 +47,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
+import { useLocalStorage } from 'react-use';
 
 function MainAppBar() {
   return (
@@ -126,32 +127,36 @@ function HomePageTile({title, children}) {
 }
 
 function App() {
+  let [creditString, setCreditString] = useLocalStorage("credit-string", "")
+
   return (
     <>
-      <Router>
-        <MainAppBar />
-        <br/>
-        <Routes>
-          <Route path="/book" element={
-            <EReader content={fullText} footnotes={footnotes} />
-          }>
-          </Route>
-          <Route path="/bots" element={
-            <TutorManager />
-          }>
-          </Route>
-          <Route path="/bots/:documentId"
-            element={
-              <Tutor />
-            }
-          >
-          </Route>
-          <Route path="*" element={
-            <Home />
-          }>
-          </Route>
-        </Routes>
-      </Router>
+      <CreditStringContext.Provider value={{creditString, setCreditString}}>
+        <Router>
+          <MainAppBar />
+          <br/>
+          <Routes>
+            <Route path="/book" element={
+              <EReader content={fullText} footnotes={footnotes} />
+            }>
+            </Route>
+            <Route path="/bots" element={
+              <TutorManager />
+            }>
+            </Route>
+            <Route path="/bots/:documentId"
+              element={
+                <Tutor />
+              }
+            >
+            </Route>
+            <Route path="*" element={
+              <Home />
+            }>
+            </Route>
+          </Routes>
+        </Router>
+      </CreditStringContext.Provider>
     </>
   );
 }
