@@ -41,6 +41,30 @@ import { useLocation,
   Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, Container,Typography } from '@mui/material';
 
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
+
+function MainAppBar() {
+  return (
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            <Link to="/" style={{color: "white"}}>Home</Link>
+          </Typography>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            <Link to="/bots" style={{color: "white"}}>Bots</Link>
+          </Typography>
+        </Toolbar>
+      </AppBar>
+    </Box>
+  );
+}
+
 let fullText = [
   ...Introduction, 
   ...Chapter1,
@@ -105,6 +129,8 @@ function App() {
   return (
     <>
       <Router>
+        <MainAppBar />
+        <br/>
         <Routes>
           <Route path="/book" element={
             <EReader content={fullText} footnotes={footnotes} />

@@ -5,13 +5,14 @@ TODO:
 
   - Need to make bots public by default (no restriction if not the owner)
 
-  - Bots sometimes start generating [User] responses (talking to itself)
-    - Can we use a better model?
-    - Use the system/user/assistant distinctions! 
+  - Textbook is broken (prompts no longer strings.  Fix!)
+
+  - Need a solution for mass-distributing access keys
+
+  - Restore past conversations
 
   - DEBT ACCRUED! 
     - UI is crappy.
-      - Nav bar
       - Polishings etc (enter sends chat message)
     - Tests!
       - Have integration tests on document_management lambdas, but should really unit test common-js
