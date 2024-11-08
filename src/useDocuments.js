@@ -20,9 +20,44 @@ export let useDocuments = () => {
 
 
   },[]);
-    
 
-  return [documents, setDocuments]
+  let addDocument = (document) => {
+    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: currentCreditString, operation: "create", ...document }) })
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        setDocuments([...documents, document])
+      })
+  }
+
+  let removeDocument = (documentId) => {
+    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: currentCreditString, operation: "delete", documentId }) })
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        setDocuments(documents.filter((d) => d.documentId !== documentId))
+      })
+  }
+
+  let updateDocument = (document) => {
+    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: currentCreditString, operation: "update", ...document }) })
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        setDocuments(documents.map((d) => {
+          if (d.documentId === document.documentId) {
+            return document
+          } else {
+            return d
+          }
+        }))
+      })
+  }
+
+  return [documents, addDocument, removeDocument, updateDocument]
 }
 
 export let useDocument = (documentId) => {

@@ -5,6 +5,9 @@ TODO:
   - Need frontend for document management (or use the bot interface).  Somehow need to let bots be created, managed, and shared via URL.  Abstracting away the fact that documents are being managed.  Should feel like creating/managing bots.
 
   - DEBT ACCRUED! 
+    - UI is crappy.
+      - Nav bar
+      - Polishings etc
     - Tests!
       - Have integration tests on document_management lambdas, but should really unit test common-js
         - Ideally on an isolated terraform environment

@@ -20,8 +20,10 @@ import * as RCE from 'react-chat-elements'
 
 import { Link, useParams } from 'react-router-dom';
 
+let civilWarHiddenPrompt = "You are an automated tutor for a lesson about the American Civil War.  Greet the user once.  Then continually ask them one simple question at a time.  Use the Socratic method."
+
 export function TutorManager() {
-  let [documents, setDocuments] = useDocuments()
+  let [documents, addDocument, removeDocument, updateDocument] = useDocuments()
 
   return <>
       <Container maxWidth="sm" >
@@ -34,7 +36,7 @@ export function TutorManager() {
           })}
         </ul>
         <Button onClick={() => { 
-          setDocuments(documents.concat({ title: "New Bot", contents: civilWarHiddenPrompt}))
+          addDocument({ title: "New Bot", contents: civilWarHiddenPrompt})
 
         }} >Add Bot</Button>
       </Container>
@@ -70,7 +72,6 @@ function postProcessGPT(text, afterRefresh){
   return newText
 }
 
-let civilWarHiddenPrompt = "You are an automated tutor for a lesson about the American Civil War.  Greet the user once.  Then continually ask them one simple question at a time.  Use the Socratic method."
 
 function Chat(){
 
