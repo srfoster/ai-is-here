@@ -99,6 +99,7 @@ function Chat(){
     let [editMode, setEditMode] = React.useState(false)
     let [nextPrompt, setNextPrompt] = React.useState(hiddenPrompt)
     let [nextTitle, setNextTitle] = React.useState(undefined)
+    let [owner, setOwner] = React.useState(false)
 
     let [response, startStreaming] = useGpt({ prompt:  {role: "system", content: [{type: "text", text: hiddenPrompt}]},  
       onParagraph: (p) => { 
@@ -111,6 +112,7 @@ function Chat(){
         setHiddenPrompt(doc.content)
         setNextPrompt(doc.content)
         setNextTitle(doc.title)
+        setOwner(doc.owner)
         setShouldReply(true)
       } 
     }, [JSON.stringify(doc)])
@@ -149,7 +151,8 @@ function Chat(){
         setEditMode(!editMode);
       }}>{!editMode ? "Edit this Bot" : "Done Editing"}</Button>
     
-    if(!doc?.owner){
+    console.log(owner)
+    if(!owner){
       editButton = <></>
     }
 
