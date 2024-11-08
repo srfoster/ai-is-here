@@ -68,8 +68,10 @@ export function Tutor() {
 }
 
 function postProcessGPT(text, afterRefresh){
-  //console.log("postProcessGPT", text, text.match(/\[OutOfCredits\]/))
-  let newText = text.replace(/\[GPT\]:/g, "")
+  if(typeof(text) !== "string") return text
+  console.log("postProcessGPT", text, text.match(/\[OutOfCredits\]/))
+  let newText = text
+
 
   if(newText.match(/\[OutOfCredits\]/)){
     let newText = text.replace(/\[OutOfCredits\]/g, "")
@@ -146,6 +148,7 @@ function Chat(){
         setEditMode(!editMode);
       }}>{!editMode ? "Edit this Bot" : "Done Editing"}</Button>
 
+    let postProcessedResponse = postProcessGPT(response, ()=>{setShouldReply(true)})
     return <>
       
       {editMode ? 
@@ -167,14 +170,14 @@ function Chat(){
                 position={i.user == "GPT" ? "left" : "right"}
                 type={"text"}
                 title={i.user}
-                text={<Markdown>{i.text}</Markdown>}
+                text={typeof(i.text) == "string" ? <Markdown>{i.text}</Markdown> : i.text}
             />
           })}
           {streaming && <MessageBox
             position={"left"}
             type={"text"}
             title={"GPT"}
-            text={<Markdown>{postProcessGPT(response, ()=>{setShouldReply(true)})}</Markdown>}
+            text={typeof(postProcessedResponse) == "string" ? <Markdown>{postProcessedResponse}</Markdown> : postProcessedResponse}
           />}
           <Input
             ref={inputRef}

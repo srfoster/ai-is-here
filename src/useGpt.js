@@ -90,16 +90,21 @@ export let useGpt = ({prompt, onParagraph}) => {
 
   let startStreaming = React.useCallback(async (morePrompt, onStreamComplete) => {
     console.log({prompt, morePrompt})
+    if(!currentCreditString){
+      console.log("No credit string")
+      let ooc = "[OutOfCredits]" 
+      setResponse(ooc)
+
+      //onStreamComplete && onStreamComplete(ooc)
+      return
+    }
+
     if(!prompt || prompt == "") 
       prompt = {role: "system", content: [{type: "text", text: "You are a helpful assistant."}]}
 
     if(typeof(prompt) === "object" && 
        (!prompt.content || prompt.content.length == 0 || !prompt.content[0].text)) return
 
-    if(!currentCreditString){
-      setResponse("[OutOfCredits] Please enter a credit string")
-      return
-    }
 
 
     setResponse("")
