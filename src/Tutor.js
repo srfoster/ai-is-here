@@ -8,22 +8,29 @@ To get rid of the [GPT] flicker and send a proper conversation, need to fix up t
 
 import * as React from 'react';
 import './App.css';
-import { Button, Container, TextField, Typography } from '@mui/material';
+import { Button, Container, TextField, Typography, Stack } from '@mui/material';
+
+import Box from '@mui/material/Box';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import "react-chat-elements/dist/main.css"
 import { MessageBox } from "react-chat-elements";
 import { useGpt, UsageContext, OutOfCredits } from "./useGpt";
-import { useDocuments, useDocument } from "./useDocuments";
+import { useDocs, useDoc } from "./useDocuments";
 
 import { Input } from 'react-chat-elements'
 import * as RCE from 'react-chat-elements'
 
 import { Link, useParams } from 'react-router-dom';
+import Markdown from 'react-markdown'
+
 
 let civilWarHiddenPrompt = "You are an automated tutor for a lesson about the American Civil War.  Greet the user once.  Then continually ask them one simple question at a time.  Use the Socratic method."
 
 export function TutorManager() {
-  let [documents, addDocument, removeDocument, updateDocument] = useDocuments()
+  let [documents, createDocument, deleteDocument, updateDocument] = useDocs()
 
   return <>
       <Container maxWidth="sm" >
@@ -36,7 +43,7 @@ export function TutorManager() {
           })}
         </ul>
         <Button onClick={() => { 
-          addDocument({ title: "New Bot", content: civilWarHiddenPrompt})
+          createDocument({ title: "New Bot", content: civilWarHiddenPrompt})
 
         }} >Add Bot</Button>
       </Container>
@@ -52,7 +59,7 @@ export function Tutor() {
     }
 
     return (
-      <Container maxWidth="sm" >
+      <Container maxWidth="sm" style={{paddingTop: 30}}>
         <UsageContext.Provider value={{ usageData, increaseGPTWords }}>
             <Chat />
         </UsageContext.Provider> 
@@ -61,7 +68,7 @@ export function Tutor() {
 }
 
 function postProcessGPT(text, afterRefresh){
-  console.log("postProcessGPT", text, text.match(/\[OutOfCredits\]/))
+  //console.log("postProcessGPT", text, text.match(/\[OutOfCredits\]/))
   let newText = text.replace(/\[GPT\]:/g, "")
 
   if(newText.match(/\[OutOfCredits\]/)){
@@ -83,14 +90,15 @@ function Chat(){
     let inputRef = React.createRef()
 
     let { documentId } = useParams()
-    let [doc, setDoc] = useDocument(documentId)
+    let [doc, updateDoc, deleteDoc] = useDoc(documentId)
 
     let [hiddenPrompt, setHiddenPrompt] = React.useState(undefined)
 
     let [editMode, setEditMode] = React.useState(false)
     let [nextPrompt, setNextPrompt] = React.useState(hiddenPrompt)
+    let [nextTitle, setNextTitle] = React.useState(undefined)
 
-    let [response, startStreaming] = useGpt({ prompt:  hiddenPrompt, 
+    let [response, startStreaming] = useGpt({ prompt:  {role: "system", content: [{type: "text", text: hiddenPrompt}]},  
       onParagraph: (p) => { 
         console.log("onParagraph", p)
 
@@ -100,6 +108,7 @@ function Chat(){
       if(doc && doc.content){
         setHiddenPrompt(doc.content)
         setNextPrompt(doc.content)
+        setNextTitle(doc.title)
         setShouldReply(true)
       } 
     }, [JSON.stringify(doc)])
@@ -108,7 +117,13 @@ function Chat(){
         if(!shouldReply) return 
         setShouldReply(false)
         setStreaming(true);
-        let morePrompt = inputs.map((i)=>"["+i.user + "]:" + i.text).join("\n\n\n")
+        //let morePrompt = inputs.map((i)=>"["+i.user + "]:" + i.text).join("\n\n\n")
+        let morePrompt = 
+           inputs.map(
+            (i)=>{
+              return {role: i.user == "GPT" ? "assistant" : "user", 
+                      content: [{type: "text", text: i.text}]}
+        })
 
         startStreaming(morePrompt, (finalResponse)=>{
             setStreaming(false)
@@ -116,11 +131,13 @@ function Chat(){
         })
     }, [hiddenPrompt, shouldReply])
 
-    return <>
-      <Button onClick={()=>{
-        if(editMode && nextPrompt != hiddenPrompt){
+    let editButton = <Button 
+        //variant='contained' 
+        onClick={()=>{
+        if(editMode && (nextPrompt != hiddenPrompt || nextTitle != doc.title)){
           console.log("Setting hidden prompt", nextPrompt)
           setHiddenPrompt(nextPrompt)
+          updateDoc(nextTitle, nextPrompt)
           setInputs([]); 
           setInputVal("");
           setShouldReply(true);
@@ -128,24 +145,36 @@ function Chat(){
         }
         setEditMode(!editMode);
       }}>{!editMode ? "Edit this Bot" : "Done Editing"}</Button>
+
+    return <>
+      
       {editMode ? 
         <EditMode setNextPrompt={setNextPrompt} 
-                  nextPrompt={nextPrompt}  /> :
+                  nextPrompt={nextPrompt}
+                  setNextTitle={setNextTitle}
+                  nextTitle={nextTitle}
+                  deleteBot={deleteDoc}
+                  updateBot={updateDoc}
+                  doneEditingButton={editButton}
+                  /> :
           <>
-          <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">Tutor</Typography>
+          <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">{nextTitle}</Typography>
+          <Stack alignItems="flex-end">
+            {editButton}
+          </Stack>
           {inputs.map((i)=>{
             return <MessageBox
                 position={i.user == "GPT" ? "left" : "right"}
                 type={"text"}
                 title={i.user}
-                text={i.text}
+                text={<Markdown>{i.text}</Markdown>}
             />
           })}
           {streaming && <MessageBox
             position={"left"}
             type={"text"}
             title={"GPT"}
-            text={postProcessGPT(response, ()=>{setShouldReply(true)})}
+            text={<Markdown>{postProcessGPT(response, ()=>{setShouldReply(true)})}</Markdown>}
           />}
           <Input
             ref={inputRef}
@@ -170,15 +199,87 @@ function Chat(){
 
 }
 
-function EditMode({setNextPrompt, nextPrompt}){
+function EditMode({setNextPrompt, nextPrompt, nextTitle, setNextTitle, deleteBot, doneEditingButton}){
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
     return <>
-      <Typography>You can edit the prompt below to configure the bot</Typography>
+      <Typography>Use the fields below to edit the bot's name and prompt.  Prompts should be written in the second-person imperative voice (like you're telling the AI how to interact with people)</Typography>
+      <br/>
+      <TextField 
+        label="Bot Name"
+      style={{width: "100%"}} value={nextTitle} onChange={(e)=>{setNextTitle(e.target.value)}} />
+      <br/>
+      <br/>
       <TextField
+        label="Bot Prompt"
         style={{width: "100%"}}
         multiline
         maxRows={10}
         value={nextPrompt} 
         onChange={(e)=>{setNextPrompt(e.target.value)}
         } />
+      <br/>
+      <br/>
+      <br/>
+      <hr/>
+      <Stack direction="row"
+        justifyContent="space-between"
+        alignItems="center">
+      {doneEditingButton}
+      <Button 
+        color="error"
+        variant='contained'
+        onClick={handleClickOpen}
+          >Delete</Button>
+      </Stack>
+      <AlertDialog open={open} handleClose={handleClose} deleteBot={deleteBot} />
     </>
+}
+
+
+export default function AlertDialog({open, handleClose, deleteBot}) {
+
+  return (
+    <React.Fragment>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <Box style={{padding: 50}}>
+        <DialogTitle id="alert-dialog-title">
+          {"Are you sure you want to delete this bot?"}
+        </DialogTitle>
+        <Stack direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Button 
+            variant='contained'
+            color="primary"
+            onClick={handleClose} autoFocus>
+              No.  Let it live.
+          </Button>
+          <Button 
+            variant='contained'
+            color="error"
+            onClick={
+            ()=>{
+              deleteBot(()=>window.location = "/#/bots")
+            }
+            }>Yes. Destroy it!</Button>
+        </Stack>
+        </Box>
+      </Dialog>
+    </React.Fragment>
+  );
 }

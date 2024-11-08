@@ -2,12 +2,17 @@ TODO:
 
 * Document management features
   - Purpose: Let users CRUDI documents so that they can (among other things) store documents that are used as bot prompts
-  - Need frontend for document management (or use the bot interface).  Somehow need to let bots be created, managed, and shared via URL.  Abstracting away the fact that documents are being managed.  Should feel like creating/managing bots.
+
+  - Need to make bots public by default (no restriction if not the owner)
+
+  - Bots sometimes start generating [User] responses (talking to itself)
+    - Can we use a better model?
+    - Use the system/user/assistant distinctions! 
 
   - DEBT ACCRUED! 
     - UI is crappy.
       - Nav bar
-      - Polishings etc
+      - Polishings etc (enter sends chat message)
     - Tests!
       - Have integration tests on document_management lambdas, but should really unit test common-js
         - Ideally on an isolated terraform environment

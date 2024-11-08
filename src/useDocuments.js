@@ -3,7 +3,7 @@ import * as React from 'react';
 import gptProxyData from "./gptProxyData.json";
 import {useLocalStorage} from 'react-use'
 
-export let useDocuments = () => {
+export let useDocs = () => {
   let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
 
   let [documents, setDocuments] = React.useState([])
@@ -21,7 +21,7 @@ export let useDocuments = () => {
 
   },[]);
 
-  let addDocument = (document) => {
+  let createDocument = (document) => {
     fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: currentCreditString, operation: "create", ...document }) })
       .then((response) => {
         return response.json()
@@ -32,7 +32,7 @@ export let useDocuments = () => {
       })
   }
 
-  let removeDocument = (documentId) => {
+  let deleteDocument = (documentId) => {
     fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: currentCreditString, operation: "delete", documentId }) })
       .then((response) => {
         return response.json()
@@ -58,10 +58,10 @@ export let useDocuments = () => {
       })
   }
 
-  return [documents, addDocument, removeDocument, updateDocument]
+  return [documents, createDocument, deleteDocument, updateDocument]
 }
 
-export let useDocument = (documentId) => {
+export let useDoc = (documentId) => {
   let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
   let [doc, setDoc] = React.useState()
 
@@ -71,10 +71,33 @@ export let useDocument = (documentId) => {
         return response.json()
       })
       .then((data) => {
-        setDoc(JSON.parse(data.body))
+        let doc = JSON.parse(data.body)
+        doc.documentId = documentId
+        setDoc(doc)
       })
   },[]);
     
+  let updateDoc = (title, content) => {
+    console.log("Updating doc", doc, title, content)
+    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: currentCreditString, operation: "update", documentId, title, content }) })
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        setDoc(document)
+      })
+  }
 
-  return [doc, setDoc]
+  let deleteDoc = (afterDelete) => {
+    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: currentCreditString, operation: "delete", documentId }) })
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        setDoc(undefined)
+        afterDelete && afterDelete()
+      })
+  } 
+
+  return [doc, updateDoc, deleteDoc]
 }

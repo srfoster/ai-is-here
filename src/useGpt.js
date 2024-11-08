@@ -77,10 +77,8 @@ export let OutOfCredits = ({afterRefresh}) => {
 export let useGpt = ({prompt, onParagraph}) => {
   let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
 
-  //NOTE: Use terraform state show aws_lambda_function_url.openai_proxy to find the current url
   let url = gptProxyData.url 
   let [response, setResponse] = React.useState("")
-  //TODO: Response caching to reduce costs?
 
   const {usageData, increaseGPTWords} = React.useContext(UsageContext);
 
@@ -98,34 +96,69 @@ export let useGpt = ({prompt, onParagraph}) => {
     onParagraph()
   },[response.split("\n").length]);
 
+  
+
   let startStreaming = React.useCallback(async (morePrompt, onStreamComplete) => {
     if(!prompt) return
+    if(typeof(prompt) === "object" && 
+       (!prompt.content || prompt.content.length == 0 || !prompt.content[0].text)) return
 
-    setResponse("")
-    console.log("Prompt", prompt, "Cached", cachedPrompts)
-    let availableResponses = cachedPrompts[prompt.trim()]
-    if(availableResponses){
-      //Cycle, rather than choosing randomly
-      if(availableResponses.count === undefined) availableResponses.count = -1
-      availableResponses.count = (availableResponses.count + 1) % availableResponses.length
-
-      //Fake stream it
-      let fullResponse = availableResponses[availableResponses.count].split(" "); 
-      setResponse("")
-
-      while (fullResponse.length > 0) {
-        let value = fullResponse.shift() 
-        await new Promise((resolve) => setTimeout(resolve, 30));
-        increaseGPTWords(1)
-        setResponse((response) => response + value + " ")
-      }
-
-      onStreamComplete && onStreamComplete(response)
-
+    if(!currentCreditString){
+      setResponse("[OutOfCredits] Please enter a credit string")
       return
     }
-    
-    let response = await fetch(url, { method: "POST", body: JSON.stringify({ credits: currentCreditString, role: "user", content: prompt + (morePrompt || "")}) });
+
+
+    setResponse("")
+
+
+    if(typeof(morePrompt) !== typeof(prompt)){
+      throw new Error("Prompt and morePrompt must be the same type")
+    }
+
+    //Not even sure we should keep this caching logic, but it's used in the "textbook" and I want to avoid breaking it for now (caching ensures people don't need to be logged in with an access key)
+    if(typeof(morePrompt) === "string"){
+      let availableResponses = cachedPrompts[prompt.trim()]
+      if(availableResponses){
+        //Cycle, rather than choosing randomly
+        if(availableResponses.count === undefined) availableResponses.count = -1
+        availableResponses.count = (availableResponses.count + 1) % availableResponses.length
+
+        //Fake stream it
+        let fullResponse = availableResponses[availableResponses.count].split(" "); 
+        setResponse("")
+
+        while (fullResponse.length > 0) {
+          let value = fullResponse.shift() 
+          await new Promise((resolve) => setTimeout(resolve, 30));
+          increaseGPTWords(1)
+          setResponse((response) => response + value + " ")
+        }
+
+        onStreamComplete && onStreamComplete(response)
+
+        return
+      }
+    }
+
+    if(typeof(prompt) === "string"){
+      prompt = {role: "system", content: [{type: "text", text: prompt}]}
+    }
+
+    if(typeof(morePrompt) === "string"){
+      morePrompt = {role: "user", content: [{type: "text", text: morePrompt}]}
+    }
+
+    let finalPrompt =  [prompt, morePrompt].flat()
+
+    console.log("Sending prompt to Proxy", finalPrompt)
+
+    let response = await fetch(url, 
+      { method: "POST", 
+        body: JSON.stringify(
+          { credits: currentCreditString, 
+            content: finalPrompt
+          })});
     let streamResponse = response.body;
     let reader = streamResponse.getReader();
     let decoder = new TextDecoder();
