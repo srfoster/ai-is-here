@@ -36,7 +36,7 @@ export function TutorManager() {
           })}
         </ul>
         <Button onClick={() => { 
-          addDocument({ title: "New Bot", contents: civilWarHiddenPrompt})
+          addDocument({ title: "New Bot", content: civilWarHiddenPrompt})
 
         }} >Add Bot</Button>
       </Container>

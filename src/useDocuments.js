@@ -27,7 +27,8 @@ export let useDocuments = () => {
         return response.json()
       })
       .then((data) => {
-        setDocuments([...documents, document])
+        let documentId = JSON.parse(data.body).documentId
+        setDocuments([...documents, { ...document, documentId}])
       })
   }
 
