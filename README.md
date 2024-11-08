@@ -4,8 +4,6 @@ TODO:
   - Purpose: Let users CRUDI documents so that they can (among other things) store documents that are used as bot prompts
 
   - Need to make bots public by default (no restriction if not the owner)
-    - But should still ask for credits if not logged in (not working)
-      - Need to make creditString be a context.  Pulling from local storage is causing issues
     - And don't show the Edit Bot button
 
   - Need a solution for mass-distributing access keys

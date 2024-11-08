@@ -148,6 +148,10 @@ function Chat(){
         }
         setEditMode(!editMode);
       }}>{!editMode ? "Edit this Bot" : "Done Editing"}</Button>
+    
+    if(!doc?.owner){
+      editButton = <></>
+    }
 
     let postProcessedResponse = postProcessGPT(response, ()=>{setShouldReply(true)})
     return <>
