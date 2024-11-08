@@ -82,16 +82,6 @@ export let useGpt = ({prompt, onParagraph}) => {
 
   const {usageData, increaseGPTWords} = React.useContext(UsageContext);
 
-  let [cachedPrompts, setCachedPrompts] = React.useState({}) //Where should this get set?
-
-  React.useEffect(()=>{
-    fetch("/ai-is-here/cached-prompts.json")
-      .then((response) => response.json())
-      .then((data) => {
-        setCachedPrompts(data)
-      })
-  },[])
-
   React.useEffect(() => {
     onParagraph()
   },[response.split("\n").length]);
@@ -99,7 +89,10 @@ export let useGpt = ({prompt, onParagraph}) => {
   
 
   let startStreaming = React.useCallback(async (morePrompt, onStreamComplete) => {
-    if(!prompt) return
+    console.log({prompt, morePrompt})
+    if(!prompt || prompt == "") 
+      prompt = {role: "system", content: [{type: "text", text: "You are a helpful assistant."}]}
+
     if(typeof(prompt) === "object" && 
        (!prompt.content || prompt.content.length == 0 || !prompt.content[0].text)) return
 
@@ -112,34 +105,11 @@ export let useGpt = ({prompt, onParagraph}) => {
     setResponse("")
 
 
+    /*
     if(typeof(morePrompt) !== typeof(prompt)){
       throw new Error("Prompt and morePrompt must be the same type")
     }
-
-    //Not even sure we should keep this caching logic, but it's used in the "textbook" and I want to avoid breaking it for now (caching ensures people don't need to be logged in with an access key)
-    if(typeof(morePrompt) === "string"){
-      let availableResponses = cachedPrompts[prompt.trim()]
-      if(availableResponses){
-        //Cycle, rather than choosing randomly
-        if(availableResponses.count === undefined) availableResponses.count = -1
-        availableResponses.count = (availableResponses.count + 1) % availableResponses.length
-
-        //Fake stream it
-        let fullResponse = availableResponses[availableResponses.count].split(" "); 
-        setResponse("")
-
-        while (fullResponse.length > 0) {
-          let value = fullResponse.shift() 
-          await new Promise((resolve) => setTimeout(resolve, 30));
-          increaseGPTWords(1)
-          setResponse((response) => response + value + " ")
-        }
-
-        onStreamComplete && onStreamComplete(response)
-
-        return
-      }
-    }
+    */
 
     if(typeof(prompt) === "string"){
       prompt = {role: "system", content: [{type: "text", text: prompt}]}
@@ -175,7 +145,7 @@ export let useGpt = ({prompt, onParagraph}) => {
       setResponse((response) => response + chunkValue)
     }
     onStreamComplete && onStreamComplete(fullResponse)
-  }, [prompt,cachedPrompts]);
+  }, [prompt]);
 
   return [response, startStreaming]
 }

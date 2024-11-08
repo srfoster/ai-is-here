@@ -58,25 +58,6 @@ const usePathname = () => {
   return location.pathname;
 }
 
-const decodeToken = async (type,token) => {
-  // Verifier that expects valid access tokens:
-  const verifier = CognitoJwtVerifier.create({
-    userPoolId: "us-east-1_5eFNzSJSY",
-    tokenUse: type,
-    clientId: "2vs918871e1lh19ump5oblk25v",
-  });
-
-  try {
-    const payload = await verifier.verify(
-      token
-    );
-    console.log("Token is valid. Payload:", payload);
-    return payload
-  } catch(e) {
-    console.log("Token not valid!",e);
-  }
-}
-
 const modalStyle = {
   position: 'absolute',
   top: '50%',
@@ -198,34 +179,6 @@ export function EReader({ content, footnotes }) {
 
   let pathname = usePathname();
 
-  React.useEffect(() => {
-    async function func() {
-      if (pathname.startsWith("/id_token")) {
-        let { id_token, access_token } = parseOutToken(pathname)
-        setIdToken(id_token)
-        let payload = await decodeToken("id",id_token)
-        if(payload){
-          setUsername(payload["cognito:username"])
-        }
-      }
-    }
-    func()
-  }, [])
-
-  React.useEffect(() => {
-    console.log("HERE", idToken)
-    if(!idToken) return 
-
-    async function func() {
-      let payload = await decodeToken("id", idToken)
-      if (payload) {
-        setUsername(payload["cognito:username"])
-      }
-    }
-
-    func()
-  }, [idToken])
-
 
   return (
     <>
@@ -251,13 +204,6 @@ export function EReader({ content, footnotes }) {
       </UsageContext.Provider>
     </>
   );
-}
-
-let parseOutToken = (path)=>{
-  let parts = path.replace("/id_token=","").split("&")
-  let id_token = parts[0]
-  let access_token = parts[1].replace("access_token=","")
-  return {id_token,access_token}
 }
 
 let NavBar = ({prev, next}) => {
@@ -332,7 +278,7 @@ export let Benchmark = ({ name, goal, modelsTested, result }) => {
 
 export let GPT = ({prompt, avatar, hiddenPrompt, showCosts}) => {
   let { usageData } = React.useContext(UsageContext)
-  let [response, startStreaming] = useGpt({ prompt:  (hiddenPrompt || "") + " " + prompt, onParagraph: () => { } })
+  let [response, startStreaming] = useGpt({ prompt:  (hiddenPrompt || "") , onParagraph: () => { } })
 
 
   let words = response.split(" ").length
@@ -344,9 +290,9 @@ export let GPT = ({prompt, avatar, hiddenPrompt, showCosts}) => {
       {response.split("\n").map((x, i) => <ReactMarkdown key={i}>{x}</ReactMarkdown>)}
     </CardContent>
     <CardActions>
-      <Button variant="outlined" onClick={startStreaming}>Ask GPT</Button>
+      <Button variant="outlined" onClick={()=>startStreaming(prompt)}>Ask GPT</Button>
       {avatar &&
-        <div style={{marginLeft: 5}} onClick={startStreaming}>
+        <div style={{marginLeft: 5}} onClick={()=>startStreaming(prompt)}>
           <Avatar style={{ width: 50, height: 50, cursor: "pointer" }} {...avatar} />
         </div> }
       {showCosts && (
