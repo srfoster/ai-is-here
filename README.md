@@ -6,9 +6,13 @@ TODO:
 
   - Need a solution for mass-distributing access keys
     - Need place for seeing "child" access keys (so teachers can manage students)
-    - Have begun, but the security model needs work:
-       * Ensure that all lambda calls check whether the provided parentKey is actually the parent of the provided childKey
     - Make UI for creating, deleting, transfering to child keys
+    - Notes for keys -- mass upload?  Email addresses and names attached?
+    - Testing TODO:
+      - Make sure you can't transfer more credits than you have
+      - Make sure you can't take more credits than the child has
+      - Test that non-parents can't transfer/delete arbitrary child keys
+         (Although... if "keys are secret" is the rule, how would they get the arbitrary child key...)
 
   - Restore past conversations
 
@@ -18,6 +22,7 @@ TODO:
     - Tests!
       - Have integration tests on document_management lambdas, but should really unit test common-js
         - Ideally on an isolated terraform environment
+        - Need cleanup after tests (littering dynamo with child keys e.g.)
     - creditString is a weird convention (accessKey?)
       - While we're at it -- there are other oddities (consider document_management as a resource and standardize everything...)
       - documentId => just id

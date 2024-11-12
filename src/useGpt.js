@@ -7,26 +7,32 @@ import {useLocalStorage} from 'react-use'
 export const UsageContext = React.createContext();
 export const CreditStringContext = React.createContext();
 
-export let useCheckCredits = () => {
-  let [remainingCredits, setRemainingCredits] = React.useState(null);
-  const {creditString,setCreditString} = React.useContext(CreditStringContext);
+export let useCheckCredits = (creditString) => {
+  const [remainingCredits, setRemainingCredits] = React.useState(null);
+  const [lastRefresh, setLastRefresh] = React.useState(Date.now())
 
   React.useEffect(()=>{
+    console.log("Checking credits")
+    //setRemainingCredits(null)
     fetch(gptProxyData.get_credits+"?credits="+creditString)
       .then((response) => {
          return response.json()
       })
       .then((data) => {
+        console.log("Credits response", JSON.parse(data.body).remainingCredits)
         setRemainingCredits(JSON.parse(data.body).remainingCredits)
       })
-  },[])
+  },[lastRefresh, creditString])
 
-  return remainingCredits 
+  console.log("useCheckCredits",{creditString, remainingCredits})
+
+  return { remainingCredits,
+          refreshCredits: () => setLastRefresh(Date.now())}
 }
 
 export let OutOfCreditsIfOutOfCredits = ({afterRefresh}) => {
   
-  let remainingCredits = useCheckCredits()
+  let {remainingCredits, refreshCredits} = React.useContext(CreditStringContext)
 
   console.log("Remaining Credits", remainingCredits)
 

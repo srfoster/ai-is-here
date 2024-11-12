@@ -8,16 +8,15 @@ To get rid of the [GPT] flicker and send a proper conversation, need to fix up t
 
 import * as React from 'react';
 import './App.css';
-import { Button, Container, TextField, Typography, Stack } from '@mui/material';
+import { Button, Container, TextField, Typography, Stack, Slider } from '@mui/material';
 
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
 import DialogTitle from '@mui/material/DialogTitle';
 
 import "react-chat-elements/dist/main.css"
 import { MessageBox } from "react-chat-elements";
-import { useGpt, UsageContext, OutOfCredits } from "./useGpt";
+import { useGpt, UsageContext, OutOfCredits, CreditStringContext } from "./useGpt";
 import { useDocs, useDoc, useChildKeys } from "./useDocuments";
 
 import { Input } from 'react-chat-elements'
@@ -26,19 +25,38 @@ import * as RCE from 'react-chat-elements'
 import { Link, useParams } from 'react-router-dom';
 import Markdown from 'react-markdown'
 
+import { OutOfCreditsIfOutOfCredits } from './useGpt';
+
 
 let civilWarHiddenPrompt = "You are an automated tutor for a lesson about the American Civil War.  Greet the user once.  Then continually ask them one simple question at a time.  Use the Socratic method."
 
 export function ChildKeyManager() {
-  let [keys] = useChildKeys([])
+  let [keys, createKey, deleteKey, transferCreditsToKey] = useChildKeys()
+
+  let [amount, setAmount] = React.useState(1000)
 
   return <>
       <Container maxWidth="sm" >
         <Typography variant="h2">Keys</Typography>
+        <OutOfCreditsIfOutOfCredits afterRefresh={()=>{window.location.reload()}} />
+        <Slider min={1000} max={100000} step={1000}  
+          onChange={(e)=>{setAmount(e.target.value)}}
+          />
         <ul>
           {keys.map((k) => { 
             return <li key={ k.childKey}>
                {k.childKey} 
+               <ul>
+                 <li>Remaining Credits: {k.remainingCredits}</li>
+               </ul>
+               <Button onClick={() => {
+                  transferCreditsToKey(k.childKey, amount)
+                }} >Give ${amount} credits</Button>
+               <Button 
+                color="error"
+                onClick={() => {
+                  transferCreditsToKey(k.childKey, -amount)
+                }} >Take -${amount} credits</Button>
             </li>
           })}
         </ul>

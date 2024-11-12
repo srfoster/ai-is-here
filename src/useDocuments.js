@@ -2,36 +2,80 @@
 import * as React from 'react';
 import gptProxyData from "./gptProxyData.json";
 import {useLocalStorage} from 'react-use'
+import { CreditStringContext, useCheckCredits } from './useGpt';
 
 export let useChildKeys = () => {
   //TODO: Pull from context
-  let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
+  const {creditString,setCreditString,remainingCredits, refreshCredits } = React.useContext(CreditStringContext);
 
   let [keys, setKeys] = React.useState([])
 
   React.useEffect(() => {
-    fetch(gptProxyData.child_management, { method: "POST", body: JSON.stringify({ parentKey: currentCreditString, operation: "list" }) })
+    if(!creditString) {
+      return
+    }
+    fetch(gptProxyData.child_management, { method: "POST", body: JSON.stringify({ parentKey: creditString, operation: "list" }) })
       .then((response) => {
         return response.json()
       })
       .then((data) => {
-        console.log("Keys", data)
-        setKeys(JSON.parse(data.body))
+        console.log("Keys response", data) 
+        if(data.statusCode === 200){
+          console.log("Keys", data)
+          setKeys(JSON.parse(data.body))
+        }
       })
+  },[creditString]);
 
+  let createKey = (key) => {
+    fetch(gptProxyData.child_management, { method: "POST", body: JSON.stringify({ parentKey: creditString, operation: "create", childKey: key }) })
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        setKeys([...keys, key])
+      })
+  }
 
-  },[]);
+  let deleteKey = (key) => {
+    fetch(gptProxyData.child_management, { method: "POST", body: JSON.stringify({ parentKey: creditString, operation: "delete", childKey: key }) })
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        setKeys(keys.filter((k) => k !== key))
+      })
+  }
 
-  return [keys]
+  let transferCreditsToKey = (key, amount) => {
+    fetch(gptProxyData.child_management, { method: "POST", body: JSON.stringify({ parentKey: creditString, operation: "transfer", childKey: key, amount: amount }) })
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        console.log("Transfer", data)
+        if(data.statusCode === 200) {
+          setKeys(keys.map((k)=>{
+            if(k.childKey === key) {
+              return {...k, remainingCredits: k.remainingCredits + amount}
+            }
+            return k
+          }))
+          refreshCredits()
+        }
+      })
+  }
+
+  return [keys, createKey, deleteKey, transferCreditsToKey]
 }
 
 export let useDocs = () => {
-  let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
+  const {creditString,setCreditString} = React.useContext(CreditStringContext);
 
   let [documents, setDocuments] = React.useState([])
 
   React.useEffect(() => {
-    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: currentCreditString, operation: "list" }) })
+    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: creditString, operation: "list" }) })
       .then((response) => {
         return response.json()
       })
@@ -44,7 +88,7 @@ export let useDocs = () => {
   },[]);
 
   let createDocument = (document) => {
-    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: currentCreditString, operation: "create", ...document }) })
+    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: creditString, operation: "create", ...document }) })
       .then((response) => {
         return response.json()
       })
@@ -55,7 +99,7 @@ export let useDocs = () => {
   }
 
   let deleteDocument = (documentId) => {
-    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: currentCreditString, operation: "delete", documentId }) })
+    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: creditString, operation: "delete", documentId }) })
       .then((response) => {
         return response.json()
       })
@@ -65,7 +109,7 @@ export let useDocs = () => {
   }
 
   let updateDocument = (document) => {
-    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: currentCreditString, operation: "update", ...document }) })
+    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: creditString, operation: "update", ...document }) })
       .then((response) => {
         return response.json()
       })
@@ -84,11 +128,11 @@ export let useDocs = () => {
 }
 
 export let useDoc = (documentId) => {
-  let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
+  const {creditString,setCreditString} = React.useContext(CreditStringContext);
   let [doc, setDoc] = React.useState()
 
   React.useEffect(() => {
-    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: currentCreditString, operation: "read", documentId: documentId }) })
+    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: creditString, operation: "read", documentId: documentId }) })
       .then((response) => {
         return response.json()
       })
@@ -101,7 +145,7 @@ export let useDoc = (documentId) => {
     
   let updateDoc = (title, content) => {
     console.log("Updating doc", doc, title, content)
-    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: currentCreditString, operation: "update", documentId, title, content }) })
+    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: creditString, operation: "update", documentId, title, content }) })
       .then((response) => {
         return response.json()
       })
@@ -111,7 +155,7 @@ export let useDoc = (documentId) => {
   }
 
   let deleteDoc = (afterDelete) => {
-    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: currentCreditString, operation: "delete", documentId }) })
+    fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: creditString, operation: "delete", documentId }) })
       .then((response) => {
         return response.json()
       })

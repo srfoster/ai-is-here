@@ -29,7 +29,7 @@
 
 import * as React from 'react';
 import './App.css';
-import { CreditStringContext, OutOfCreditsIfOutOfCredits } from './useGpt';
+import { CreditStringContext, OutOfCreditsIfOutOfCredits, useCheckCredits } from './useGpt';
 import { EReader} from './EReader';
 import { Introduction,  Chapter1, Acknowledgements, } from './Sections';
 import { Tutor, TutorManager, ChildKeyManager } from './Tutor';
@@ -130,11 +130,18 @@ function HomePageTile({title, children}) {
 }
 
 function App() {
+
   let [creditString, setCreditString] = useLocalStorage("credit-string", "")
+
+  let {remainingCredits, 
+       refreshCredits} = useCheckCredits(creditString)
 
   return (
     <>
-      <CreditStringContext.Provider value={{creditString, setCreditString}}>
+      <CreditStringContext.Provider value={{creditString, 
+        setCreditString,
+        remainingCredits,
+        refreshCredits}}>
         <Router>
           <MainAppBar />
           <br/>
