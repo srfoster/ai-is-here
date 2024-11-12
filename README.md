@@ -13,6 +13,7 @@ TODO:
       - Make sure you can't take more credits than the child has
       - Test that non-parents can't transfer/delete arbitrary child keys
          (Although... if "keys are secret" is the rule, how would they get the arbitrary child key...)
+    - At some point we'll need pagination for the Keys page...
 
   - Restore past conversations
 

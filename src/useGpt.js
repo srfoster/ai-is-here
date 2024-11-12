@@ -30,7 +30,7 @@ export let useCheckCredits = (creditString) => {
           refreshCredits: () => setLastRefresh(Date.now())}
 }
 
-export let OutOfCreditsIfOutOfCredits = ({afterRefresh}) => {
+export let OutOfCreditsIfOutOfCredits = ({afterRefresh, showLogout}) => {
   
   let {remainingCredits, refreshCredits} = React.useContext(CreditStringContext)
 
@@ -43,9 +43,11 @@ export let OutOfCreditsIfOutOfCredits = ({afterRefresh}) => {
   } else {
     return <Alert severity='info'>
       <Chip label={"Remaining credits: " + remainingCredits} />
-      <br/>
-      <br/>
-      <Logout afterRefresh={afterRefresh} />
+      {showLogout && <>
+        <br/>
+        <br/>
+        <Logout afterRefresh={afterRefresh} />
+      </>}
     </Alert>
   }
 }

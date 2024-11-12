@@ -8,7 +8,7 @@ To get rid of the [GPT] flicker and send a proper conversation, need to fix up t
 
 import * as React from 'react';
 import './App.css';
-import { Button, Container, TextField, Typography, Stack, Slider } from '@mui/material';
+import { Button, Card, Checkbox, Container, TextField, Typography, Stack, Slider, CardContent } from '@mui/material';
 
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
@@ -26,40 +26,106 @@ import { Link, useParams } from 'react-router-dom';
 import Markdown from 'react-markdown'
 
 import { OutOfCreditsIfOutOfCredits } from './useGpt';
+import { Check } from '@mui/icons-material';
 
 
 let civilWarHiddenPrompt = "You are an automated tutor for a lesson about the American Civil War.  Greet the user once.  Then continually ask them one simple question at a time.  Use the Socratic method."
 
 export function ChildKeyManager() {
+  const {remainingCredits} = React.useContext(CreditStringContext);
   let [keys, createKey, deleteKey, transferCreditsToKey] = useChildKeys()
-
   let [amount, setAmount] = React.useState(1000)
+  let [selectedKeys, setSelectedKeys] = React.useState([])
+  let splitAmount = Math.floor(amount/selectedKeys.length)
+  let minSplitAmount = Math.min(
+    ...[
+      ...keys.filter((k)=>selectedKeys.includes(k.childKey))
+             .map((k)=>k.remainingCredits)]
+  )
 
   return <>
       <Container maxWidth="sm" >
         <Typography variant="h2">Keys</Typography>
-        <OutOfCreditsIfOutOfCredits afterRefresh={()=>{window.location.reload()}} />
-        <Slider min={1000} max={100000} step={1000}  
-          onChange={(e)=>{setAmount(e.target.value)}}
-          />
-        <ul>
+            <OutOfCreditsIfOutOfCredits 
+              showLogout={false}
+              />
+            <br/>
+            <br/>
+            <Typography variant="p">Use the slider to control how many credits you'd like to give or take</Typography>
+            <Stack direction="row">
+              <Slider 
+                min={0} 
+                max={
+                  Math.max(
+                    ...[remainingCredits, ...keys.map((k)=>k.remainingCredits)])
+                } 
+                step={1000}  
+                valueLabelDisplay="auto"
+                onChange={(e)=>{setAmount(e.target.value)}}
+                />
+            </Stack>
+
+        <br/> 
+        <hr/>
+        <Stack direction="row" alignItems={"center"}>
+          <Checkbox onClick={(e) => {
+            if(e.target.checked){
+              setSelectedKeys(keys.map((k) => k.childKey))
+            } else {
+              setSelectedKeys([])
+            }
+          }} />  
+          <Typography variant="span">Select All</Typography>
+            {selectedKeys.length > 0 && <>
+              <Button 
+                onClick={async () => {
+                  for (let k of keys.filter(k => selectedKeys.includes(k.childKey))) {
+                    await transferCreditsToKey(k.childKey, splitAmount)
+                  }
+                } } >Give to selected {isFinite(splitAmount) ? `(${splitAmount})` : ""}</Button>
+              <Button 
+                color="error" 
+                onClick={async () => {
+                  for (let k of keys.filter(k => selectedKeys.includes(k.childKey))) {
+                    await transferCreditsToKey(k.childKey, -minSplitAmount)
+                  }
+                } } >Take from selected {isFinite(splitAmount) ? `(-${minSplitAmount})` : ""}</Button>
+            </>}
+        </Stack>
+          <hr/>
           {keys.map((k) => { 
-            return <li key={ k.childKey}>
+            let takeAmount = Math.min(amount, k.remainingCredits)
+            let giveAmount = Math.min(amount, remainingCredits)
+            return <div key={ k.childKey}>
+               <Checkbox
+                 checked={selectedKeys.includes(k.childKey)}
+                 onClick={
+                    (e) => {
+                      if(e.target.checked){
+                        setSelectedKeys([...selectedKeys, k.childKey])
+                      } else {
+                        setSelectedKeys(selectedKeys.filter((sk) => sk !== k.childKey))
+                      }
+                    }
+                  }
+                />
                {k.childKey} 
-               <ul>
-                 <li>Remaining Credits: {k.remainingCredits}</li>
-               </ul>
-               <Button onClick={() => {
-                  transferCreditsToKey(k.childKey, amount)
-                }} >Give ${amount} credits</Button>
-               <Button 
-                color="error"
-                onClick={() => {
-                  transferCreditsToKey(k.childKey, -amount)
-                }} >Take -${amount} credits</Button>
-            </li>
+               <Stack style={{marginLeft: 50}} direction="row" alignItems="center">
+                <Typography variant="div">Credits: {k.remainingCredits}</Typography>
+                <Button onClick={() => {
+                    transferCreditsToKey(k.childKey, amount)
+                  }} >Give +{giveAmount}</Button>
+                {k.remainingCredits > 0 &&
+                  <Button 
+                    color="error"
+                    onClick={() => {
+                      transferCreditsToKey(k.childKey, -takeAmount)
+                    }} >Take -{takeAmount}</Button>
+                }
+               </Stack>
+               <hr/>
+            </div>
           })}
-        </ul>
       </Container>
   </>
 }
