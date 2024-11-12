@@ -3,6 +3,28 @@ import * as React from 'react';
 import gptProxyData from "./gptProxyData.json";
 import {useLocalStorage} from 'react-use'
 
+export let useChildKeys = () => {
+  //TODO: Pull from context
+  let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
+
+  let [keys, setKeys] = React.useState([])
+
+  React.useEffect(() => {
+    fetch(gptProxyData.child_management, { method: "POST", body: JSON.stringify({ parentKey: currentCreditString, operation: "list" }) })
+      .then((response) => {
+        return response.json()
+      })
+      .then((data) => {
+        console.log("Keys", data)
+        setKeys(JSON.parse(data.body))
+      })
+
+
+  },[]);
+
+  return [keys]
+}
+
 export let useDocs = () => {
   let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
 

@@ -18,7 +18,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import "react-chat-elements/dist/main.css"
 import { MessageBox } from "react-chat-elements";
 import { useGpt, UsageContext, OutOfCredits } from "./useGpt";
-import { useDocs, useDoc } from "./useDocuments";
+import { useDocs, useDoc, useChildKeys } from "./useDocuments";
 
 import { Input } from 'react-chat-elements'
 import * as RCE from 'react-chat-elements'
@@ -28,6 +28,23 @@ import Markdown from 'react-markdown'
 
 
 let civilWarHiddenPrompt = "You are an automated tutor for a lesson about the American Civil War.  Greet the user once.  Then continually ask them one simple question at a time.  Use the Socratic method."
+
+export function ChildKeyManager() {
+  let [keys] = useChildKeys([])
+
+  return <>
+      <Container maxWidth="sm" >
+        <Typography variant="h2">Keys</Typography>
+        <ul>
+          {keys.map((k) => { 
+            return <li key={ k.childKey}>
+               {k.childKey} 
+            </li>
+          })}
+        </ul>
+      </Container>
+  </>
+}
 
 export function TutorManager() {
   let [documents, createDocument, deleteDocument, updateDocument] = useDocs()

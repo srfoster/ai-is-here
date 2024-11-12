@@ -2,12 +2,13 @@ TODO:
 
 * Document management features
   - Purpose: Let users CRUDI documents so that they can (among other things) store documents that are used as bot prompts
-
-  - Need to make bots public by default (no restriction if not the owner)
-    - And don't show the Edit Bot button
+  - Bots public by default and get a unique URL
 
   - Need a solution for mass-distributing access keys
     - Need place for seeing "child" access keys (so teachers can manage students)
+    - Have begun, but the security model needs work:
+       * Ensure that all lambda calls check whether the provided parentKey is actually the parent of the provided childKey
+    - Make UI for creating, deleting, transfering to child keys
 
   - Restore past conversations
 

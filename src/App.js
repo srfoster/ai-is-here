@@ -32,7 +32,7 @@ import './App.css';
 import { CreditStringContext, OutOfCreditsIfOutOfCredits } from './useGpt';
 import { EReader} from './EReader';
 import { Introduction,  Chapter1, Acknowledgements, } from './Sections';
-import { Tutor, TutorManager } from './Tutor';
+import { Tutor, TutorManager, ChildKeyManager } from './Tutor';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 import { useLocation,
   HashRouter as Router,
@@ -59,6 +59,9 @@ function MainAppBar() {
           </Typography>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             <Link to="/bots" style={{color: "white"}}>Bots</Link>
+          </Typography>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            <Link to="/keys" style={{color: "white"}}>Keys</Link>
           </Typography>
         </Toolbar>
       </AppBar>
@@ -142,6 +145,10 @@ function App() {
             </Route>
             <Route path="/bots" element={
               <TutorManager />
+            }>
+            </Route>
+            <Route path="/keys" element={
+              <ChildKeyManager />
             }>
             </Route>
             <Route path="/bots/:documentId"
