@@ -61,7 +61,22 @@ export let useChildKeys = () => {
     }
   }
 
-  return [keys, createKey, deleteKey, transferCreditsToKey]
+  let sendInvite = async (key) => {
+    let response = await fetch(gptProxyData.child_management, { method: "POST", body: JSON.stringify({ operation: "invite", childKey: key }) })
+
+    let data = await response.json()
+
+    if(data.statusCode === 200) {
+      setKeys((keys) => keys.map((k)=>{
+        if(k.childKey === key) {
+          return {...k, inviteSent: true}
+        }
+        return k
+      }))
+    }
+  }
+
+  return [keys, createKey, deleteKey, transferCreditsToKey, sendInvite]
 }
 
 export let useDocs = () => {

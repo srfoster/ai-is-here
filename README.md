@@ -1,14 +1,13 @@
 TODO:
 
   - Need a solution for mass-distributing access keys
-    - Need place for seeing "child" access keys (so teachers can manage students)
-    - Notes for keys -- mass upload?  Email addresses and names attached?
-      * Use a bot for this?
+    - Send email invites
     - Testing TODO:
       - Make sure you can't transfer more credits than you have
       - Make sure you can't take more credits than the child has
-    - At some point we'll need pagination for the Keys page...
-      * Also, what to do with the create key widget?  No good place for it -- if between slider and list, unclear.  If below list or above slider, can't see newly created key (if we must do this, place a "Successfully created (scroll up)" message near the creation widget) 
+
+  - Chrome bug:
+    - Deleted items don't fully disappear 
 
   - Restore past conversations with bots
     * Tie bot id to the stored conversations 
@@ -20,6 +19,7 @@ TODO:
   - DEBT ACCRUED! 
     - UI is crappy.
       - Polishings etc (enter sends chat message)
+      - At some point we'll need pagination for the Keys page...
     - Tests!
       - Have integration tests on document_management lambdas, but should really unit test common-js
         - Ideally on an isolated terraform environment

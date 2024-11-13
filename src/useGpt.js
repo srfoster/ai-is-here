@@ -12,10 +12,15 @@ export let useCheckCredits = (creditString) => {
   const [lastRefresh, setLastRefresh] = React.useState(Date.now())
 
   React.useEffect(()=>{
-    console.log("Checking credits")
+    if (!creditString) {
+      setRemainingCredits(null)
+      return
+    }
+    console.log("Checking credits for", creditString)
     //setRemainingCredits(null)
     fetch(gptProxyData.get_credits+"?credits="+creditString)
       .then((response) => {
+        console.log("Credits response", response)
          return response.json()
       })
       .then((data) => {
@@ -36,9 +41,7 @@ export let OutOfCreditsIfOutOfCredits = ({afterRefresh, showLogout}) => {
 
   console.log("Remaining Credits", remainingCredits)
 
-  if(remainingCredits === null) return <div>Checking credits...</div>
-
-  if(remainingCredits < 0 || remainingCredits === undefined){
+  if(remainingCredits < 0 || remainingCredits == undefined){
     return <OutOfCredits afterRefresh={afterRefresh} />
   } else {
     return <Alert severity='info'>

@@ -43,7 +43,7 @@ let civilWarHiddenPrompt = "You are an automated tutor for a lesson about the Am
 
 export function ChildKeyManager() {
   const {remainingCredits} = React.useContext(CreditStringContext);
-  let [keys, createKey, deleteKey, transferCreditsToKey] = useChildKeys()
+  let [keys, createKey, deleteKey, transferCreditsToKey, sendInvite] = useChildKeys()
   let [amount, setAmount] = React.useState(1000)
   let [newKeyName, setNewKeyName] = React.useState("")
   let [selectedKeys, setSelectedKeys] = React.useState([])
@@ -123,6 +123,7 @@ export function ChildKeyManager() {
                   />
                <SafeShowKey k={k} 
                  deleteKey={() => deleteKey(k.childKey)}
+                 sendInvite={() => sendInvite(k.childKey)}
                  creditActions={<>
                     <Button onClick={() => {
                         transferCreditsToKey(k.childKey, amount)
@@ -268,9 +269,9 @@ function BulkKeyCreation({createKey}){
     <Button onClick={async () => {
       let lines = bulkKeyString.split("\n").map((s) => s.trim())
       for(let l of lines){
-        let e = l.match(/<(.*)>/)
+        let e = l.match(/<([^<>]*)>/)
         let n = e ? l.replace(e[0], "").trim() : l
-        await createKey({name: n, email: e ? e[0] : ""})
+        await createKey({name: n, email: e ? e[1] : ""})
       }
       setBulkKeyString("")
     }} >Create Keys</Button>
@@ -278,7 +279,7 @@ function BulkKeyCreation({createKey}){
 }
 
 
-export function SafeShowKey({k, deleteKey, creditActions}){
+export function SafeShowKey({k, deleteKey, creditActions, sendInvite}){
   let [expanded, setExpanded] = React.useState(false)
   if(!k) return ""
   const date = new Date(k.createdAt);
@@ -297,6 +298,7 @@ export function SafeShowKey({k, deleteKey, creditActions}){
         {creditActions}
       </Stack>
     </Stack>
+   <Button variant="contained" color="primar" onClick={sendInvite}>Send Invite</Button>
    <Button variant="contained" color="error" onClick={deleteKey}>Delete</Button>
    </Stack>
   }
