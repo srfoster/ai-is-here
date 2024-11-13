@@ -30,6 +30,10 @@ import { OutOfCreditsIfOutOfCredits } from './useGpt';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+
+
 TimeAgo.addDefaultLocale(en);
 
 const timeAgo = new TimeAgo('en-US');
@@ -53,20 +57,16 @@ export function ChildKeyManager() {
   return <>
       <Container maxWidth="sm" style={{marginBottom: 100}}>
         <Typography variant="h2">Keys</Typography>
-        {keys.length === 0 ? <Typography variant="p">You have no keys.  Create one below.</Typography> : <>
-        <Typography variant="p">You have {remainingCredits} credits. Use the slider and the buttons in the list below to control how many credits you'd like to give or take</Typography>
-        <Stack direction="row">
-          <Slider 
-            min={0} 
-            max={
-              Math.max(
-                ...[remainingCredits, ...keys.map((k)=>k.remainingCredits)])
-            } 
-            step={1000}  
-            valueLabelDisplay="auto"
-            onChange={(e)=>{setAmount(e.target.value)}}
-            />
-        </Stack>
+        <KeyManagementTools 
+          keys={keys} 
+          remainingCredits={remainingCredits} 
+          setAmount={setAmount} 
+          createKey={createKey}
+          setNewKeyName={setNewKeyName}
+          newKeyName={newKeyName}
+          />
+        {keys.length === 0 ? <Typography variant="p">You have no keys.  Create one with the widget above.</Typography> : 
+        <>
         <br/> 
         <hr/>
         <Stack direction="row" alignItems={"center"}>
@@ -142,6 +142,94 @@ export function ChildKeyManager() {
         </>}
         <br/>
         <br/>
+      </Container>
+  </>
+}
+
+function CustomTabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
+
+function BasicTabs({items}) {
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  return (
+    <Box sx={{ width: '100%' }}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+          {items.map((i, index)=>{
+            return <Tab label={i.title} {...a11yProps(index)} />
+          })}
+        </Tabs>
+      </Box>
+      {items.map((i, index)=>{
+        return <CustomTabPanel value={value} index={index}>
+          {i.content}
+        </CustomTabPanel>
+      })}
+    </Box>
+  );
+}
+
+//Too many params
+export function KeyManagementTools({keys, remainingCredits, setAmount, createKey, setNewKeyName, newKeyName}){
+
+  return <>
+  <BasicTabs items={[
+    {title: "Create Keys", 
+     content: <KeyCreationWidgets 
+                createKey={createKey}
+                newKeyName={newKeyName}
+                setNewKeyName={setNewKeyName} 
+                />},
+    {title: "Manage Credits", content:
+    <>
+        <Typography variant="p">You have {remainingCredits} credits. Use the slider and the buttons in the list below to control how many credits you'd like to give or take</Typography>
+        <Stack direction="row">
+          <Slider 
+            min={0} 
+            max={
+              Math.max(
+                ...[remainingCredits, ...keys.map((k)=>k.remainingCredits)])
+            } 
+            step={1000}  
+            valueLabelDisplay="auto"
+            onChange={(e)=>{setAmount(e.target.value)}}
+            />
+        </Stack>
+      </>},
+  ]} />
+  </>
+}
+
+function KeyCreationWidgets({newKeyName, setNewKeyName, createKey}){
+  return <>
+        <Typography variant="p">Create a new key to give to someone else.  Give it a name to help you remember what the key is for.  </Typography>
+        <br/>
+        <br/>
         <Stack direction="row" alignItems={"center"} >
           <TextField 
             label="New Key Name"
@@ -152,9 +240,43 @@ export function ChildKeyManager() {
             setNewKeyName("")
           }} >Create Key</Button>
         </Stack>
-      </Container>
+        <br/>
+        <Typography variant="p">
+          Or, if you need to create a lot of keys at once, 
+          use the bulk key creation tool below.  Each key needs its
+          own line containing a name, an email address, or both. 
+          Emails must be enclosed in angle brackets like so: {`<me@example.com>`}  
+        </Typography>
+        <br/>
+        <br/>
+        <BulkKeyCreation createKey={createKey} />
+        
   </>
 }
+
+//A single box where user can enter comma separated list of names and email addresses
+function BulkKeyCreation({createKey}){
+  let [bulkKeyString, setBulkKeyString] = React.useState("")
+
+  return <>
+    <TextField 
+      label="Bulk Key Creation"
+      multiline
+      rows={4}
+      value={bulkKeyString}
+      onChange={(e) => {setBulkKeyString(e.target.value)}} />
+    <Button onClick={async () => {
+      let lines = bulkKeyString.split("\n").map((s) => s.trim())
+      for(let l of lines){
+        let e = l.match(/<(.*)>/)
+        let n = e ? l.replace(e[0], "").trim() : l
+        await createKey({name: n, email: e ? e[0] : ""})
+      }
+      setBulkKeyString("")
+    }} >Create Keys</Button>
+  </>
+}
+
 
 export function SafeShowKey({k, deleteKey, creditActions}){
   let [expanded, setExpanded] = React.useState(false)
@@ -200,7 +322,7 @@ export function TutorManager() {
   </>
 }
 
-export function Tutor() {
+export function Tutor({hiddenPrompt}) {
     let [usageData, setUsageData] = React.useState({
         gptWords: 0
     })
@@ -211,7 +333,7 @@ export function Tutor() {
     return (
       <Container maxWidth="sm" style={{paddingTop: 30}}>
         <UsageContext.Provider value={{ usageData, increaseGPTWords }}>
-            <Chat />
+            <Chat providedHiddenPrompt={hiddenPrompt} />
         </UsageContext.Provider> 
       </Container>
     )
@@ -232,7 +354,7 @@ function postProcessGPT(text, afterRefresh){
 }
 
 
-function Chat(){
+function Chat({providedHiddenPrompt}){
 
     let [streaming, setStreaming] = React.useState(false)
     let [shouldReply, setShouldReply] = React.useState(true)
@@ -241,10 +363,8 @@ function Chat(){
     let [inputVal, setInputVal] = React.useState("")
     let inputRef = React.createRef()
 
-    let { documentId } = useParams()
-    let [doc, updateDoc, deleteDoc] = useDoc(documentId)
 
-    let [hiddenPrompt, setHiddenPrompt] = React.useState(undefined)
+    let [hiddenPrompt, setHiddenPrompt] = React.useState(providedHiddenPrompt)
 
     let [editMode, setEditMode] = React.useState(false)
     let [nextPrompt, setNextPrompt] = React.useState(hiddenPrompt)
@@ -257,6 +377,10 @@ function Chat(){
 
       } })
 
+    let { documentId } = useParams()
+    let [doc, updateDoc, deleteDoc] = useDoc(documentId)
+    console.log("Doc", doc)
+
     React.useEffect(() => {
       if(doc && doc.content){
         setHiddenPrompt(doc.content)
@@ -265,7 +389,14 @@ function Chat(){
         setOwner(doc.owner)
         setShouldReply(true)
       } 
-    }, [JSON.stringify(doc)])
+      if(providedHiddenPrompt){
+        console.log("Starting the bot...")
+        setHiddenPrompt(providedHiddenPrompt)
+        setNextPrompt(providedHiddenPrompt)
+        setNextTitle("")
+        setShouldReply(true)
+      }
+    }, [JSON.stringify(doc), providedHiddenPrompt])
 
     React.useEffect(()=>{
         if(!shouldReply) return 

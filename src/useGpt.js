@@ -43,7 +43,7 @@ export let OutOfCreditsIfOutOfCredits = ({afterRefresh, showLogout}) => {
   } else {
     return <Alert severity='info'>
       <Chip label={"Remaining credits: " + remainingCredits} />
-      {showLogout && <>
+      {(showLogout || showLogout === undefined) && <>
         <br/>
         <br/>
         <Logout afterRefresh={afterRefresh} />

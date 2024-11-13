@@ -1,16 +1,7 @@
 TODO:
 
-* Document management features
-  - Purpose: Let users CRUDI documents so that they can (among other things) store documents that are used as bot prompts
-  - Bots public by default and get a unique URL
-
-  - SECURITY
-    * Really need to think through some worst case scenarios
-      (Someone gets my key and deletes all other keys?)
-
   - Need a solution for mass-distributing access keys
     - Need place for seeing "child" access keys (so teachers can manage students)
-      * NOTE: Should we stop displaying these in plain text?
     - Notes for keys -- mass upload?  Email addresses and names attached?
       * Use a bot for this?
     - Testing TODO:
@@ -21,6 +12,10 @@ TODO:
 
   - Restore past conversations with bots
     * Tie bot id to the stored conversations 
+
+  - SECURITY
+    * Really need to think through some worst case scenarios
+      (Someone gets my key and deletes all other keys?)
 
   - DEBT ACCRUED! 
     - UI is crappy.
@@ -34,27 +29,22 @@ TODO:
       - documentId => just id
     
 * Tutor improvements
-  - Make it possible to edit the prompt
-    * Store in backend?
-  - Make various tutor bots, tile them on the tutors index page
   - Be able to assign avatars to the bots
-  - Do a UI/UX pass on the chat itself (bubbles, pressing enter, etc)
 
 * POS for getting more credits
-
   
 * Next feature?  
   - Clean up UI of the tutoring bot
   - Make better homepage
-  - Maybe a "backend" for teachers bots?  (Could also be on s3?)
-     s:///bucket/users/ABCDE/prompts/blah-bla-blah
-  - CRUD operations on prompts (bots)?
 
+UI/UX
 * OutOfCredits is a bit ugly on the homepage
   - Make it more of a "Welcome" "Please enter credits" feel
   - Consider: Running low on credits message...
   - Make it display your current number of credits (possibly show a progress bar somewhere?)
 
+11/12/2024:
+  - Tons of features over the past few sessions.  Access Key management
 
 11/1/2024:
   - Implemented the lambda backend for check_credits

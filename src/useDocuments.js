@@ -31,7 +31,7 @@ export let useChildKeys = () => {
       })
       .then((data) => {
         if(data.statusCode === 200)
-          setKeys([{...JSON.parse(data.body), createdAt: new Date(), justCreated: true}, ...keys])
+          setKeys((keys)=>[{...JSON.parse(data.body), createdAt: new Date(), justCreated: true}, ...keys])
       })
   }
 
