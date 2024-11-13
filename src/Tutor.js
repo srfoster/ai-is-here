@@ -26,7 +26,13 @@ import { Link, useParams } from 'react-router-dom';
 import Markdown from 'react-markdown'
 
 import { OutOfCreditsIfOutOfCredits } from './useGpt';
-import { Check } from '@mui/icons-material';
+
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
+
+TimeAgo.addDefaultLocale(en);
+
+const timeAgo = new TimeAgo('en-US');
 
 
 let civilWarHiddenPrompt = "You are an automated tutor for a lesson about the American Civil War.  Greet the user once.  Then continually ask them one simple question at a time.  Use the Socratic method."
@@ -35,6 +41,7 @@ export function ChildKeyManager() {
   const {remainingCredits} = React.useContext(CreditStringContext);
   let [keys, createKey, deleteKey, transferCreditsToKey] = useChildKeys()
   let [amount, setAmount] = React.useState(1000)
+  let [newKeyName, setNewKeyName] = React.useState("")
   let [selectedKeys, setSelectedKeys] = React.useState([])
   let splitAmount = Math.floor(amount/selectedKeys.length)
   let minSplitAmount = Math.min(
@@ -44,27 +51,22 @@ export function ChildKeyManager() {
   )
 
   return <>
-      <Container maxWidth="sm" >
+      <Container maxWidth="sm" style={{marginBottom: 100}}>
         <Typography variant="h2">Keys</Typography>
-            <OutOfCreditsIfOutOfCredits 
-              showLogout={false}
-              />
-            <br/>
-            <br/>
-            <Typography variant="p">Use the slider to control how many credits you'd like to give or take</Typography>
-            <Stack direction="row">
-              <Slider 
-                min={0} 
-                max={
-                  Math.max(
-                    ...[remainingCredits, ...keys.map((k)=>k.remainingCredits)])
-                } 
-                step={1000}  
-                valueLabelDisplay="auto"
-                onChange={(e)=>{setAmount(e.target.value)}}
-                />
-            </Stack>
-
+        {keys.length === 0 ? <Typography variant="p">You have no keys.  Create one below.</Typography> : <>
+        <Typography variant="p">You have {remainingCredits} credits. Use the slider and the buttons in the list below to control how many credits you'd like to give or take</Typography>
+        <Stack direction="row">
+          <Slider 
+            min={0} 
+            max={
+              Math.max(
+                ...[remainingCredits, ...keys.map((k)=>k.remainingCredits)])
+            } 
+            step={1000}  
+            valueLabelDisplay="auto"
+            onChange={(e)=>{setAmount(e.target.value)}}
+            />
+        </Stack>
         <br/> 
         <hr/>
         <Stack direction="row" alignItems={"center"}>
@@ -90,45 +92,92 @@ export function ChildKeyManager() {
                     await transferCreditsToKey(k.childKey, -minSplitAmount)
                   }
                 } } >Take from selected {isFinite(splitAmount) ? `(-${minSplitAmount})` : ""}</Button>
+              {/*<Button
+                variant="contained"
+                color="error"
+                onClick={async () => {
+                  for (let k of keys.filter(k => selectedKeys.includes(k.childKey))) {
+                    await deleteKey(k.childKey)
+                  }
+                } } >Delete selected</Button>*/}
             </>}
         </Stack>
           <hr/>
           {keys.map((k) => { 
             let takeAmount = Math.min(amount, k.remainingCredits)
             let giveAmount = Math.min(amount, remainingCredits)
-            return <div key={ k.childKey}>
-               <Checkbox
-                 checked={selectedKeys.includes(k.childKey)}
-                 onClick={
-                    (e) => {
-                      if(e.target.checked){
-                        setSelectedKeys([...selectedKeys, k.childKey])
-                      } else {
-                        setSelectedKeys(selectedKeys.filter((sk) => sk !== k.childKey))
+
+            return <div key={k.childKey} className={k.justDeleted ? "fade-out" : (k.justCreated ? "fade-in" : "")}>
+              <Stack direction="row" alignItems="center">
+                <Checkbox
+                  checked={selectedKeys.includes(k.childKey)}
+                  onClick={
+                      (e) => {
+                        if(e.target.checked){
+                          setSelectedKeys([...selectedKeys, k.childKey])
+                        } else {
+                          setSelectedKeys(selectedKeys.filter((sk) => sk !== k.childKey))
+                        }
                       }
                     }
-                  }
-                />
-               {k.childKey} 
-               <Stack style={{marginLeft: 50}} direction="row" alignItems="center">
-                <Typography variant="div">Credits: {k.remainingCredits}</Typography>
-                <Button onClick={() => {
-                    transferCreditsToKey(k.childKey, amount)
-                  }} >Give +{giveAmount}</Button>
-                {k.remainingCredits > 0 &&
-                  <Button 
-                    color="error"
-                    onClick={() => {
-                      transferCreditsToKey(k.childKey, -takeAmount)
-                    }} >Take -{takeAmount}</Button>
-                }
+                  />
+               <SafeShowKey k={k} 
+                 deleteKey={() => deleteKey(k.childKey)}
+                 creditActions={<>
+                    <Button onClick={() => {
+                        transferCreditsToKey(k.childKey, amount)
+                      }} >Give +{giveAmount}</Button>
+                    {k.remainingCredits > 0 &&
+                      <Button 
+                        color="error"
+                        onClick={() => {
+                          transferCreditsToKey(k.childKey, -takeAmount)
+                        }} >Take -{takeAmount}</Button>
+                    }
+                    </>} />
                </Stack>
                <hr/>
             </div>
           })}
+        </>}
+        <br/>
+        <br/>
+        <Stack direction="row" alignItems={"center"} >
+          <TextField 
+            label="New Key Name"
+            value={newKeyName}
+            onChange={(e) => {setNewKeyName(e.target.value)}} />
+          <Button onClick={() => {
+            createKey({name: newKeyName})
+            setNewKeyName("")
+          }} >Create Key</Button>
+        </Stack>
       </Container>
   </>
 }
+
+export function SafeShowKey({k, deleteKey, creditActions}){
+  let [expanded, setExpanded] = React.useState(false)
+  if(!k) return ""
+  const date = new Date(k.createdAt);
+  const formattedDateString = timeAgo.format(date);
+
+  return <Stack direction="row" alignItems="center" justifyContent={"space-between"} spacing={10}>
+    <Stack>
+      <div><b>Secret:</b> {<>{expanded ? k.childKey : k.childKey.slice(0, 4)} <span style={{cursor:"pointer", color: "blue", textDecoration: "underline"}} onClick={()=>setExpanded(!expanded)}>{expanded ? "(hide)" : "..."}</span></>}
+      <div><b>Created:</b> {formattedDateString}</div>
+      {k.metadata && Object.keys(k.metadata).length > 0 && Object.keys(k.metadata).map((key) => {
+        return <div><Typography variant="div"><b>{key}:</b> {k.metadata[key]}</Typography></div>
+      })}
+      </div>
+      <Stack direction="row" alignItems={"center"}>
+        <span><b>Remaining Credits:</b> {k.remainingCredits}</span> 
+        {creditActions}
+      </Stack>
+    </Stack>
+   <Button variant="contained" color="error" onClick={deleteKey}>Delete</Button>
+   </Stack>
+  }
 
 export function TutorManager() {
   let [documents, createDocument, deleteDocument, updateDocument] = useDocs()

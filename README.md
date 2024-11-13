@@ -4,18 +4,23 @@ TODO:
   - Purpose: Let users CRUDI documents so that they can (among other things) store documents that are used as bot prompts
   - Bots public by default and get a unique URL
 
+  - SECURITY
+    * Really need to think through some worst case scenarios
+      (Someone gets my key and deletes all other keys?)
+
   - Need a solution for mass-distributing access keys
     - Need place for seeing "child" access keys (so teachers can manage students)
-    - Make UI for creating, deleting, transfering to child keys
+      * NOTE: Should we stop displaying these in plain text?
     - Notes for keys -- mass upload?  Email addresses and names attached?
+      * Use a bot for this?
     - Testing TODO:
       - Make sure you can't transfer more credits than you have
       - Make sure you can't take more credits than the child has
-      - Test that non-parents can't transfer/delete arbitrary child keys
-         (Although... if "keys are secret" is the rule, how would they get the arbitrary child key...)
     - At some point we'll need pagination for the Keys page...
+      * Also, what to do with the create key widget?  No good place for it -- if between slider and list, unclear.  If below list or above slider, can't see newly created key (if we must do this, place a "Successfully created (scroll up)" message near the creation widget) 
 
-  - Restore past conversations
+  - Restore past conversations with bots
+    * Tie bot id to the stored conversations 
 
   - DEBT ACCRUED! 
     - UI is crappy.
@@ -34,6 +39,8 @@ TODO:
   - Make various tutor bots, tile them on the tutors index page
   - Be able to assign avatars to the bots
   - Do a UI/UX pass on the chat itself (bubbles, pressing enter, etc)
+
+* POS for getting more credits
 
   
 * Next feature?  

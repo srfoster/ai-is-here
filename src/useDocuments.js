@@ -5,7 +5,6 @@ import {useLocalStorage} from 'react-use'
 import { CreditStringContext, useCheckCredits } from './useGpt';
 
 export let useChildKeys = () => {
-  //TODO: Pull from context
   const {creditString,setCreditString,remainingCredits, refreshCredits } = React.useContext(CreditStringContext);
 
   let [keys, setKeys] = React.useState([])
@@ -19,21 +18,20 @@ export let useChildKeys = () => {
         return response.json()
       })
       .then((data) => {
-        console.log("Keys response", data) 
         if(data.statusCode === 200){
-          console.log("Keys", data)
           setKeys(JSON.parse(data.body))
         }
       })
   },[creditString]);
 
-  let createKey = (key) => {
-    fetch(gptProxyData.child_management, { method: "POST", body: JSON.stringify({ parentKey: creditString, operation: "create", childKey: key }) })
+  let createKey = (metadata = {}) => {
+    fetch(gptProxyData.child_management, { method: "POST", body: JSON.stringify({ parentKey: creditString, operation: "create", metadata: metadata}) })
       .then((response) => {
         return response.json()
       })
       .then((data) => {
-        setKeys([...keys, key])
+        if(data.statusCode === 200)
+          setKeys([{...JSON.parse(data.body), createdAt: new Date(), justCreated: true}, ...keys])
       })
   }
 
@@ -43,7 +41,7 @@ export let useChildKeys = () => {
         return response.json()
       })
       .then((data) => {
-        setKeys(keys.filter((k) => k !== key))
+        setKeys(keys.map((k) => k.childKey !== key ? k : {...k, justDeleted: true}))
       })
   }
 
