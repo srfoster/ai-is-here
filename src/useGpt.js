@@ -98,7 +98,7 @@ export let useGpt = ({prompt, onParagraph}) => {
 
   
 
-  let startStreaming = React.useCallback(async (morePrompt, onStreamComplete) => {
+  let startStreaming = React.useCallback(async (morePrompt, onStreamComplete, extraParams) => {
     console.log({prompt, morePrompt})
     if(!creditString){
       console.log("No credit string")
@@ -120,12 +120,6 @@ export let useGpt = ({prompt, onParagraph}) => {
     setResponse("")
 
 
-    /*
-    if(typeof(morePrompt) !== typeof(prompt)){
-      throw new Error("Prompt and morePrompt must be the same type")
-    }
-    */
-
     if(typeof(prompt) === "string"){
       prompt = {role: "system", content: [{type: "text", text: prompt}]}
     }
@@ -141,8 +135,10 @@ export let useGpt = ({prompt, onParagraph}) => {
     let response = await fetch(url, 
       { method: "POST", 
         body: JSON.stringify(
-          { credits: creditString, 
-            content: finalPrompt
+          { 
+            ...extraParams,
+            credits: creditString, 
+            content: finalPrompt,
           })});
     let streamResponse = response.body;
     let reader = streamResponse.getReader();

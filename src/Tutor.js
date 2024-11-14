@@ -32,6 +32,8 @@ import en from 'javascript-time-ago/locale/en';
 
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
+import { useLocalStorage } from 'react-use';
+import { v4 as uuidv4 } from 'uuid';
 
 
 TimeAgo.addDefaultLocale(en);
@@ -298,7 +300,7 @@ export function SafeShowKey({k, deleteKey, creditActions, sendInvite}){
         {creditActions}
       </Stack>
     </Stack>
-   <Button variant="contained" color="primar" onClick={sendInvite}>Invite</Button>
+   <Button variant="contained" color="primary" onClick={sendInvite}>Invite</Button>
    <Button variant="contained" color="error" onClick={deleteKey}>Delete</Button>
    </Stack>
   }
@@ -373,15 +375,18 @@ function Chat({providedHiddenPrompt}){
     let [nextTitle, setNextTitle] = React.useState(undefined)
     let [owner, setOwner] = React.useState(false)
 
+
+    let { documentId } = useParams()
+    let [doc, updateDoc, deleteDoc] = useDoc(documentId)
+
+    let [conversationId, setConversationId] = useLocalStorage("conversationId", uuidv4()
+    )
+
     let [response, startStreaming] = useGpt({ prompt:  {role: "system", content: [{type: "text", text: hiddenPrompt}]},  
       onParagraph: (p) => { 
         console.log("onParagraph", p)
 
       } })
-
-    let { documentId } = useParams()
-    let [doc, updateDoc, deleteDoc] = useDoc(documentId)
-    console.log("Doc", doc)
 
     React.useEffect(() => {
       if(doc && doc.content){
@@ -398,6 +403,7 @@ function Chat({providedHiddenPrompt}){
         setNextTitle("")
         setShouldReply(true)
       }
+
     }, [JSON.stringify(doc), providedHiddenPrompt])
 
     React.useEffect(()=>{
@@ -413,10 +419,16 @@ function Chat({providedHiddenPrompt}){
                       content: [{type: "text", text: i.text}]}
         })
 
+        let extraParams = {}
+
+        if(documentId){
+          extraParams = {logPrefix: documentId+ "/" + conversationId}
+        }
+
         startStreaming(morePrompt, (finalResponse)=>{
             setStreaming(false)
             setInputs(inputs.concat({user: "GPT", text: postProcessGPT(finalResponse, ()=>{setShouldReply(true)})}))
-        })
+        }, extraParams)
     }, [hiddenPrompt, shouldReply])
 
     let editButton = <Button 
