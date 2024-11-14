@@ -1,7 +1,6 @@
 TODO:
 
   - Need a solution for mass-distributing access keys
-    - Send email invites
     - Testing TODO:
       - Make sure you can't transfer more credits than you have
       - Make sure you can't take more credits than the child has
@@ -42,6 +41,7 @@ UI/UX
   - Make it more of a "Welcome" "Please enter credits" feel
   - Consider: Running low on credits message...
   - Make it display your current number of credits (possibly show a progress bar somewhere?)
+* Can we prevent invites from going to spam?
 
 11/12/2024:
   - Tons of features over the past few sessions.  Access Key management

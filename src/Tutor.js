@@ -300,8 +300,8 @@ export function SafeShowKey({k, deleteKey, creditActions, sendInvite}){
         {creditActions}
       </Stack>
     </Stack>
-   <Button variant="contained" color="primary" onClick={sendInvite}>Invite</Button>
-   <Button variant="contained" color="error" onClick={deleteKey}>Delete</Button>
+    <Button variant="contained" color="primar" onClick={sendInvite}>Invite{k.inviteSent && " ✓"}</Button>
+    <Button variant="contained" color="error" onClick={deleteKey}>Delete</Button>
    </Stack>
   }
 
