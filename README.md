@@ -1,5 +1,10 @@
 TODO:
 
+  - MVP - be able to view users' past conversations with your bot
+    * On key page, expand out conversations
+    * This is currently wacked. Sends a request per bot id.  Need the lambda to take an child key, and return all the child's conversations.  Then on the client-side, we can filter it down to just the bots that the current access key owns (or seperate out the lists)
+       - Also, is this hard because we're using S3's path structure instead of 
+
   - Need a solution for mass-distributing access keys
     - Testing TODO:
       - Make sure you can't transfer more credits than you have
@@ -8,14 +13,15 @@ TODO:
   - Chrome bug:
     - Deleted items don't fully disappear 
 
-  - Restore past conversations with bots
-    * Tie bot id to the stored conversations 
 
   - SECURITY
     * Really need to think through some worst case scenarios
       (Someone gets my key and deletes all other keys?)
 
   - DEBT ACCRUED! 
+    - Plan:
+      There's so much to fix here.  Need to set up testing/staging envs, deployment plan, and start refactoring the crap out of everything...
+    - lambda error messages are the WORST!
     - UI is crappy.
       - Polishings etc (enter sends chat message)
       - At some point we'll need pagination for the Keys page...

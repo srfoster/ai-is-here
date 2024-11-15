@@ -1,7 +1,6 @@
 
 import * as React from 'react';
 import gptProxyData from "./gptProxyData.json";
-import {useLocalStorage} from 'react-use'
 import { CreditStringContext, useCheckCredits } from './useGpt';
 
 export let useChildKeys = () => {

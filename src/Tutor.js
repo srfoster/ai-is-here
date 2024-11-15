@@ -35,6 +35,8 @@ import Tab from '@mui/material/Tab';
 import { useLocalStorage } from 'react-use';
 import { v4 as uuidv4 } from 'uuid';
 
+import gptProxyData from "./gptProxyData.json";
+
 
 TimeAgo.addDefaultLocale(en);
 
@@ -283,9 +285,12 @@ function BulkKeyCreation({createKey}){
 
 export function SafeShowKey({k, deleteKey, creditActions, sendInvite}){
   let [expanded, setExpanded] = React.useState(false)
+  let [showConversations, setShowConversations] = React.useState(false)
+
   if(!k) return ""
   const date = new Date(k.createdAt);
   const formattedDateString = timeAgo.format(date);
+
 
   return <Stack direction="row" alignItems="center" justifyContent={"space-between"} spacing={10}>
     <Stack>
@@ -294,16 +299,61 @@ export function SafeShowKey({k, deleteKey, creditActions, sendInvite}){
       {k.metadata && Object.keys(k.metadata).length > 0 && Object.keys(k.metadata).map((key) => {
         return <div><Typography variant="div"><b>{key}:</b> {k.metadata[key]}</Typography></div>
       })}
+      <div>
+        <Typography variant="div"><b>Conversations: </b> 
+          <a onClick={()=>{
+            setShowConversations(!showConversations) 
+          }} 
+             style={{color: "blue", textDecoration: "underline"}}>Click here</a>
+        </Typography></div>
+        {showConversations && <ListConversations k={k} />}
       </div>
       <Stack direction="row" alignItems={"center"}>
         <span><b>Remaining Credits:</b> {k.remainingCredits}</span> 
         {creditActions}
       </Stack>
     </Stack>
-    <Button variant="contained" color="primar" onClick={sendInvite}>Invite{k.inviteSent && " ✓"}</Button>
+    <Button variant="contained" color="primary" onClick={sendInvite}>Invite{k.inviteSent && " ✓"}</Button>
     <Button variant="contained" color="error" onClick={deleteKey}>Delete</Button>
    </Stack>
   }
+
+function ListConversations({k}){
+  let [conversations, setConversations] = React.useState([])
+  let [loading, setLoading] = React.useState(false)
+  let [documents, createDocument, deleteDocument, updateDocument] = useDocs()
+
+  React.useEffect(()=>{
+    if(!documents || !k.childKey) return
+
+    (async ()=>{
+      setLoading(true)
+
+      for(let d of documents){
+        console.log("Getting convos for bot", d.title)
+        let r = await fetch(gptProxyData.conversation_management, { method: "POST", body: JSON.stringify({ accessKey: k.childKey, botId: d.documentId, operation: "list" }) })
+        let response = await r.json()
+        console.log("Got response", response)
+        if(response.statusCode !== 200) continue
+        let newCs = JSON.parse(response.body)
+        setConversations((cs)=>{
+          return cs.concat(newCs)
+        })
+      }
+
+      setLoading(false)
+    })()
+  }, [k.childKey, documents])
+
+  return <Stack>
+    {loading && <Typography>Loading...</Typography>}
+    <ul>
+      {conversations.map((c)=>{
+        return <li>{c}</li>
+      })}
+    </ul>
+  </Stack>
+}
 
 export function TutorManager() {
   let [documents, createDocument, deleteDocument, updateDocument] = useDocs()
