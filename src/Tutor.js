@@ -329,17 +329,12 @@ function ListConversations({k}){
     (async ()=>{
       setLoading(true)
 
-      for(let d of documents){
-        console.log("Getting convos for bot", d.title)
-        let r = await fetch(gptProxyData.conversation_management, { method: "POST", body: JSON.stringify({ accessKey: k.childKey, botId: d.documentId, operation: "list" }) })
-        let response = await r.json()
-        console.log("Got response", response)
-        if(response.statusCode !== 200) continue
-        let newCs = JSON.parse(response.body)
-        setConversations((cs)=>{
-          return cs.concat(newCs)
-        })
-      }
+      let r = await fetch(gptProxyData.conversation_management, { method: "POST", body: JSON.stringify({ accessKey: k.childKey, operation: "list" }) })
+      let response = await r.json()
+      let newCs = JSON.parse(response.body)
+      setConversations((cs)=>{
+        return newCs
+      }) //TODO: Filter by documentIds
 
       setLoading(false)
     })()
@@ -349,7 +344,7 @@ function ListConversations({k}){
     {loading && <Typography>Loading...</Typography>}
     <ul>
       {conversations.map((c)=>{
-        return <li>{c}</li>
+        return <li>{timeAgo.format(new Date(c.updatedAt))}</li>
       })}
     </ul>
   </Stack>

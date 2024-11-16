@@ -1,7 +1,8 @@
 TODO:
 
   - MVP - be able to view users' past conversations with your bot
-    * On key page, expand out conversations
+    * On key page, link to conversations/botId/convoId
+      - See record (no chatting)
     * This is currently wacked. Sends a request per bot id.  Need the lambda to take an child key, and return all the child's conversations.  Then on the client-side, we can filter it down to just the bots that the current access key owns (or seperate out the lists)
        - Also, is this hard because we're using S3's path structure instead of 
 
