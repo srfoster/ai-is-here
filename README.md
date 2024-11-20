@@ -1,18 +1,30 @@
 TODO:
 
-  - MVP - be able to view users' past conversations with your bot
-    * On key page, link to conversations/botId/convoId
-      - See record (no chatting)
-    * This is currently wacked. Sends a request per bot id.  Need the lambda to take an child key, and return all the child's conversations.  Then on the client-side, we can filter it down to just the bots that the current access key owns (or seperate out the lists)
-       - Also, is this hard because we're using S3's path structure instead of 
+  - The Big Polish!
+    - Bots 
+      - creation is broken...
+      - Enter sends message
+    - Keys
+      - snackbar to confirm creation 
+      - If I have 1m credits, it is very difficult to use the slider to give a small amount of credits. (Cap it at ____)
+      - Chrome bug: - Deleted items don't fully disappear 
+    - Misc
+      - Hide or fix the textbook for the time being
+      - OutOfCredits is a bit ugly on the homepage
+        - Make it more of a "Welcome" "Please enter credits" feel
+      - Emails
+        - Can we prevent invites from going to spam?
+
+
+
+
+
+  - The Debt Payoff
 
   - Need a solution for mass-distributing access keys
     - Testing TODO:
       - Make sure you can't transfer more credits than you have
       - Make sure you can't take more credits than the child has
-
-  - Chrome bug:
-    - Deleted items don't fully disappear 
 
 
   - SECURITY
@@ -24,7 +36,6 @@ TODO:
       There's so much to fix here.  Need to set up testing/staging envs, deployment plan, and start refactoring the crap out of everything...
     - lambda error messages are the WORST!
     - UI is crappy.
-      - Polishings etc (enter sends chat message)
       - At some point we'll need pagination for the Keys page...
     - Tests!
       - Have integration tests on document_management lambdas, but should really unit test common-js
@@ -33,6 +44,9 @@ TODO:
     - creditString is a weird convention (accessKey?)
       - While we're at it -- there are other oddities (consider document_management as a resource and standardize everything...)
       - documentId => just id
+
+
+New features!!
     
 * Tutor improvements
   - Be able to assign avatars to the bots
@@ -44,11 +58,7 @@ TODO:
   - Make better homepage
 
 UI/UX
-* OutOfCredits is a bit ugly on the homepage
-  - Make it more of a "Welcome" "Please enter credits" feel
   - Consider: Running low on credits message...
-  - Make it display your current number of credits (possibly show a progress bar somewhere?)
-* Can we prevent invites from going to spam?
 
 11/12/2024:
   - Tons of features over the past few sessions.  Access Key management
