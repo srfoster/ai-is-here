@@ -45,6 +45,19 @@ const timeAgo = new TimeAgo('en-US');
 
 let civilWarHiddenPrompt = "You are an automated tutor for a lesson about the American Civil War.  Greet the user once.  Then continually ask them one simple question at a time.  Use the Socratic method."
 
+export function Conversation(){
+  let { botId, conversationId } = useParams()
+
+  let [doc, updateDoc, deleteDoc] = useDoc(`${botId}/${conversationId}`)
+
+  return <>
+    {doc && <ChatHistory messages={JSON.parse(doc.content).map((c)=>{
+
+      return {user: c.role, text: typeof(c.content) == "object" && c.content.length ? c.content[0].text : c.content.text}
+    })} />}
+  </>
+}
+
 export function ChildKeyManager() {
   const {remainingCredits} = React.useContext(CreditStringContext);
   let [keys, createKey, deleteKey, transferCreditsToKey, sendInvite] = useChildKeys()
@@ -344,7 +357,7 @@ function ListConversations({k}){
     {loading && <Typography>Loading...</Typography>}
     <ul>
       {conversations.map((c)=>{
-        return <li>{timeAgo.format(new Date(c.updatedAt))}</li>
+        return <li><Link to={`/conversations/${c.documentId}`}>{timeAgo.format(new Date(c.updatedAt))}</Link></li>
       })}
     </ul>
   </Stack>
@@ -513,14 +526,7 @@ function Chat({providedHiddenPrompt}){
           <Stack alignItems="flex-end">
             {editButton}
           </Stack>
-          {inputs.map((i)=>{
-            return <MessageBox
-                position={i.user == "GPT" ? "left" : "right"}
-                type={"text"}
-                title={i.user}
-                text={typeof(i.text) == "string" ? <Markdown>{i.text}</Markdown> : i.text}
-            />
-          })}
+          <ChatHistory messages={inputs} />
           {streaming && <MessageBox
             position={"left"}
             type={"text"}
@@ -538,7 +544,7 @@ function Chat({providedHiddenPrompt}){
               onClick={()=>{
                 setInputVal("")
                 setShouldReply(true)
-                setInputs(inputs.concat({user: "User", text: inputVal})); 
+                setInputs(inputs.concat({user: "user", text: inputVal})); 
                 }
               }
               color='white' backgroundColor='black' text='Send' />
@@ -548,6 +554,23 @@ function Chat({providedHiddenPrompt}){
         }
         </>
 
+}
+
+function ChatHistory({messages}){
+  return <>
+    <Container maxWidth="sm" style={{marginBottom: 100}}>
+      {messages.map((i)=>{
+        return <>
+          <MessageBox
+              position={i.user != "user" ? "left" : "right"}
+              type={"text"}
+              title={i.user}
+              text={typeof(i.text) == "string" ? <Markdown>{i.text}</Markdown> : i.text}
+          />
+        </>
+      })}
+    </Container>
+  </>
 }
 
 function EditMode({setNextPrompt, nextPrompt, nextTitle, setNextTitle, deleteBot, doneEditingButton}){

@@ -32,7 +32,7 @@ import './App.css';
 import { CreditStringContext, OutOfCreditsIfOutOfCredits, useCheckCredits } from './useGpt';
 import { EReader} from './EReader';
 import { Introduction,  Chapter1, Acknowledgements, } from './Sections';
-import { Tutor, TutorManager, ChildKeyManager } from './Tutor';
+import { Conversation,Tutor, TutorManager, ChildKeyManager } from './Tutor';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 import { useLocation,
   HashRouter as Router,
@@ -161,6 +161,12 @@ function App() {
             <Route path="/bots/:documentId"
               element={
                 <Tutor />
+              }
+            >
+            </Route>
+            <Route path="/conversations/:botId/:conversationId"
+              element={
+                <Conversation />
               }
             >
             </Route>
