@@ -50,6 +50,8 @@ TODO:
 New features!!
     
 * Tutor improvements
+  - A way to resume/clear a converation
+  - Be able to see your own past conversations with a bot
   - Be able to assign avatars to the bots
 
 * POS for getting more credits

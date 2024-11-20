@@ -544,6 +544,13 @@ function Chat({providedHiddenPrompt}){
                 multiline={false}
                 value={inputVal}
                 onChange={(x)=>{setInputVal(x.target.value)}}
+                onKeyDown={(e)=>{
+                  if(e.key === "Enter"){
+                    setInputVal("")
+                    setShouldReply(true); 
+                    setInputs(inputs.concat({user: "user", text: inputVal}));
+                  }
+                }}
                 rightButtons={
                   <RCE.Button 
                   onClick={()=>{
