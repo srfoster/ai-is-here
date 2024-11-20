@@ -2,7 +2,8 @@ TODO:
 
   - The Big Polish!
     - Bots 
-      - creation is broken...
+      - Better send message bar
+      - Something weird with placement of in-progress response
       - Enter sends message
     - Keys
       - snackbar to confirm creation 

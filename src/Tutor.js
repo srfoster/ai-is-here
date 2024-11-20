@@ -51,10 +51,12 @@ export function Conversation(){
   let [doc, updateDoc, deleteDoc] = useDoc(`${botId}/${conversationId}`)
 
   return <>
-    {doc && <ChatHistory messages={JSON.parse(doc.content).map((c)=>{
+    <Container maxWidth="sm" style={{marginBottom: 100}}>
+      {doc && <ChatHistory messages={JSON.parse(doc.content).map((c)=>{
 
-      return {user: c.role, text: typeof(c.content) == "object" && c.content.length ? c.content[0].text : c.content.text}
-    })} />}
+        return {user: c.role, text: typeof(c.content) == "object" && c.content.length ? c.content[0].text : c.content.text}
+      })} />}
+    </Container>
   </>
 }
 
@@ -367,7 +369,7 @@ export function TutorManager() {
   let [documents, createDocument, deleteDocument, updateDocument] = useDocs()
 
   return <>
-      <Container maxWidth="sm" >
+      <Container maxWidth="sm" style={{marginBottom: 100}} >
         <Typography variant="h2">Bots</Typography>
         <ul>
           {documents.map((d) => { 
@@ -393,7 +395,7 @@ export function Tutor({hiddenPrompt}) {
     }
 
     return (
-      <Container maxWidth="sm" style={{paddingTop: 30}}>
+      <Container maxWidth="sm" style={{paddingTop: 30, marginBottom: 100}}>
         <UsageContext.Provider value={{ usageData, increaseGPTWords }}>
             <Chat providedHiddenPrompt={hiddenPrompt} />
         </UsageContext.Provider> 
@@ -533,23 +535,28 @@ function Chat({providedHiddenPrompt}){
             title={"GPT"}
             text={typeof(postProcessedResponse) == "string" ? <Markdown>{postProcessedResponse}</Markdown> : postProcessedResponse}
           />}
-          <Input
-            ref={inputRef}
-            placeholder='Type here...'
-            multiline={false}
-            value={inputVal}
-            onChange={(x)=>{setInputVal(x.target.value)}}
-            rightButtons={
-              <RCE.Button 
-              onClick={()=>{
-                setInputVal("")
-                setShouldReply(true)
-                setInputs(inputs.concat({user: "user", text: inputVal})); 
+          <div
+            style = {{position: "fixed", bottom: 0, left: 0, width: "100%", textAlign: "center", borderTop: "1px solid gray"}}>
+              <div style={{width: "50%", margin: "auto"}}>
+              <Input
+                ref={inputRef}
+                placeholder='Type here...'
+                multiline={false}
+                value={inputVal}
+                onChange={(x)=>{setInputVal(x.target.value)}}
+                rightButtons={
+                  <RCE.Button 
+                  onClick={()=>{
+                    setInputVal("")
+                    setShouldReply(true)
+                    setInputs(inputs.concat({user: "user", text: inputVal})); 
+                    }
+                  }
+                  color='white' backgroundColor='black' text='Send' />
                 }
-              }
-              color='white' backgroundColor='black' text='Send' />
-            }
-          />
+              />
+              </div>
+            </div>
           </>
         }
         </>
@@ -558,7 +565,6 @@ function Chat({providedHiddenPrompt}){
 
 function ChatHistory({messages}){
   return <>
-    <Container maxWidth="sm" style={{marginBottom: 100}}>
       {messages.map((i)=>{
         return <>
           <MessageBox
@@ -569,7 +575,6 @@ function ChatHistory({messages}){
           />
         </>
       })}
-    </Container>
   </>
 }
 
