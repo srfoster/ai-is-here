@@ -44,7 +44,7 @@ export function LoginWidget(){
   React.useEffect(() => {
     setCreditString(accessKey)
     // Update the URL without reloading the page
-    window.location = "/#/";
+    window.location = "/ai-is-here/#/";
   },[accessKey])
 
   return (
