@@ -329,7 +329,7 @@ export function SafeShowKey({k, deleteKey, creditActions, sendInvite}){
       </Stack>
     </Stack>
     <Button variant="contained" color="primary" onClick={sendInvite}>Invite{k.inviteSent && " ✓"}</Button>
-    <Button variant="contained" color="error" onClick={deleteKey}>Delete</Button>
+    <Button variant="text" color="error" onClick={deleteKey}>Delete</Button>
    </Stack>
   }
 
@@ -378,7 +378,7 @@ export function TutorManager() {
             </li>
           })}
         </ul>
-        <Button onClick={() => { 
+        <Button variant ='contained' onClick={() => { 
           createDocument({ title: "New Bot", content: civilWarHiddenPrompt})
 
         }} >Add Bot</Button>
@@ -492,7 +492,7 @@ function Chat({providedHiddenPrompt}){
     }, [hiddenPrompt, shouldReply])
 
     let editButton = <Button 
-        //variant='contained' 
+        variant='contained' 
         onClick={()=>{
         if(editMode && (nextPrompt != hiddenPrompt || nextTitle != doc.title)){
           console.log("Setting hidden prompt", nextPrompt)
@@ -619,12 +619,13 @@ function EditMode({setNextPrompt, nextPrompt, nextTitle, setNextTitle, deleteBot
       <Stack direction="row"
         justifyContent="space-between"
         alignItems="center">
-      {doneEditingButton}
-      <Button 
+       <Button 
         color="error"
-        variant='contained'
+        variant='text'
         onClick={handleClickOpen}
           >Delete</Button>
+          {doneEditingButton}
+    
       </Stack>
       <AlertDialog open={open} handleClose={handleClose} deleteBot={deleteBot} />
     </>
