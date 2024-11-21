@@ -668,7 +668,7 @@ export default function AlertDialog({open, handleClose, deleteBot}) {
             color="error"
             onClick={
             ()=>{
-              deleteBot(()=>window.location = "/#/bots")
+              deleteBot(()=>window.location = "/ai-is-here/#/bots")
             }
             }>Yes. Destroy it!</Button>
         </Stack>
