@@ -50,9 +50,28 @@ export let useChildKeys = () => {
     let data = await response.json()
 
     if(data.statusCode === 200) {
+      let body = JSON.parse(data.body)
       setKeys((keys) => keys.map((k)=>{
         if(k.childKey === key) {
-          return {...k, remainingCredits: k.remainingCredits + amount}
+          return {...k, remainingCredits: k.remainingCredits + body.transferredCredits}
+        }
+        return k
+      }))
+      refreshCredits()
+    }
+  }
+
+  let transferCreditsFromKey = async (key, amount) => {
+    let response = await fetch(gptProxyData.child_management, { method: "POST", body: JSON.stringify({ parentKey: key, operation: "transfer", childKey: creditString, amount: amount }) })
+
+    let data = await response.json()
+
+    if(data.statusCode === 200) {
+      let body = JSON.parse(data.body)
+      setKeys((keys) => keys.map((k)=>{
+        if(k.childKey === key) {
+          console.log(k)
+          return {...k, remainingCredits: k.remainingCredits - body.transferredCredits}
         }
         return k
       }))
@@ -75,7 +94,7 @@ export let useChildKeys = () => {
     }
   }
 
-  return [keys, createKey, deleteKey, transferCreditsToKey, sendInvite]
+  return [keys, createKey, deleteKey, transferCreditsToKey, transferCreditsFromKey , sendInvite]
 }
 
 export let useDocs = () => {

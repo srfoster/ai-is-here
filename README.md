@@ -1,15 +1,8 @@
 TODO:
 
   - The Big Polish!
-    - Major bugs
-      - Viewing conversations seems to be broken on Laura's (is it the student or teacher side?  is it cuz of localstorage?)
-    - Bots 
-      - Better send message bar
-      - Something weird with placement of in-progress response
-      - Enter sends message
     - Keys
-      - snackbar to confirm creation 
-      - If I have 1m credits, it is very difficult to use the slider to give a small amount of credits. (Cap it at ____)
+      - Fix up give/take for selected
       - Chrome bug: - Deleted items don't fully disappear 
     - Misc
       - Hide or fix the textbook for the time being
@@ -31,6 +24,7 @@ TODO:
 
 
   - SECURITY
+    * Use transaction to make sure you can't give more credits than you have... (2 requests in quick succession??)
     * Really need to think through some worst case scenarios
       (Someone gets my key and deletes all other keys?)
 
@@ -40,6 +34,7 @@ TODO:
     - lambda error messages are the WORST!
     - UI is crappy.
       - At some point we'll need pagination for the Keys page...
+      - snackbar to confirm creation of keys
     - Tests!
       - Have integration tests on document_management lambdas, but should really unit test common-js
         - Ideally on an isolated terraform environment

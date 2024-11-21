@@ -62,16 +62,15 @@ export function Conversation(){
 
 export function ChildKeyManager() {
   const {remainingCredits} = React.useContext(CreditStringContext);
-  let [keys, createKey, deleteKey, transferCreditsToKey, sendInvite] = useChildKeys()
+  let [keys, createKey, deleteKey, transferCreditsToKey, transferCreditsFromKey, sendInvite] = useChildKeys()
   let [amount, setAmount] = React.useState(1000)
   let [newKeyName, setNewKeyName] = React.useState("")
   let [selectedKeys, setSelectedKeys] = React.useState([])
-  let splitAmount = Math.floor(amount/selectedKeys.length)
-  let minSplitAmount = Math.min(
-    ...[
+  let totalGivable = Math.min(remainingCredits, amount*selectedKeys.length)
+  let totalTakable = 
+    [
       ...keys.filter((k)=>selectedKeys.includes(k.childKey))
-             .map((k)=>k.remainingCredits)]
-  )
+             .map((k)=>Math.min(k.remainingCredits, amount))].reduce((a,b)=>a+b, 0)
 
   return <>
       <Container maxWidth="sm" style={{marginBottom: 100}}>
@@ -79,6 +78,7 @@ export function ChildKeyManager() {
         <KeyManagementTools 
           keys={keys} 
           remainingCredits={remainingCredits} 
+          amount={amount} 
           setAmount={setAmount} 
           createKey={createKey}
           setNewKeyName={setNewKeyName}
@@ -101,16 +101,16 @@ export function ChildKeyManager() {
               <Button 
                 onClick={async () => {
                   for (let k of keys.filter(k => selectedKeys.includes(k.childKey))) {
-                    await transferCreditsToKey(k.childKey, splitAmount)
+                    await transferCreditsToKey(k.childKey, Math.min(amount,remainingCredits))
                   }
-                } } >Give to selected {isFinite(splitAmount) ? `(${splitAmount})` : ""}</Button>
+                } } >Give to selected {isFinite(totalGivable) ? `(${totalGivable})` : ""}</Button>
               <Button 
                 color="error" 
                 onClick={async () => {
                   for (let k of keys.filter(k => selectedKeys.includes(k.childKey))) {
-                    await transferCreditsToKey(k.childKey, -minSplitAmount)
+                    await transferCreditsFromKey(k.childKey, Math.min(amount,k.remainingCredits))
                   }
-                } } >Take from selected {isFinite(splitAmount) ? `(-${minSplitAmount})` : ""}</Button>
+                } } >Take from selected {isFinite(totalTakable) ? `(-${totalTakable})` : ""}</Button>
               {/*<Button
                 variant="contained"
                 color="error"
@@ -151,7 +151,7 @@ export function ChildKeyManager() {
                       <Button 
                         color="error"
                         onClick={() => {
-                          transferCreditsToKey(k.childKey, -takeAmount)
+                          transferCreditsFromKey(k.childKey, takeAmount)
                         }} >Take -{takeAmount}</Button>
                     }
                     </>} />
@@ -215,7 +215,7 @@ function BasicTabs({items}) {
 }
 
 //Too many params
-export function KeyManagementTools({keys, remainingCredits, setAmount, createKey, setNewKeyName, newKeyName}){
+export function KeyManagementTools({keys, remainingCredits, amount, setAmount, createKey, setNewKeyName, newKeyName}){
 
   return <>
   <BasicTabs items={[
@@ -227,18 +227,19 @@ export function KeyManagementTools({keys, remainingCredits, setAmount, createKey
                 />},
     {title: "Manage Credits", content:
     <>
-        <Typography variant="p">You have {remainingCredits} credits. Use the slider and the buttons in the list below to control how many credits you'd like to give or take</Typography>
-        <Stack direction="row">
-          <Slider 
-            min={0} 
-            max={
-              Math.max(
-                ...[remainingCredits, ...keys.map((k)=>k.remainingCredits)])
-            } 
-            step={1000}  
-            valueLabelDisplay="auto"
-            onChange={(e)=>{setAmount(e.target.value)}}
-            />
+        <Stack spacing={3}>
+            <Typography variant="p">You have {remainingCredits} credits. Use the field below to control how many credits you'd like to give or take</Typography>
+              <TextField
+                onChange={(e)=>{setAmount(e.target.value)}}
+                label="Number"
+                type="number"
+                slotProps={{
+                  inputLabel: {
+                    shrink: true,
+                  },
+                }}
+              />
+            {amount > 0 && <Typography variant="p">Now use the Give or Take buttons below, or select specifc keys</Typography>}
         </Stack>
       </>},
   ]} />
@@ -329,7 +330,7 @@ export function SafeShowKey({k, deleteKey, creditActions, sendInvite}){
       </Stack>
     </Stack>
     <Button variant="contained" color="primary" onClick={sendInvite}>Invite{k.inviteSent && " ✓"}</Button>
-    <Button variant="text" color="error" onClick={deleteKey}>Delete</Button>
+    <Button variant="contained" color="error" onClick={deleteKey}>Delete</Button>
    </Stack>
   }
 
@@ -378,7 +379,7 @@ export function TutorManager() {
             </li>
           })}
         </ul>
-        <Button variant ='contained' onClick={() => { 
+        <Button onClick={() => { 
           createDocument({ title: "New Bot", content: civilWarHiddenPrompt})
 
         }} >Add Bot</Button>
@@ -492,7 +493,7 @@ function Chat({providedHiddenPrompt}){
     }, [hiddenPrompt, shouldReply])
 
     let editButton = <Button 
-        variant='contained' 
+        //variant='contained' 
         onClick={()=>{
         if(editMode && (nextPrompt != hiddenPrompt || nextTitle != doc.title)){
           console.log("Setting hidden prompt", nextPrompt)
@@ -619,13 +620,12 @@ function EditMode({setNextPrompt, nextPrompt, nextTitle, setNextTitle, deleteBot
       <Stack direction="row"
         justifyContent="space-between"
         alignItems="center">
-       <Button 
+      {doneEditingButton}
+      <Button 
         color="error"
-        variant='text'
+        variant='contained'
         onClick={handleClickOpen}
           >Delete</Button>
-          {doneEditingButton}
-    
       </Stack>
       <AlertDialog open={open} handleClose={handleClose} deleteBot={deleteBot} />
     </>
