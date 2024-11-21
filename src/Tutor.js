@@ -372,7 +372,7 @@ export function TutorManager() {
       <Container maxWidth="sm" style={{marginBottom: 100}} >
         <Typography variant="h2">Bots</Typography>
         <ul>
-          {documents.map((d) => { 
+          {documents.filter((d)=>d.type != "conversation").map((d) => { 
             return <li key={ d.documentId}>
               <Link to={"/bots/"+d.documentId}>{d.title}</Link>
             </li>

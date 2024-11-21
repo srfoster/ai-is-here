@@ -1,6 +1,8 @@
 TODO:
 
   - The Big Polish!
+    - Major bugs
+      - Viewing conversations seems to be broken on Laura's (is it the student or teacher side?  is it cuz of localstorage?)
     - Bots 
       - Better send message bar
       - Something weird with placement of in-progress response
