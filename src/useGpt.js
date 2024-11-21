@@ -43,7 +43,8 @@ export function LoginWidget(){
 
   React.useEffect(() => {
     setCreditString(accessKey)
-    location.pathname = "/"
+    // Update the URL without reloading the page
+    window.location = "/#/";
   },[accessKey])
 
   return (
