@@ -29,7 +29,7 @@
 
 import * as React from 'react';
 import './App.css';
-import { CreditStringContext, OutOfCreditsIfOutOfCredits, useCheckCredits } from './useGpt';
+import { LoginWidget, CreditStringContext, OutOfCreditsIfOutOfCredits, useCheckCredits } from './useGpt';
 import { EReader} from './EReader';
 import { Introduction,  Chapter1, Acknowledgements, } from './Sections';
 import { Conversation,Tutor, TutorManager, ChildKeyManager } from './Tutor';
@@ -170,6 +170,14 @@ function App() {
               }
             >
             </Route>
+            <Route path="/login"
+              element={
+                <Container maxWidth="sm" >
+                  <LoginWidget />
+                </Container>
+              }
+            >
+            </Route>
             <Route path="*" element={
               <Home />
             }>
@@ -180,5 +188,6 @@ function App() {
     </>
   );
 }
+
 
 export default App;

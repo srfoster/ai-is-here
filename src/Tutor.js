@@ -8,7 +8,7 @@ To get rid of the [GPT] flicker and send a proper conversation, need to fix up t
 
 import * as React from 'react';
 import './App.css';
-import { Button, Card, Checkbox, Container, TextField, Typography, Stack, Slider, CardContent } from '@mui/material';
+import { Button, Card, Checkbox, Container, TextField, Typography, Stack, Slider, CardContent, IconButton } from '@mui/material';
 
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
@@ -37,6 +37,10 @@ import { v4 as uuidv4 } from 'uuid';
 
 import gptProxyData from "./gptProxyData.json";
 
+
+import Tooltip from "@mui/material/Tooltip";
+import FileCopyIcon from "@mui/icons-material/FileCopy";
+import DoneIcon from "@mui/icons-material/Done";
 
 TimeAgo.addDefaultLocale(en);
 
@@ -126,7 +130,10 @@ export function ChildKeyManager() {
             let takeAmount = Math.min(amount, k.remainingCredits)
             let giveAmount = Math.min(amount, remainingCredits)
 
-            return <div key={k.childKey} className={k.justDeleted ? "fade-out" : (k.justCreated ? "fade-in" : "")}>
+            return <div key={k.childKey} className={k.justDeleted ? "fade-out" : (k.justCreated ? "fade-in" : "")} onAnimationEnd={(e)=>{
+              if(k.justDeleted)
+                e.target.style.display="none"
+              }}>
               <Stack direction="row" alignItems="center">
                 <Checkbox
                   checked={selectedKeys.includes(k.childKey)}
@@ -310,7 +317,7 @@ export function SafeShowKey({k, deleteKey, creditActions, sendInvite}){
 
   return <Stack direction="row" alignItems="center" justifyContent={"space-between"} spacing={10}>
     <Stack>
-      <div><b>Secret:</b> {<>{expanded ? k.childKey : k.childKey.slice(0, 4)} <span style={{cursor:"pointer", color: "blue", textDecoration: "underline"}} onClick={()=>setExpanded(!expanded)}>{expanded ? "(hide)" : "..."}</span></>}
+      <div>{<>{expanded ? k.childKey : k.childKey.slice(0, 4)} <span style={{cursor:"pointer", color: "blue", textDecoration: "underline"}} onClick={()=>setExpanded(!expanded)}>{expanded ? "(hide)" : "..."}</span>  <CopyToClipboardButton text={k.childKey}/> </>} 
       <div><b>Created:</b> {formattedDateString}</div>
       {k.metadata && Object.keys(k.metadata).length > 0 && Object.keys(k.metadata).map((key) => {
         return <div><Typography variant="div"><b>{key}:</b> {k.metadata[key]}</Typography></div>
@@ -668,5 +675,30 @@ export default function AlertDialog({open, handleClose, deleteBot}) {
         </Box>
       </Dialog>
     </React.Fragment>
+  );
+}
+
+export function CopyToClipboardButton({ text }) {
+  const [tooltip, setTooltip] = React.useState("Copy to Clipboard");
+  const [copied, setCopied] = React.useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTooltip("Copied!");
+      setTimeout(() => {
+        setCopied(false);
+        setTooltip("Copy to Clipboard");
+      }, 2000); // Reset tooltip after 2 seconds
+    });
+  };
+
+  return (
+    <Tooltip title={tooltip} arrow>
+      <IconButton
+        onClick={handleCopy} >
+        {copied ? <DoneIcon /> : <FileCopyIcon />}
+      </IconButton>
+    </Tooltip>
   );
 }

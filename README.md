@@ -1,15 +1,10 @@
 TODO:
 
   - The Big Polish!
-    - Keys
-      - Fix up give/take for selected
-      - Chrome bug: - Deleted items don't fully disappear 
     - Misc
-      - Hide or fix the textbook for the time being
-      - OutOfCredits is a bit ugly on the homepage
-        - Make it more of a "Welcome" "Please enter credits" feel
       - Emails
         - Can we prevent invites from going to spam?
+        - Send link as well as access key
 
 
 

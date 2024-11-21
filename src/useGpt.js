@@ -3,6 +3,7 @@ import * as React from 'react';
 import gptProxyData from "./gptProxyData.json";
 import { Alert, Button, Card, CardContent, Chip, Typography, TextField} from '@mui/material';
 import {useLocalStorage} from 'react-use'
+import { useLocation } from 'react-router-dom';
 
 export const UsageContext = React.createContext();
 export const CreditStringContext = React.createContext();
@@ -33,6 +34,23 @@ export let useCheckCredits = (creditString) => {
 
   return { remainingCredits,
           refreshCredits: () => setLastRefresh(Date.now())}
+}
+
+export function LoginWidget(){
+  let location = useLocation()
+  let accessKey = new URLSearchParams(location.search).get("key")
+  const {creditString,setCreditString} = React.useContext(CreditStringContext);
+
+  React.useEffect(() => {
+    setCreditString(accessKey)
+    location.pathname = "/"
+  },[accessKey])
+
+  return (
+    <div>
+      <h1>Logging in...</h1>
+    </div>
+  )
 }
 
 export let OutOfCreditsIfOutOfCredits = ({afterRefresh, showLogout}) => {
