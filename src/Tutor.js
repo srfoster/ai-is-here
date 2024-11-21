@@ -48,6 +48,7 @@ const timeAgo = new TimeAgo('en-US');
 
 
 let civilWarHiddenPrompt = "You are an automated tutor for a lesson about the American Civil War.  Greet the user once.  Then continually ask them one simple question at a time.  Use the Socratic method."
+let defaultBotPrompt = "You are a bot that helps the user (educators and students) modify you for educational purposes.  You can be modified if the user presses the Edit Bot button above (mention this to the user).  They must then enter a prompt, which will become your system prompt.  You can give the user prompt suggestions, like: `"+civilWarHiddenPrompt+"`.  Give examples that relate to education and tutoring."
 
 export function Conversation(){
   let { botId, conversationId } = useParams()
@@ -387,7 +388,7 @@ export function TutorManager() {
           })}
         </ul>
         <Button onClick={() => { 
-          createDocument({ title: "New Bot", content: civilWarHiddenPrompt})
+          createDocument({ title: "New Bot", content: defaultBotPrompt})
 
         }} >Add Bot</Button>
       </Container>
