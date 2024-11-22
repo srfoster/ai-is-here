@@ -8,6 +8,8 @@ To get rid of the [GPT] flicker and send a proper conversation, need to fix up t
 
 import * as React from 'react';
 import './App.css';
+import Avatar, { genConfig } from 'react-nice-avatar'
+import { AvatarSays, AVATARS } from './EReader';
 import { Button, Card, Checkbox, Container, TextField, Typography, Stack, Slider, CardContent, IconButton } from '@mui/material';
 
 import Box from '@mui/material/Box';
@@ -17,13 +19,14 @@ import DialogTitle from '@mui/material/DialogTitle';
 import "react-chat-elements/dist/main.css"
 import { MessageBox } from "react-chat-elements";
 import { useGpt, UsageContext, OutOfCredits, CreditStringContext } from "./useGpt";
-import { useDocs, useDoc, useChildKeys } from "./useDocuments";
+import { useDocs, useDoc, useChildKeys, useConversations } from "./useDocuments";
 
 import { Input } from 'react-chat-elements'
 import * as RCE from 'react-chat-elements'
 
 import { Link, useParams } from 'react-router-dom';
 import Markdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 import { OutOfCreditsIfOutOfCredits } from './useGpt';
 
@@ -57,12 +60,17 @@ export function Conversation(){
 
   return <>
     <Container maxWidth="sm" style={{marginBottom: 100}}>
-      {doc && <ChatHistory messages={JSON.parse(doc.content).map((c)=>{
-
-        return {user: c.role, text: typeof(c.content) == "object" && c.content.length ? c.content[0].text : c.content.text}
-      })} />}
+      <DocConversationHistory doc={doc} />
     </Container>
   </>
+}
+
+function DocConversationHistory({doc}){  
+  return doc && <ChatHistory messages={JSON.parse(doc.content).map(gptMessageToLocal)} />
+}
+
+let gptMessageToLocal = (c)=>{
+    return {user: c.role, text: typeof(c.content) == "object" && c.content.length ? c.content[0].text : c.content.text}
 }
 
 export function ChildKeyManager() {
@@ -431,7 +439,6 @@ function Chat({providedHiddenPrompt}){
 
     let [streaming, setStreaming] = React.useState(false)
     let [shouldReply, setShouldReply] = React.useState(true)
-    let [inputs, setInputs] = React.useState([])
 
     let [inputVal, setInputVal] = React.useState("")
     let inputRef = React.createRef()
@@ -446,6 +453,7 @@ function Chat({providedHiddenPrompt}){
 
 
     let { documentId } = useParams()
+    let [inputs, setInputs] = useLocalStorage(documentId+"-conversation",[])
     let [doc, updateDoc, deleteDoc] = useDoc(documentId)
 
     let [conversationId, setConversationId] = useLocalStorage("conversationId", uuidv4()
@@ -456,6 +464,36 @@ function Chat({providedHiddenPrompt}){
         console.log("onParagraph", p)
 
       } })
+    
+  
+    const {creditString,setCreditString} = React.useContext(CreditStringContext);
+    let [conversations] = useConversations(creditString)
+
+    let [conversationHistory, setConversationHistory] = React.useState(null)
+
+
+    React.useEffect(()=>{
+      if(!conversations || conversations.lenght == 0) return
+
+      let lastConversation = 
+         conversations.filter((c)=>c.documentId.match(`${documentId}/`))
+                      .sort((a,b)=>a.updatedAt < b.updatedAt ? 1 : -1)[0]
+
+      if(!lastConversation) return
+
+      fetch(gptProxyData.document_management, { method: "POST", body: JSON.stringify({ creditString: creditString, operation: "read", documentId: lastConversation.documentId }) })
+        .then((response) => {
+          return response.json()
+        })
+        .then((data) => {
+          let doc = JSON.parse(data.body)
+          console.log("Last conversation doc", doc)
+          let history = JSON.parse(doc.content).map(gptMessageToLocal)
+          setConversationHistory(history)
+        })
+    
+
+    }, [conversations])
 
     React.useEffect(() => {
       if(doc && doc.content){
@@ -476,7 +514,18 @@ function Chat({providedHiddenPrompt}){
     }, [JSON.stringify(doc), providedHiddenPrompt])
 
     React.useEffect(()=>{
+        console.log("Should reply", shouldReply)
         if(!shouldReply) return 
+        //If the bot spoke last, don't let it speak again
+        let lastInput = inputs[inputs.length-1] 
+        console.log("Last input", lastInput)
+        if(lastInput && lastInput.user == "GPT") {
+          console.log("Bot spoke last")
+          setShouldReply(false)
+          //setStreaming(true);
+          return 
+        }
+
         setShouldReply(false)
         setStreaming(true);
 
@@ -533,31 +582,63 @@ function Chat({providedHiddenPrompt}){
                   doneEditingButton={editButton}
                   /> :
           <>
-          <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">{nextTitle}</Typography>
-          <Stack alignItems="flex-end">
+          <Stack 
+            justifyContent="center"
+            direction={"row"} 
+            alignItems="center" 
+            spacing={1}>
+              <Avatar style={{ width: 50, height: 50, cursor: "pointer" }}  
+                {...(genConfig(documentId))}
+              />
+            <div 
+              style={{ textAlign: "center", paddingBottom: "0px important!", marginBottom: 0, fontSize: "3em", fontWeight: "bold"}} 
+              >
+                {nextTitle}
+            </div>
+          </Stack>
+          <br/>
+          <Stack alignItems="flex-end" justifyContent={"flex-end"} spacing={2} direction="row">
             {editButton}
           </Stack>
+          <br/>
+          <br/>
           <ChatHistory messages={inputs} />
           {streaming && <MessageBox
             position={"left"}
             type={"text"}
             title={"GPT"}
-            text={typeof(postProcessedResponse) == "string" ? <Markdown>{postProcessedResponse}</Markdown> : postProcessedResponse}
+            text={typeof(postProcessedResponse) == "string" ? 
+            <Markdown remarkPlugins={remarkGfm}>{postProcessedResponse}</Markdown> : postProcessedResponse}
           />}
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+          <br/>
+            <Button variant="text" onClick={()=>{
+              setInputs([])
+              setInputVal("")
+              setShouldReply(true)
+              setStreaming(false)
+            }} >New Conversation</Button>
           <div
             style = {{position: "fixed", bottom: 0, left: 0, width: "100%", textAlign: "center", borderTop: "1px solid gray"}}>
               <div style={{width: "50%", margin: "auto"}}>
               <Input
                 ref={inputRef}
                 placeholder='Type here...'
-                multiline={false}
+                multiline={true}
                 value={inputVal}
                 onChange={(x)=>{setInputVal(x.target.value)}}
                 onKeyDown={(e)=>{
-                  if(e.key === "Enter"){
+                  //Enter unless shift is held
+                  if(e.key === "Enter" && !e.shiftKey){
                     setInputVal("")
+                    e.target.value = ""
+                    e.target.style.height = "40px"
                     setShouldReply(true); 
                     setInputs(inputs.concat({user: "user", text: inputVal}));
+                    e.preventDefault()
                   }
                 }}
                 rightButtons={
@@ -587,7 +668,8 @@ function ChatHistory({messages}){
               position={i.user != "user" ? "left" : "right"}
               type={"text"}
               title={i.user}
-              text={typeof(i.text) == "string" ? <Markdown>{i.text}</Markdown> : i.text}
+              text={typeof(i.text) == "string" ? 
+                <Markdown remarkPlugins={remarkGfm}>{i.text}</Markdown> : i.text}
           />
         </>
       })}

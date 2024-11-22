@@ -195,3 +195,23 @@ export let useDoc = (documentId) => {
 
   return [doc, updateDoc, deleteDoc]
 }
+
+export let useConversations = (accessKey) => {
+  let [conversations, setConversations] = React.useState([])
+  let [documents, createDocument, deleteDocument, updateDocument] = useDocs()
+
+  React.useEffect(()=>{
+    if(!documents || !accessKey) return
+
+    (async ()=>{
+      let r = await fetch(gptProxyData.conversation_management, { method: "POST", body: JSON.stringify({ accessKey: accessKey, operation: "list" }) })
+      let response = await r.json()
+      let newCs = JSON.parse(response.body)
+      setConversations((cs)=>{
+        return newCs
+      }) //TODO: Filter by documentIds
+    })()
+  }, [accessKey, documents])
+
+  return [conversations]
+}

@@ -23,6 +23,8 @@ TODO:
       - Make sure you can't transfer more credits than you have
       - Make sure you can't take more credits than the child has
 
+  - Optimizations
+    - Make streaming faster?  Decrementing credits in the streaming loop could be made faster...   (Dec at end, and just allow some negative -- or stop at zero...)
 
   - SECURITY
     * Use transaction to make sure you can't give more credits than you have... (2 requests in quick succession??)
