@@ -4,7 +4,13 @@ TODO:
     - Misc
       - Emails
         - Can we prevent invites from going to spam?
-        - Send link as well as access key
+
+  
+  - Test plan
+    - Make the powerpoint so we know how the workshop will flow...
+      * Good bots / bad bots?
+    - Load testing...
+    - Check OpenAPI usage so far.  Rate limits?  Throttles?
 
 
 
