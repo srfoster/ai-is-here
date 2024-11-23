@@ -715,8 +715,8 @@ function EditMode({setNextPrompt, nextPrompt, nextTitle, setNextTitle, deleteBot
         variant='text'
         onClick={handleClickOpen}
           >Delete</Button>
+                {doneEditingButton}
       </Stack>
-      {doneEditingButton}
       <AlertDialog open={open} handleClose={handleClose} deleteBot={deleteBot} />
     </>
 }
