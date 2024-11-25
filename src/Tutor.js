@@ -282,7 +282,6 @@ function KeyCreationWidgets({newKeyName, setNewKeyName, createKey}){
           Or, if you need to create a lot of keys at once, 
           use the bulk key creation tool below.  Each key needs its
           own line containing a name, an email address, or both. 
-          Emails must be enclosed in angle brackets like so: {`<me@example.com>`}  
         </Typography>
         <br/>
         <br/>
@@ -305,7 +304,7 @@ function BulkKeyCreation({createKey}){
     <Button onClick={async () => {
       let lines = bulkKeyString.split("\n").map((s) => s.trim())
       for(let l of lines){
-        let e = l.match(/<([^<>]*)>/)
+        let e = l.match(/([^ ]*@[^ ]*.[^ ]*)/)
         let n = e ? l.replace(e[0], "").trim() : l
         await createKey({name: n, email: e ? e[1] : ""})
       }
