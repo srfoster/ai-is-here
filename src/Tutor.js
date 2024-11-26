@@ -411,7 +411,7 @@ export function Tutor({hiddenPrompt}) {
     }
 
     return (
-      <Container maxWidth="sm" style={{paddingTop: 30, marginBottom: 100}}>
+      <Container maxWidth="md" style={{paddingTop: 30, marginBottom: 100}}>
         <UsageContext.Provider value={{ usageData, increaseGPTWords }}>
             <Chat providedHiddenPrompt={hiddenPrompt} />
         </UsageContext.Provider> 
@@ -596,7 +596,13 @@ function Chat({providedHiddenPrompt}){
             </div>
           </Stack>
           <br/>
-          <Stack alignItems="flex-end" justifyContent={"flex-end"} spacing={2} direction="row">
+          <Stack alignItems="center" justifyContent={"center"} spacing={2} direction="row">
+            <Button variant="text" color="error" onClick={()=>{
+              setInputs([])
+              setInputVal("")
+              setShouldReply(true)
+              setStreaming(false)
+            }} >New Conversation</Button>
             {editButton}
           </Stack>
           <br/>
@@ -609,19 +615,8 @@ function Chat({providedHiddenPrompt}){
             text={typeof(postProcessedResponse) == "string" ? 
             <Markdown remarkPlugins={remarkGfm}>{postProcessedResponse}</Markdown> : postProcessedResponse}
           />}
-          <br/>
-          <br/>
-          <br/>
-          <br/>
-          <br/>
-            <Button variant="text" onClick={()=>{
-              setInputs([])
-              setInputVal("")
-              setShouldReply(true)
-              setStreaming(false)
-            }} >New Conversation</Button>
           <div
-            style = {{position: "fixed", bottom: 0, left: 0, width: "100%", textAlign: "center", borderTop: "1px solid gray"}}>
+            style = {{position: "fixed", bottom: 0, left: 0, width: "100%", textAlign: "center", borderTop: "1px solid gray", backgroundColor: "rgba(255,255,255, 0.9)"}}>
               <div style={{width: "50%", margin: "auto"}}>
               <Input
                 ref={inputRef}
