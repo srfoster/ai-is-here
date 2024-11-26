@@ -550,6 +550,7 @@ function Chat({providedHiddenPrompt}){
 
     let editButton = <Button 
         variant='contained' 
+        disabled={streaming}
         onClick={()=>{
         if(editMode && (nextPrompt != hiddenPrompt || nextTitle != doc.title)){
           console.log("Setting hidden prompt", nextPrompt)
@@ -636,6 +637,7 @@ function Chat({providedHiddenPrompt}){
                 onKeyDown={(e)=>{
                   //Enter unless shift is held
                   if(e.key === "Enter" && !e.shiftKey){
+                    if(streaming) return
                     setInputVal("")
                     e.target.value = ""
                     e.target.style.height = "40px"
@@ -647,12 +649,14 @@ function Chat({providedHiddenPrompt}){
                 rightButtons={
                   <RCE.Button 
                   onClick={()=>{
+                    if(streaming) return
                     setInputVal("")
                     setShouldReply(true)
                     setInputs(inputs.concat({user: "user", text: inputVal})); 
                     }
                   }
-                  color='white' backgroundColor='black' text='Send' />
+                  color='white' backgroundColor='black' text='Send' 
+                  />
                 }
               />
               </div>
