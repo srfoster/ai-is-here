@@ -569,6 +569,14 @@ function Chat({providedHiddenPrompt}){
     }
 
     let postProcessedResponse = postProcessGPT(response, ()=>{setShouldReply(true)})
+
+    let avatar = 
+      <div style={{width:50,height:50}}>
+        <Avatar style={{ width: 50, height: 50, cursor: "pointer" }}  
+                  {...(genConfig(documentId))}
+                />
+      </div>
+
     return <>
       
       {editMode ? 
@@ -586,9 +594,7 @@ function Chat({providedHiddenPrompt}){
             direction={"row"} 
             alignItems="center" 
             spacing={1}>
-              <Avatar style={{ width: 50, height: 50, cursor: "pointer" }}  
-                {...(genConfig(documentId))}
-              />
+            {avatar}
             <div 
               style={{ textAlign: "center", paddingBottom: "0px important!", marginBottom: 0, fontSize: "3em", fontWeight: "bold"}} 
               >
@@ -607,14 +613,17 @@ function Chat({providedHiddenPrompt}){
           </Stack>
           <br/>
           <br/>
-          <ChatHistory messages={inputs} />
-          {streaming && <MessageBox
-            position={"left"}
-            type={"text"}
-            title={"GPT"}
-            text={typeof(postProcessedResponse) == "string" ? 
-            <Markdown remarkPlugins={remarkGfm}>{postProcessedResponse}</Markdown> : postProcessedResponse}
-          />}
+          <ChatHistory messages={inputs} avatar={avatar}/>
+          {streaming && 
+          
+            <MessageBox
+              position={"left"}
+              type={"text"}
+              title={"GPT"}
+              text={typeof(postProcessedResponse) == "string" ? 
+              <Markdown remarkPlugins={remarkGfm}>{postProcessedResponse}</Markdown> : postProcessedResponse}
+            />
+          }
           <div
             style = {{position: "fixed", bottom: 0, left: 0, width: "100%", textAlign: "center", borderTop: "1px solid gray", backgroundColor: "rgba(255,255,255, 0.9)"}}>
               <div style={{width: "50%", margin: "auto"}}>
@@ -654,17 +663,17 @@ function Chat({providedHiddenPrompt}){
 
 }
 
-function ChatHistory({messages}){
+function ChatHistory({messages, avatar}){
   return <>
       {messages.map((i)=>{
         return <>
-          <MessageBox
-              position={i.user != "user" ? "left" : "right"}
-              type={"text"}
-              title={i.user}
-              text={typeof(i.text) == "string" ? 
-                <Markdown remarkPlugins={remarkGfm}>{i.text}</Markdown> : i.text}
-          />
+            <MessageBox
+                position={i.user != "user" ? "left" : "right"}
+                type={"text"}
+                title={i.user}
+                text={typeof(i.text) == "string" ? 
+                  <Markdown remarkPlugins={remarkGfm}>{i.text}</Markdown> : i.text}
+            />
         </>
       })}
   </>
