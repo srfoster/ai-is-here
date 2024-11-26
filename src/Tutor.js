@@ -411,7 +411,7 @@ export function Tutor({hiddenPrompt}) {
     }
 
     return (
-      <Container maxWidth="md" style={{paddingTop: 30, marginBottom: 100}}>
+      <Container maxWidth="lg" style={{paddingTop: 30, marginBottom: 100}}>
         <UsageContext.Provider value={{ usageData, increaseGPTWords }}>
             <Chat providedHiddenPrompt={hiddenPrompt} />
         </UsageContext.Provider> 
