@@ -1,51 +1,49 @@
-
-/*TODO
-
-  * Authentication
-     * https://aws.amazon.com/blogs/security/use-the-hosted-ui-or-create-a-custom-ui-in-amazon-cognito/
-     * 
-     - Authentication url works: https://ai-is-here.auth.us-east-1.amazoncognito.com/oauth2/authorize?client_id=2vs918871e1lh19ump5oblk25v&response_type=token&scope=email+openid+phone&redirect_uri=https%3A%2F%2Fsrfoster.github.io%2Fai-is-here%2F
-     - Directs back to:  https://srfoster.github.io/ai-is-here/#id_token=<<>>&access_token=<<>>&expires_in=3600&token_type=Bearer
-     - Need to store this in local storage, send it along with lambda requests
-     - Need to check it on the "backend" along with available credits
-     - Update credits when used
-     - Send back error message when out of credits
-     - Decide on how much to give for free 
-  * Add history push (links to sections), 
-  * Chapter 1
-    - On Reading (speed and cost)
-  * Cover page: "Praise for..."
-  * Bugs with customization
-    - Prefs don't update until refresh.  Need to propagate state or use context
-    - Consider making customized text styled slightly differently
-    - Fix the flashing
-    - Can't click footnote links
-  * Another section showing an edgier use of AI (to censor and rewrite certain things accoring to overarching dystopian worldviews...  Flat earth.  Racism.  Alt-right.  Newspeak.)  
-  * Missing footnotes  
-  * Demo ideas: 
-    - Flash card app embedded
-    - English to code to UI?  Make buttons and stuff?
-*/
-
 import * as React from 'react';
 import './App.css';
 import { LoginWidget, CreditStringContext, useCheckCredits } from './useGpt';
-import { EReader} from './EReader';
-import { Introduction,  Chapter1, Acknowledgements, } from './Sections';
-import { Conversation,Tutor, TutorManager, ChildKeyManager } from './Tutor';
+import { EReader } from './EReader';
+import { Introduction, Chapter1, Acknowledgements } from './Sections';
+import { Conversation, Tutor, TutorManager, ChildKeyManager } from './Tutor';
 import { 
   HashRouter as Router,
   Routes,
   Route,
-  Link } from 'react-router-dom';
-import {Container,Typography } from '@mui/material';
+  Link,
+  useParams
+} from 'react-router-dom';
+import { Container, Typography, CssBaseline } from '@mui/material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import { useLocalStorage } from 'react-use';
 
-import {Home} from './Pages/Home';
+import { Home } from './Pages/Home';
+import resourcesData from './data/resources.json';
+import authorsData from './data/authors.json';
+import Logo from './Components/Logo'; // Import the Logo component
+
+// Create a dark theme
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#90caf9', // Light blue
+    },
+    secondary: {
+      main: '#f48fb1', // Pink
+    },
+    background: {
+      default: '#121212', // Dark background
+      paper: '#1e1e1e', // Slightly lighter for cards
+    },
+    text: {
+      primary: '#ffffff', // White text
+      secondary: '#b0bec5', // Light gray text
+    },
+  },
+});
 
 function MainAppBar() {
   return (
@@ -53,13 +51,13 @@ function MainAppBar() {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            <Link to="/" style={{color: "white"}}>Home</Link>
+            <Link to="/" style={{ color: "white", textDecoration: "none" }}>Home</Link>
           </Typography>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            <Link to="/bots" style={{color: "white"}}>Bots</Link>
+            <Link to="/bots" style={{ color: "white", textDecoration: "none" }}>Bots</Link>
           </Typography>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            <Link to="/keys" style={{color: "white"}}>Keys</Link>
+            <Link to="/keys" style={{ color: "white", textDecoration: "none" }}>Keys</Link>
           </Typography>
         </Toolbar>
       </AppBar>
@@ -67,11 +65,46 @@ function MainAppBar() {
   );
 }
 
+function ResourcePage() {
+  const { slug } = useParams();
+  const resource = resourcesData.find((res) => res.slug === slug);
+
+  if (!resource) {
+    return <p>Resource not found.</p>;
+  }
+
+  return (
+    <Container maxWidth="sm">
+      <Typography variant="h4">{resource.title}</Typography>
+      <Typography variant="subtitle1">{resource.description}</Typography>
+      <Typography variant="body1">{resource.content}</Typography>
+    </Container>
+  );
+}
+
+function AuthorPage() {
+  const { slug } = useParams();
+  const author = authorsData.find((auth) => auth.slug === slug);
+
+  if (!author) {
+    return <p>Author not found.</p>;
+  }
+
+  return (
+    <Container maxWidth="sm">
+      <Typography variant="h4">{author.name}</Typography>
+      <img src={author.avatar} alt={author.name} style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+      <Typography variant="body1">{author.bio}</Typography>
+      <Typography variant="body2">{author.homepageContent}</Typography>
+    </Container>
+  );
+}
+
 let fullText = [
-  ...Introduction, 
+  ...Introduction,
   ...Chapter1,
   Acknowledgements
-]
+];
 
 let footnotes = {
   "bigger-context-window": `I say this knowing full well that OpenAI is already offering (for a steep price tag) a model with a [context-window of 32,000 words](https://community.openai.com/t/it-looks-like-gpt-4-32k-is-rolling-out/194615/3).  Will this solve the incoherence problem?  Maybe.  But I doubt it.`,
@@ -94,24 +127,30 @@ let footnotes = {
   "compulsory-education-ages": `This differs from state to state but begins between ages 5 and 8 and ends between ages 16 and 18.  See [here for details by state](https://nces.ed.gov/programs/statereform/tab5_1.asp).`,
   "per-word": "Technically, they charge 'per token', which includes partial words.  But I'll say 'per word' for simplicity.",
   "student-signup": "If you're one of my students, you **are** required to do this.  You will not be able to complete the homework for my class if you don't sign up."
-}
-
+};
 
 function App() {
+  let [creditString, setCreditString] = useLocalStorage("credit-string", "");
 
-  let [creditString, setCreditString] = useLocalStorage("credit-string", "")
-
-  let {remainingCredits, 
-       refreshCredits} = useCheckCredits(creditString)
+  let { remainingCredits, refreshCredits } = useCheckCredits(creditString);
 
   return (
-    <>
-      <CreditStringContext.Provider value={{creditString, 
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <CreditStringContext.Provider value={{
+        creditString,
         setCreditString,
         remainingCredits,
-        refreshCredits}}>
+        refreshCredits
+      }}>
         <Router>
+          <br />
+
+          <Container maxWidth="sm">
+            <Logo />
+          </Container>
           <br/>
+
           <Routes>
             <Route path="/book" element={
               <>
@@ -123,32 +162,32 @@ function App() {
             <Route path="/bots" element={
               <>
                 <MainAppBar />
-              <TutorManager />
+                <TutorManager />
               </>
             }>
             </Route>
             <Route path="/keys" element={
               <>
                 <MainAppBar />
-              <ChildKeyManager />
+                <ChildKeyManager />
               </>
             }>
             </Route>
             <Route path="/bots/:documentId"
               element={
-              <>
-                <MainAppBar />
-                <Tutor />
-              </>
+                <>
+                  <MainAppBar />
+                  <Tutor />
+                </>
               }
             >
             </Route>
             <Route path="/conversations/:botId/:conversationId"
               element={
-              <>
-                <MainAppBar />
-                <Conversation />
-              </>
+                <>
+                  <MainAppBar />
+                  <Conversation />
+                </>
               }
             >
             </Route>
@@ -160,6 +199,8 @@ function App() {
               }
             >
             </Route>
+            <Route path="/pages/:slug" element={<ResourcePage />} />
+            <Route path="/authors/:slug" element={<AuthorPage />} />
             <Route path="*" element={
               <Home />
             }>
@@ -167,9 +208,8 @@ function App() {
           </Routes>
         </Router>
       </CreditStringContext.Provider>
-    </>
+    </ThemeProvider>
   );
 }
-
 
 export default App;

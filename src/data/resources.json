@@ -1,0 +1,52 @@
+[
+  {
+    "type": "video",
+    "title": "Introduction to AI in Education",
+    "slug": "intro-to-ai",
+    "author": ["John Doe"],
+    "description": "A brief introduction to how AI is transforming education.",
+    "content": "## Introduction\nThis video explains the basics of AI in education...",
+    "dateCreated": "2025-03-01",
+    "tags": ["for-educators", "video", "introduction"]
+  },
+  {
+    "type": "text",
+    "title": "How to Use AI Tools in the Classroom",
+    "slug": "how-to-use-in-classroom",
+    "author": ["stephen-foster"],
+    "description": "A guide for educators on integrating AI tools into their teaching.",
+    "content": "## How to Use AI Tools\nThis guide provides step-by-step instructions...",
+    "dateCreated": "2025-03-10",
+    "tags": ["for-educators", "text", "how-to"]
+  },
+  {
+    "type": "video",
+    "title": "AI for Students: Getting Started",
+    "slug": "for-students-getting-started",
+    "author": ["lindsey-handley"],
+    "description": "A video tutorial for students on how to use AI tools effectively.",
+    "content": "## Getting Started\nThis video walks students through...",
+    "dateCreated": "2025-03-15",
+    "tags": ["for-students", "video", "tutorial"]
+  },
+  {
+    "type": "video",
+    "title": "AI for Students: Getting Started",
+    "slug": "for-students-getting-started-2",
+    "author": ["davis-smith"],
+    "description": "A video tutorial for students on how to use AI tools effectively.",
+    "content": "## Getting Started\nThis video walks students through...",
+    "dateCreated": "2025-03-15",
+    "tags": ["for-students", "video", "tutorial"]
+  },
+  {
+    "type": "video",
+    "title": "AI for Students: Getting Started",
+    "slug": "for-students-getting-started-3",
+    "author": ["candice-morrow"],
+    "description": "A video tutorial for students on how to use AI tools effectively.",
+    "content": "## Getting Started\nThis video walks students through...",
+    "dateCreated": "2025-03-15",
+    "tags": ["for-students", "video", "tutorial"]
+  }
+]

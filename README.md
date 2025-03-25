@@ -7,11 +7,18 @@ Spring 2025 re-envisioning.
 
   Anyway, goals:
   - Revise homepage
-  - Subpages:
-    - Videos
-    - Blogs?
-    - Software / Bots
-    - Textbooks?
+    [x] Cool banner
+  - Placeholder content
+    - Routing is aware of JSON
+      - Links to author pages
+      - Link to full blog posts
+
+  Backlog:
+   * Deploy to ai-is-here.com/olympic-college
+   * Actual content.  CAT video.  Workshops.  Opinion pieces.
+     - Student voices
+     - Graph to track "conversations"
+       - Conversation view instead of feed view?
 
 
 03/05/2025 - 
