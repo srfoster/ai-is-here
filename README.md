@@ -1,5 +1,41 @@
 TODO:
 
+Spring 2025 re-envisioning.
+
+03/25/2025 -
+  Fixed it by `git checkout src/gptProxyData.json`  Seems like maybe the teraform build is broken on the PC but works on the laptop?
+
+  Anyway, goals:
+  - Revise homepage
+  - Subpages:
+    - Videos
+    - Blogs?
+    - Software / Bots
+    - Textbooks?
+
+
+03/05/2025 - 
+  Well, I broke everything.  Gotta remember how the deployment is supposed to work.  After deploying the backend, the frontend is not working (Killed the proxy data).  ./deploy.sh failed with errors about not being able to recreate various resources (e.g. IAM??)
+  
+  "Rebrand" for AI stakeholders at OC
+  - Do video for Kathy (modeling Candice's)
+  - [x] "Logo"
+  - Add welcome tile
+    - Convey message and navigation options (imply site layout / information architecture)
+      - Model after Candice's areas of interest...
+      - Videos / Lectures
+      - Articles / Blogs
+      - Login
+      - Logged in content
+
+  - Fix Navbar
+
+
+
+
+
+----
+
   - The Big Polish!
     - Misc
       - Emails

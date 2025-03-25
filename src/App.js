@@ -29,25 +29,23 @@
 
 import * as React from 'react';
 import './App.css';
-import { LoginWidget, CreditStringContext, OutOfCreditsIfOutOfCredits, useCheckCredits } from './useGpt';
+import { LoginWidget, CreditStringContext, useCheckCredits } from './useGpt';
 import { EReader} from './EReader';
 import { Introduction,  Chapter1, Acknowledgements, } from './Sections';
 import { Conversation,Tutor, TutorManager, ChildKeyManager } from './Tutor';
-import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
-import { useLocation,
+import { 
   HashRouter as Router,
   Routes,
   Route,
   Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, Container,Typography } from '@mui/material';
+import {Container,Typography } from '@mui/material';
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
 import { useLocalStorage } from 'react-use';
+
+import {Home} from './Pages/Home';
 
 function MainAppBar() {
   return (
@@ -98,36 +96,6 @@ let footnotes = {
   "student-signup": "If you're one of my students, you **are** required to do this.  You will not be able to complete the homework for my class if you don't sign up."
 }
 
-function Home() {
-  return (
-    <Container maxWidth="sm" >
-      <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">AI for Education</Typography>
-
-      <OutOfCreditsIfOutOfCredits afterRefresh={()=>{window.location.reload()}} />
-
-      <HomePageTile title="Automated Tutor">
-       <p>Configurable AI tutoring bots.
-            Click <Link to="/bots">here</Link>.</p>
-      </HomePageTile>
-
-      <HomePageTile title="Book">
-       <p>I've written part of a sample textbook. 
-            Click <Link to="/book">here</Link> to start reading.</p>
-      </HomePageTile>
-    </Container>
-  ) 
-}
-
-function HomePageTile({title, children}) {
-  return (
-    <Card>
-      <CardHeader title={title}></CardHeader> 
-      <CardContent> 
-        {children}
-      </CardContent>
-    </Card>
-  )
-}
 
 function App() {
 
@@ -143,30 +111,44 @@ function App() {
         remainingCredits,
         refreshCredits}}>
         <Router>
-          <MainAppBar />
           <br/>
           <Routes>
             <Route path="/book" element={
-              <EReader content={fullText} footnotes={footnotes} />
+              <>
+                <MainAppBar />
+                <EReader content={fullText} footnotes={footnotes} />
+              </>
             }>
             </Route>
             <Route path="/bots" element={
+              <>
+                <MainAppBar />
               <TutorManager />
+              </>
             }>
             </Route>
             <Route path="/keys" element={
+              <>
+                <MainAppBar />
               <ChildKeyManager />
+              </>
             }>
             </Route>
             <Route path="/bots/:documentId"
               element={
+              <>
+                <MainAppBar />
                 <Tutor />
+              </>
               }
             >
             </Route>
             <Route path="/conversations/:botId/:conversationId"
               element={
+              <>
+                <MainAppBar />
                 <Conversation />
+              </>
               }
             >
             </Route>
