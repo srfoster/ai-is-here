@@ -6,7 +6,8 @@ import { useInView } from 'react-intersection-observer';
 import { useEffect, useState } from 'react';
 import resourcesData from '../data/resources.json'; // Import the resources JSON
 import authorsData from '../data/authors.json'; // Import the authors JSON
-import Avatar, { genConfig } from 'react-nice-avatar';
+import MarkdownRenderer from '../Components/MarkdownRenderer';
+import DynamicAvatar from '../Components/DynamicAvatar';
 
 export function Home() {
   const [resources, setResources] = useState([]);
@@ -14,7 +15,7 @@ export function Home() {
 
   useEffect(() => {
     // Simulate fetching resources and authors (you can replace this with API calls if needed)
-    setResources(resourcesData);
+    setResources(resourcesData.sort((a, b) => new Date(b.dateCreated) - new Date(a.dateCreated)));
     setAuthors(authorsData);
   }, []);
 
@@ -22,8 +23,7 @@ export function Home() {
     <Container maxWidth="sm">
 
       {resources.map((resource, i) => {
-        const authorSlug = resource.author[0].toLowerCase().replace(/\s+/g, '-'); // Match author key
-        const authorInfo = authors.find((a) => a.slug === authorSlug);
+        const authorInfos = authors.filter((a) => resource.author.includes(a.slug));
         return (
           <AnimatedSection key={i}>
             <Card>
@@ -36,19 +36,21 @@ export function Home() {
                 subheader={
                   <>
                     By{' '}
-                    <Link to={`/authors/${authorSlug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                      {authorInfo?.name || resource.author.join(', ')}
-                    </Link>{' '}
-                    on {new Date(resource.dateCreated).toLocaleDateString()}
+                    { resource.author.map((authorSlug) =>
+                      <Link key={authorSlug} to={`/authors/${authorSlug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                        {authors.find((a) => a.slug === authorSlug)?.name || authorSlug }
+                      </Link>
+                    ).reduce((prev, curr) => [prev, ', ', curr])}
+                    {' '}on {new Date(resource.dateCreated).toLocaleDateString()}
                   </>
                 }
                 avatar={
-                  <DynamicAvatar avatarInfo={authorInfo?.avatar} />
+                  <DynamicAvatar avatarInfo={ authorInfos.map((a) => a.avatar).filter(x=>x)} />
                 }
               />
               <CardContent>
-                <p>{resource.description}</p>
-                {authorInfo && <p><strong>About the Author:</strong> {authorInfo.bio}</p>}
+                <MarkdownRenderer>{ resource.content }</MarkdownRenderer> 
+
                 <Stack direction="row" spacing={1}>
                   {resource.tags.map((tag, index) => (
                     <Chip key={index} label={tag} variant="outlined" />
@@ -86,13 +88,6 @@ export function Home() {
   );
 }
 
-function DynamicAvatar({ avatarInfo }) {
-  if (avatarInfo == undefined || avatarInfo.length == 0) {
-    return null
-  }
-
-  return <Avatar style={{width: 50, height: 50}} {...genConfig(avatarInfo[1])} />
-}
 
 function AnimatedSection({ children }) {
   const controls = useAnimation();
@@ -126,16 +121,6 @@ function HomePageTile({ title, children }) {
       <CardHeader title={title}></CardHeader>
       <CardContent>
         {children}
-      </CardContent>
-    </Card>
-  );
-}
-
-function WelcomeTile() {
-  return (
-    <Card>
-      <CardContent>
-        <p>Welcome to Olympic College's resources for AI in higher ed.</p>
       </CardContent>
     </Card>
   );

@@ -1,53 +1,31 @@
 [
-   {
-    "slug": "john-doe",
-    "name": "John Doe",
-    "avatar": [],
-    "bio": "An AI researcher and educator with a passion for transforming education.",
-    "homepageContent": "John Doe is a leading expert in AI and its applications in education. He has authored numerous papers and given talks worldwide."
+  {
+    "slug": "justin-lewis",
+    "name": "Justin Lewis",
+    "avatar": "/ai-is-here/avatar_images/justin-lewis.png",
+    "bio": "Educator of English and rhetoric.  AI pioneer."
   },
-   {
+  {
     "slug": "stephen-foster",
     "name": "Stephen Foster",
-    "avatar": ["react-nice-avatar:Avatar", {
-    "sex": "man",
-    "faceColor": "#F9C9B6",
-    "earSize": "small",
-    "eyeStyle": "oval",
-    "noseStyle": "round",
-    "mouthStyle": "smile",
-    "shirtStyle": "hoody",
-    "glassesStyle": "square",
-    "hairColor": "#000",
-    "hairStyle": "normal",
-    "hatStyle": "none",
-    "hatColor": "#fff",
-    "eyeBrowStyle": "up",
-    "shirtColor": "#F4D150",
-    "bgColor": "#E0DDFF"
-    }
-    ],
-    "bio": "An educator focused on integrating AI tools into classrooms.",
-    "homepageContent": "Stephen Foster is dedicated to helping educators leverage AI to enhance teaching and learning experiences."
+    "avatar": "/ai-is-here/avatar_images/stephen-foster.png",
+    "bio": "Computer scientist, educator, and AI solutions builder."
   },
-   {
+  {
     "slug": "lindsey-handley",
     "name": "Lindsey Handley",
-    "avatar": [],
-    "bio": "A technology enthusiast helping students navigate AI tools.",
-    "homepageContent": "Lindsey Handley creates engaging tutorials to empower students to use AI effectively in their studies."
+    "avatar": "/ai-is-here/avatar_images/lindsey-handley.png",
+    "bio": "Chemist, author, software engineer, and educator with a passion for AI."
   },
-   {
+  {
     "slug": "davis-smith",
     "name": "Davis Smith",
-    "avatar": [],
     "bio": "An AI advocate for students and educators alike.",
     "homepageContent": "Davis Smith focuses on making AI accessible and practical for students in higher education."
   },
-   {
+  {
     "slug": "candice-morrow",
     "name": "Candice Morrow",
-    "avatar": [],
     "bio": "A passionate educator exploring AI's potential in learning.",
     "homepageContent": "Candice Morrow works on innovative ways to integrate AI into student learning experiences."
   }

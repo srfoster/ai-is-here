@@ -1,52 +1,42 @@
 [
   {
-    "type": "video",
-    "title": "Introduction to AI in Education",
-    "slug": "intro-to-ai",
-    "author": ["John Doe"],
-    "description": "A brief introduction to how AI is transforming education.",
-    "content": "## Introduction\nThis video explains the basics of AI in education...",
-    "dateCreated": "2025-03-01",
-    "tags": ["for-educators", "video", "introduction"]
-  },
-  {
-    "type": "text",
-    "title": "How to Use AI Tools in the Classroom",
-    "slug": "how-to-use-in-classroom",
+    "tags": ["for-faculty", "video", "tutorial", "how-to", "notebook-llm"],
+    "dateCreated": "2025-03-25",
+    "title": "Classroom Assessment Tool generation",
+    "slug": "cat-generation",
     "author": ["stephen-foster"],
-    "description": "A guide for educators on integrating AI tools into their teaching.",
-    "content": "## How to Use AI Tools\nThis guide provides step-by-step instructions...",
-    "dateCreated": "2025-03-10",
-    "tags": ["for-educators", "text", "how-to"]
+    "content": "How to generate a Classroom Assessment Tool using AI\n\nhttps://youtu.be/1a2b3c4d5e6"
   },
   {
-    "type": "video",
+    "tags": ["for-faculty", "video", "discussion"],
+    "dateCreated": "2025-03-15",
     "title": "AI for Students: Getting Started",
     "slug": "for-students-getting-started",
-    "author": ["lindsey-handley"],
-    "description": "A video tutorial for students on how to use AI tools effectively.",
-    "content": "## Getting Started\nThis video walks students through...",
-    "dateCreated": "2025-03-15",
-    "tags": ["for-students", "video", "tutorial"]
+    "author": ["stephen-foster", "lindsey-handley"],
+    "content": "A hands-on, informal investigation of DeepSeek (vs ChatGPT)\n\nhttps://youtu.be/v4sSUEGIFMM"
   },
   {
-    "type": "video",
-    "title": "AI for Students: Getting Started",
-    "slug": "for-students-getting-started-2",
-    "author": ["davis-smith"],
-    "description": "A video tutorial for students on how to use AI tools effectively.",
-    "content": "## Getting Started\nThis video walks students through...",
-    "dateCreated": "2025-03-15",
-    "tags": ["for-students", "video", "tutorial"]
+    "tags": ["video", "presentation", "for-faculty"],
+    "dateCreated": "2023-10-01",
+    "title": "AI for Creating Lesson Plans",
+    "slug": "ai-for-lesson-plans",
+    "author": ["justin-lewis","lindsey-handley","stephen-foster"],
+    "content": "A 40-minute presentation from Fall 2023 Assessment Day\n\nhttps://youtu.be/h78cdBBzPMQ"
   },
   {
-    "type": "video",
-    "title": "AI for Students: Getting Started",
-    "slug": "for-students-getting-started-3",
-    "author": ["candice-morrow"],
-    "description": "A video tutorial for students on how to use AI tools effectively.",
-    "content": "## Getting Started\nThis video walks students through...",
-    "dateCreated": "2025-03-15",
-    "tags": ["for-students", "video", "tutorial"]
+    "tags": ["video", "presentation", "for-faculty"],
+    "dateCreated": "2023-10-01",
+    "title": "Using AI in the Classroom",
+    "slug": "ai-in-the-classroom",
+    "author": ["justin-lewis"],
+    "content": "A 55-minute presentation from Fall 2023 Assessment Day\n\nhttps://youtu.be/b-ZjbBYFJuQ"
+  },
+  {
+    "tags": ["video", "presentation", "for-faculty"],
+    "dateCreated": "2023-10-01",
+    "title": "Teaching writing with AI",
+    "slug": "ai-for-writing",
+    "author": ["justin-lewis"],
+    "content": "A 40-minute presentation from Fall 2023 Assessment Day\n\nhttps://youtu.be/J81EK6Pnl14"
   }
 ]
