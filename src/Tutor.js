@@ -384,6 +384,8 @@ function ListConversations({k}){
 export function TutorManager() {
   let [documents, createDocument, deleteDocument, updateDocument] = useDocs()
 
+  if(!documents) return <>You must log in first...</>
+
   return <>
       <Container maxWidth="sm" style={{marginBottom: 100}} >
         <Typography variant="h2">Bots</Typography>

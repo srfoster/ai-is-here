@@ -1,11 +1,11 @@
 import { Card, CardContent, CardHeader, Container, Stack, Chip } from '@mui/material';
 import { OutOfCreditsIfOutOfCredits } from '../useGpt';
 import { Link } from 'react-router-dom';
-import { motion, useAnimation } from 'framer-motion';
+import { motion, Reorder, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useEffect, useState } from 'react';
-import resourcesData from '../data/resources.json'; // Import the resources JSON
-import authorsData from '../data/authors.json'; // Import the authors JSON
+import resourcesData from '../data/resources'; // Import the resources JSON
+import authorsData from '../data/authors'; // Import the authors JSON
 import MarkdownRenderer from '../Components/MarkdownRenderer';
 import DynamicAvatar from '../Components/DynamicAvatar';
 
@@ -37,7 +37,7 @@ export function Home() {
                   <>
                     By{' '}
                     { resource.author.map((authorSlug) =>
-                      <Link key={authorSlug} to={`/authors/${authorSlug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                      <Link key={authorSlug} to={`/authors/${authorSlug}`} style={{ textDecoration: 'underline', color: 'cyan' }}>
                         {authors.find((a) => a.slug === authorSlug)?.name || authorSlug }
                       </Link>
                     ).reduce((prev, curr) => [prev, ', ', curr])}
@@ -49,7 +49,14 @@ export function Home() {
                 }
               />
               <CardContent>
-                <MarkdownRenderer>{ resource.content }</MarkdownRenderer> 
+                {
+                  typeof (resource.content) == "string" ?
+                  <MarkdownRenderer>{resource.content}</MarkdownRenderer>
+                    : (
+                      (typeof (resource.content) == "function") 
+                      ? <resource.content /> : resource.content
+                    )
+                }
 
                 <Stack direction="row" spacing={1}>
                   {resource.tags.map((tag, index) => (
@@ -91,7 +98,7 @@ export function Home() {
 
 function AnimatedSection({ children }) {
   const controls = useAnimation();
-  const [ref, inView] = useInView({ threshold: 0.75 }); 
+  const [ref, inView] = useInView({ threshold: 0.5 }); 
 
   useEffect(() => {
     if (inView) {

@@ -20,9 +20,10 @@ import Toolbar from '@mui/material/Toolbar';
 import { useLocalStorage } from 'react-use';
 
 import { Home } from './Pages/Home';
-import resourcesData from './data/resources.json';
-import authorsData from './data/authors.json';
 import Logo from './Components/Logo'; // Import the Logo component
+
+import AuthorPage from './Pages/AuthorPage';
+import ResourcePage from './Pages/ResourcePage';
 
 // Create a dark theme
 const darkTheme = createTheme({
@@ -65,40 +66,7 @@ function MainAppBar() {
   );
 }
 
-function ResourcePage() {
-  const { slug } = useParams();
-  const resource = resourcesData.find((res) => res.slug === slug);
 
-  if (!resource) {
-    return <p>Resource not found.</p>;
-  }
-
-  return (
-    <Container maxWidth="sm">
-      <Typography variant="h4">{resource.title}</Typography>
-      <Typography variant="subtitle1">{resource.description}</Typography>
-      <Typography variant="body1">{resource.content}</Typography>
-    </Container>
-  );
-}
-
-function AuthorPage() {
-  const { slug } = useParams();
-  const author = authorsData.find((auth) => auth.slug === slug);
-
-  if (!author) {
-    return <p>Author not found.</p>;
-  }
-
-  return (
-    <Container maxWidth="sm">
-      <Typography variant="h4">{author.name}</Typography>
-      <img src={author.avatar} alt={author.name} style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
-      <Typography variant="body1">{author.bio}</Typography>
-      <Typography variant="body2">{author.homepageContent}</Typography>
-    </Container>
-  );
-}
 
 let fullText = [
   ...Introduction,

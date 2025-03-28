@@ -1,4 +1,4 @@
-[
+export default [
   {
     "slug": "justin-lewis",
     "name": "Justin Lewis",

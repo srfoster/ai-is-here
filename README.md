@@ -2,6 +2,83 @@ TODO:
 
 Spring 2025 re-envisioning.
 
+03/28/2025
+   TODO:
+   * Posts:
+     - Textbook
+     - Bots 
+     - CAT video.
+   * AI summaries (transcripts?) for all videos
+     - Click to read more
+
+   Backlog:
+   * Top nav (videos, software, text, login?)
+
+   * Deploy to ai-is-here.com/olympic-college
+
+   * Solicit content:
+     - Student voices (ask on discord)
+     - Marco polo solicitations to: Candice, Davis, Sage, Mirelle
+     - Graph to track "conversations"
+       - Conversation view instead of feed view?
+     - Solicit from other colleges/universities
+
+
+
+03/26/2025
+   TODO:
+   * [x] Port more ambassador content
+     - Day 1, 2, 4 (on youtube)
+   * [x] Author pages:
+     - Auto-generate list of posts w/ preview.
+   * Posts:
+     - Textbook
+     - Bots 
+     - CAT video.
+   * AI summaries (transcripts?) for all videos
+     - Click to read more
+     - [x] Fix markdown on pages/:id view (render youtube embed, e.g.)
+
+
+   Backlog:
+   * Top nav (videos, software, text, login?)
+
+   * Deploy to ai-is-here.com/olympic-college
+   * Solicit content:
+     - Student voices (ask on discord)
+     - Marco polo solicitations to: Candice, Davis, Sage, Mirelle
+     - Graph to track "conversations"
+       - Conversation view instead of feed view?
+     - Solicit from other colleges/universities
+
+03/26/2025
+  - Revise homepage
+    - [x] Content and authorship (avatars)
+    - [x] Port old assessment day content
+
+  Backlog:
+   * Port more ambassador content
+     - Day 1, 2, 4 (on youtube)
+   * Author pages:
+     - Auto-generate list of posts w/ preview.
+   * Posts:
+     - Textbook
+     - Bots 
+     - CAT video.
+   * AI summaries (transcripts?) for all videos
+     - Click to read more
+     - Fix markdown on pages/:id view (render youtube embed, e.g.)
+   * Top nav (videos, software, text, login?)
+
+   * Deploy to ai-is-here.com/olympic-college
+   * Solicit content:
+     - Student voices (ask on discord)
+     - Marco polo solicitations to: Candice, Davis, Sage, Mirelle
+     - Graph to track "conversations"
+       - Conversation view instead of feed view?
+     - Solicit from other colleges/universities
+
+
 03/25/2025 -
   Fixed it by `git checkout src/gptProxyData.json`  Seems like maybe the teraform build is broken on the PC but works on the laptop?
 

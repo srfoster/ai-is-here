@@ -2,7 +2,7 @@
 import * as React from 'react';
 import gptProxyData from "./gptProxyData.json";
 import { Alert, Button, Card, CardContent, Chip, Typography, TextField} from '@mui/material';
-import {useLocalStorage} from 'react-use'
+import { useLocalStorage } from 'react-use'
 import { useLocation } from 'react-router-dom';
 
 export const UsageContext = React.createContext();
@@ -32,8 +32,12 @@ export let useCheckCredits = (creditString) => {
 
   console.log("useCheckCredits",{creditString, remainingCredits})
 
-  return { remainingCredits,
-          refreshCredits: () => setLastRefresh(Date.now())}
+  return {
+    remainingCredits,
+    refreshCredits: () => {
+      setLastRefresh(Date.now())
+    }
+  }
 }
 
 export function LoginWidget(){
@@ -42,14 +46,18 @@ export function LoginWidget(){
   const {creditString,setCreditString} = React.useContext(CreditStringContext);
 
   React.useEffect(() => {
+    if (!accessKey) {
+      return
+    }
+
     setCreditString(accessKey)
     // Update the URL without reloading the page
-    window.location = "/ai-is-here/#/";
+    //window.location = "/ai-is-here/#/";
   },[accessKey])
 
   return (
     <div>
-      <h1>Logging in...</h1>
+      <OutOfCreditsIfOutOfCredits />
     </div>
   )
 }

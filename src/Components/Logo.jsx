@@ -39,7 +39,9 @@ export default function Logo() {
 
   return (
     <motion.div
+      onClick={ () => { window.location.href = "/ai-is-here"; } }
       style={{
+        cursor: "pointer",
         paddingTop: 20,
         textAlign: "center",
         color: "black",
