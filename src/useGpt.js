@@ -40,10 +40,10 @@ export let useCheckCredits = (creditString) => {
   }
 }
 
-export function LoginWidget(){
+export function LoginWidget({loggedInContent}){
   let location = useLocation()
   let accessKey = new URLSearchParams(location.search).get("key")
-  const {creditString,setCreditString} = React.useContext(CreditStringContext);
+  const {creditString,setCreditString,remainingCredits} = React.useContext(CreditStringContext);
 
   React.useEffect(() => {
     if (!accessKey) {
@@ -57,7 +57,10 @@ export function LoginWidget(){
 
   return (
     <div>
-      <OutOfCreditsIfOutOfCredits />
+      <OutOfCreditsIfOutOfCredits afterRefresh={() => {
+
+      }} />
+      {remainingCredits ? loggedInContent : <Alert severity="info">You are not logged in, or you are out of credits.</Alert>}
     </div>
   )
 }

@@ -1,9 +1,6 @@
 import * as React from 'react';
 import './App.css';
 import { LoginWidget, CreditStringContext, useCheckCredits } from './useGpt';
-import { EReader } from './EReader';
-import { Introduction, Chapter1, Acknowledgements } from './Sections';
-import { Conversation, Tutor, TutorManager, ChildKeyManager } from './Tutor';
 import { 
   HashRouter as Router,
   Routes,
@@ -11,12 +8,8 @@ import {
   Link,
   useParams
 } from 'react-router-dom';
-import { Container, Typography, CssBaseline } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
 import { useLocalStorage } from 'react-use';
 
 import { Home } from './Pages/Home';
@@ -24,6 +17,14 @@ import Logo from './Components/Logo'; // Import the Logo component
 
 import AuthorPage from './Pages/AuthorPage';
 import ResourcePage from './Pages/ResourcePage';
+import MetaTextbook from './Pages/MetaTextbook/MetaTextbook'; // Import MetaTextbook
+
+import { TutorRoutes } from './Tutor';
+
+import authorsData from './data/authors'; // Import the authors JSON
+import DynamicAvatar from './Components/DynamicAvatar';
+import { Card, CardContent, CardHeader, CssBaseline, Typography, Container} from '@mui/material';
+
 
 // Create a dark theme
 const darkTheme = createTheme({
@@ -46,56 +47,6 @@ const darkTheme = createTheme({
   },
 });
 
-function MainAppBar() {
-  return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            <Link to="/" style={{ color: "white", textDecoration: "none" }}>Home</Link>
-          </Typography>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            <Link to="/bots" style={{ color: "white", textDecoration: "none" }}>Bots</Link>
-          </Typography>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            <Link to="/keys" style={{ color: "white", textDecoration: "none" }}>Keys</Link>
-          </Typography>
-        </Toolbar>
-      </AppBar>
-    </Box>
-  );
-}
-
-
-
-let fullText = [
-  ...Introduction,
-  ...Chapter1,
-  Acknowledgements
-];
-
-let footnotes = {
-  "bigger-context-window": `I say this knowing full well that OpenAI is already offering (for a steep price tag) a model with a [context-window of 32,000 words](https://community.openai.com/t/it-looks-like-gpt-4-32k-is-rolling-out/194615/3).  Will this solve the incoherence problem?  Maybe.  But I doubt it.`,
-  "ai-informal": `By "AI," I mean what is referred to as a "transformer" -- the technical term for the dominant neural network architecture for natural language processing and text generation.  In fact, it's the T in ChatGPT.  We'll get to transformers later.  Until then, I'll use the coloquial term "AI" because this book is intended to be approachable to a non-technical audience.`,
-  "homework-for-my-students": `If you're one of my students, then (as you probably already know) each benchmark is assigned as homework.  Send me your results!`,
-  "my-grandfathers-thesis": `You can:`,
-  "change-is-hard": `You can:`,
-  "hallucinations": `For more information, I'd recommend [the wikipedia article on AI hallucinations](https://en.wikipedia.org/wiki/Hallucination_(artificial_intelligence)).`,
-  "context-window": `You can:`,
-  "domestication-references": `
-* **"Guns, Germs, and Steel: The Fates of Human Societies"** by Jared Diamond.  Diamond's Pulitzer-winning work argues that environmental factors, including the availability and domestication of animals, played a vital role in the uneven distribution of global resources and power.
-* **"The Horse, the Wheel, and Language: How Bronze-Age Riders from the Eurasian Steppes Shaped the Modern World"** by David W. Anthony. This book discusses the domestication of horses and the role they played in the spread of language, culture, and technology from the Eurasian steppes.
-* **"The Dog: A Natural History"** by Ádám Miklósi. While focusing mainly on the evolution and behavior of dogs, this book also touches on the profound effects that the domestication of dogs had on human societies.`,
-  "computer-is-a-fad": `See the 1985 article called [The Executive Computer](https://www.nytimes.com/1985/12/08/business/the-executive-computer.html)
-  `,
-  "contact-me": `You can:
-* Open a [GitHub issue](https://github.com/srfoster/ai-is-here/issues)
-* Or email me: [stephen@thoughtstem.com](mailto:stephen@thoughtstem.com)`,
-  "attention-is-all-you-need": "You can find the full paper [here](https://arxiv.org/abs/1706.03762).",
-  "compulsory-education-ages": `This differs from state to state but begins between ages 5 and 8 and ends between ages 16 and 18.  See [here for details by state](https://nces.ed.gov/programs/statereform/tab5_1.asp).`,
-  "per-word": "Technically, they charge 'per token', which includes partial words.  But I'll say 'per word' for simplicity.",
-  "student-signup": "If you're one of my students, you **are** required to do this.  You will not be able to complete the homework for my class if you don't sign up."
-};
 
 function App() {
   let [creditString, setCreditString] = useLocalStorage("credit-string", "");
@@ -116,57 +67,26 @@ function App() {
 
           <Container maxWidth="sm">
             <Logo />
-          </Container>
           <br/>
 
           <Routes>
-            <Route path="/book" element={
-              <>
-                <MainAppBar />
-                <EReader content={fullText} footnotes={footnotes} />
-              </>
-            }>
-            </Route>
-            <Route path="/bots" element={
-              <>
-                <MainAppBar />
-                <TutorManager />
-              </>
-            }>
-            </Route>
-            <Route path="/keys" element={
-              <>
-                <MainAppBar />
-                <ChildKeyManager />
-              </>
-            }>
-            </Route>
-            <Route path="/bots/:documentId"
-              element={
-                <>
-                  <MainAppBar />
-                  <Tutor />
-                </>
-              }
-            >
-            </Route>
-            <Route path="/conversations/:botId/:conversationId"
-              element={
-                <>
-                  <MainAppBar />
-                  <Conversation />
-                </>
-              }
-            >
-            </Route>
+            <Route path="/book" element={<MetaTextbook />} />
+            { TutorRoutes()}
+
             <Route path="/login"
               element={
                 <Container maxWidth="sm" >
-                  <LoginWidget />
+                  <LoginWidget loggedInContent={<>
+                    <Typography variant="h5" gutterBottom>
+                      Apps
+                    </Typography>
+                    <AppCards />
+                  </>} />
                 </Container>
               }
             >
             </Route>
+
             <Route path="/pages/:slug" element={<ResourcePage />} />
             <Route path="/authors/:slug" element={<AuthorPage />} />
             <Route path="*" element={
@@ -174,10 +94,51 @@ function App() {
             }>
             </Route>
           </Routes>
+          </Container>
         </Router>
       </CreditStringContext.Provider>
     </ThemeProvider>
   );
 }
+
+let AppCards = () => {
+  return <>
+    <AppCard
+      authors={["stephen-foster"]}
+      title="Bots for your students"
+      description="Make automated tutors for your students."
+      link="/bots"
+    />
+    <AppCard
+      authors={["stephen-foster"]}
+      title="Textbook"
+      description="My work-in-progress demonstration of an AI-powered textbook"
+      link="/book" />
+  </>
+}
+
+let AppCard = ({ authors, title, description, link }) => {
+  return (
+    <Link to={link} style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Card style={{marginBottom: 20}}>
+        <CardHeader
+          title={
+            <Typography variant="h5" gutterBottom>
+              {title}
+            </Typography>
+          }
+          subheader={
+            <Typography variant="body2" color="text.secondary">
+              {description}
+            </Typography>
+          }
+          avatar={
+            <DynamicAvatar avatarInfo={authorsData.filter((a) => authors.includes(a.slug)).map((a) => a.avatar).filter(x => x)} />
+          }
+        />
+      </Card>
+    </Link>
+  );
+};
 
 export default App;

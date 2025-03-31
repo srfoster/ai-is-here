@@ -16,21 +16,16 @@ import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 
-import "react-chat-elements/dist/main.css"
-import { MessageBox } from "react-chat-elements";
 import { useGpt, UsageContext, OutOfCredits, CreditStringContext } from "./useGpt";
 import { useDocs, useDoc, useChildKeys, useConversations } from "./useDocuments";
 
 import { Input } from 'react-chat-elements'
 import * as RCE from 'react-chat-elements'
 
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
-import { OutOfCreditsIfOutOfCredits } from './useGpt';
-
-import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 
 import Tabs from '@mui/material/Tabs';
@@ -40,10 +35,18 @@ import { v4 as uuidv4 } from 'uuid';
 
 import gptProxyData from "./gptProxyData.json";
 
+import TimeAgo from 'javascript-time-ago';
 
 import Tooltip from "@mui/material/Tooltip";
 import FileCopyIcon from "@mui/icons-material/FileCopy";
 import DoneIcon from "@mui/icons-material/Done";
+import ChatBubble from './Components/ChatBubble';
+import ChatInput from './Components/ChatInput';
+
+import { Route } from 'react-router-dom';
+
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -59,7 +62,7 @@ export function Conversation(){
   let [doc, updateDoc, deleteDoc] = useDoc(`${botId}/${conversationId}`)
 
   return <>
-    <Container maxWidth="sm" style={{marginBottom: 100}}>
+    <Container maxWidth="sm" style={{}}>
       <DocConversationHistory doc={doc} />
     </Container>
   </>
@@ -86,7 +89,7 @@ export function ChildKeyManager() {
              .map((k)=>Math.min(k.remainingCredits, amount))].reduce((a,b)=>a+b, 0)
 
   return <>
-      <Container maxWidth="sm" style={{marginBottom: 100}}>
+      <Container maxWidth="sm" style={{}}>
         <Typography variant="h2">Keys</Typography>
         <KeyManagementTools 
           keys={keys} 
@@ -384,27 +387,44 @@ function ListConversations({k}){
 export function TutorManager() {
   let [documents, createDocument, deleteDocument, updateDocument] = useDocs()
 
+  let [selectedBot, setSelectedBot] = React.useState(undefined)
+  let navigate = useNavigate()
+
   if(!documents) return <>You must log in first...</>
 
   return <>
-      <Container maxWidth="sm" style={{marginBottom: 100}} >
-        <Typography variant="h2">Bots</Typography>
-        <ul>
-          {documents.filter((d)=>d.type != "conversation").map((d) => { 
-            return <li key={ d.documentId}>
-              <Link to={"/bots/"+d.documentId}>{d.title}</Link>
-            </li>
-          })}
-        </ul>
-        <Button variant="contained" onClick={() => { 
-          createDocument({ title: "New Bot", content: defaultBotPrompt})
+      <Container maxWidth="sm" style={{}} >
+      {selectedBot ? <>
+        <Button variant="text" onClick={() => {
+          setSelectedBot(undefined)
+        }
+        }>Back to bots</Button>
+        <Tutor bot={selectedBot} />
+      </> :
+        <>
+          <Typography variant="h2">Bots</Typography>
+          <ul>
+            {documents.filter((d)=>d.type != "conversation").map((d) => { 
+              return <li key={ d.documentId}>
+                <Link style={{ color: "cyan" }} onClick={(e) => {
+                  e.preventDefault()
+                  //navigate("/bots/" + d.documentId)
+                  setSelectedBot(d.documentId)
+                }}>{d.title}</Link>
+              </li>
+            })}
+          </ul>
+          <Button variant="contained" onClick={() => { 
+            createDocument({ title: "New Bot", content: defaultBotPrompt})
 
-        }} >Add Bot</Button>
+          }} >Add Bot</Button>
+        </>
+      }
       </Container>
   </>
 }
 
-export function Tutor({hiddenPrompt}) {
+export function Tutor({hiddenPrompt, bot}) {
     let [usageData, setUsageData] = React.useState({
         gptWords: 0
     })
@@ -413,9 +433,9 @@ export function Tutor({hiddenPrompt}) {
     }
 
     return (
-      <Container maxWidth="lg" style={{paddingTop: 30, marginBottom: 100}}>
+      <Container maxWidth="lg" style={{paddingTop: 30}}>
         <UsageContext.Provider value={{ usageData, increaseGPTWords }}>
-            <Chat providedHiddenPrompt={hiddenPrompt} />
+            <Chat providedHiddenPrompt={hiddenPrompt} bot={bot} />
         </UsageContext.Provider> 
       </Container>
     )
@@ -436,7 +456,7 @@ function postProcessGPT(text, afterRefresh){
 }
 
 
-function Chat({providedHiddenPrompt}){
+function Chat({providedHiddenPrompt, bot}){
 
     let [streaming, setStreaming] = React.useState(false)
     let [shouldReply, setShouldReply] = React.useState(true)
@@ -454,6 +474,8 @@ function Chat({providedHiddenPrompt}){
 
 
     let { documentId } = useParams()
+    if (bot) documentId = bot
+
     let [inputs, setInputs] = useLocalStorage(documentId+"-conversation",[])
     let [doc, updateDoc, deleteDoc] = useDoc(documentId)
 
@@ -618,8 +640,7 @@ function Chat({providedHiddenPrompt}){
           <br/>
           <ChatHistory messages={inputs} avatar={avatar}/>
           {streaming && 
-          
-            <MessageBox
+            <ChatBubble
               position={"left"}
               type={"text"}
               title={"GPT"}
@@ -627,42 +648,17 @@ function Chat({providedHiddenPrompt}){
               <Markdown remarkPlugins={remarkGfm}>{postProcessedResponse}</Markdown> : postProcessedResponse}
             />
           }
-          <div
-            style = {{position: "fixed", bottom: 0, left: 0, width: "100%", textAlign: "center", borderTop: "1px solid gray", backgroundColor: "rgba(255,255,255, 0.9)"}}>
-              <div style={{width: "50%", margin: "auto"}}>
-              <Input
-                ref={inputRef}
-                placeholder='Type here...'
-                multiline={true}
-                value={inputVal}
-                onChange={(x)=>{setInputVal(x.target.value)}}
-                onKeyDown={(e)=>{
-                  //Enter unless shift is held
-                  if(e.key === "Enter" && !e.shiftKey){
-                    if(streaming) return
-                    setInputVal("")
-                    e.target.value = ""
-                    e.target.style.height = "40px"
-                    setShouldReply(true); 
-                    setInputs(inputs.concat({user: "user", text: inputVal}));
-                    e.preventDefault()
-                  }
-                }}
-                rightButtons={
-                  <RCE.Button 
-                  onClick={()=>{
-                    if(streaming) return
-                    setInputVal("")
-                    setShouldReply(true)
-                    setInputs(inputs.concat({user: "user", text: inputVal})); 
-                    }
-                  }
-                  color='white' backgroundColor='black' text='Send' 
-                  />
-                }
-              />
-              </div>
-            </div>
+          <ChatInput
+            value={inputVal}
+            onChange={setInputVal}
+            onSend={() => {
+              if (streaming) return;
+              setInputVal("");
+              setShouldReply(true);
+              setInputs(inputs.concat({ user: "user", text: inputVal }));
+            }}
+            disabled={streaming}
+          />
           </>
         }
         </>
@@ -673,7 +669,7 @@ function ChatHistory({messages, avatar}){
   return <>
       {messages.map((i)=>{
         return <>
-            <MessageBox
+            <ChatBubble
                 position={i.user != "user" ? "left" : "right"}
                 type={"text"}
                 title={i.user}
@@ -792,5 +788,60 @@ export function CopyToClipboardButton({ text }) {
         {copied ? <DoneIcon /> : <FileCopyIcon />}
       </IconButton>
     </Tooltip>
+  );
+}
+
+export function TutorRoutes() {
+
+  return <>
+            <Route path="/bots" element={
+              <>
+                <TutorAppBar />
+                <TutorManager />
+              </>
+            }>
+            </Route>
+            <Route path="/keys" element={
+              <>
+                <TutorAppBar />
+                <ChildKeyManager />
+              </>
+            }>
+            </Route>
+            <Route path="/bots/:documentId"
+              element={
+                <>
+                  <TutorAppBar />
+                  <Tutor />
+                </>
+              }
+            >
+            </Route>
+            <Route path="/conversations/:botId/:conversationId"
+              element={
+                <>
+                  <TutorAppBar />
+                  <Conversation />
+                </>
+              }
+            >
+            </Route>
+  </>
+}
+
+function TutorAppBar() {
+  return (
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static">
+        <Toolbar style={{minHeight: 40}}>
+          <Typography variant="p" component="div" sx={{ flexGrow: 1 }}>
+            <Link to="/bots" style={{ color: "white", textDecoration: "none" }}>Bots</Link>
+          </Typography>
+          <Typography variant="p" component="div" sx={{ flexGrow: 1 }}>
+            <Link to="/keys" style={{ color: "white", textDecoration: "none" }}>Keys</Link>
+          </Typography>
+        </Toolbar>
+      </AppBar>
+    </Box>
   );
 }

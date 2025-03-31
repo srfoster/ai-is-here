@@ -14,14 +14,16 @@ export default () => {
 
 ### Step 1: Login`}
         </ReactMarkdown>
-        <OutOfCreditsIfOutOfCredits afterRefresh={() => {
-        }} />
+        <OutOfCreditsIfOutOfCredits afterRefresh={() => { }} />
         <ReactMarkdown>
             {`---\n### Step 2: Create a bot`}
         </ReactMarkdown>
         {remainingCredits > 0 ? <TutorManager /> : "Log in first (see above)"}
-        <br />
-        <br />
-        <br />
+        <ReactMarkdown>
+            {`---\n### Step 3: Want to try with your students?
+
+Bookmark [this link](/ai-is-here/#/bots)
+`}
+        </ReactMarkdown>
     </>
 }

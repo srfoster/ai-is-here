@@ -1,6 +1,8 @@
-import { StickyNote2 } from '@mui/icons-material';
-import { Stack, Typography } from '@mui/material';
+import { AppBar, Stack, Typography } from '@mui/material';
 import { motion } from 'framer-motion'; // Import motion from framer-motion
+import * as React from 'react';
+
+import { MainAppBar } from './MainAppBar';
 
 export default function Logo() {
   const letterAnimation = {
@@ -38,83 +40,87 @@ export default function Logo() {
   const timeBetweenLetters = 0.1;
 
   return (
-    <motion.div
-      onClick={ () => { window.location.href = "/ai-is-here"; } }
-      style={{
-        cursor: "pointer",
-        paddingTop: 20,
-        textAlign: "center",
-        color: "black",
-        backgroundImage: "url(/ai-is-here/OC_AI.png)",
-        backgroundSize: "cover",
-        backgroundPosition: "0px -40px",
-        borderRadius: 5,
-      }}
-      initial={backgroundAnimation.initial}
-      animate={backgroundAnimation.animate}
-      transition={backgroundAnimation.transition}
-      whileHover={hoverAnimation} // Add hover animation
-    >
-      <Typography
+    <>
+      <motion.div
+        onClick={() => { window.location.href = "/ai-is-here"; }}
         style={{
-          fontSize: "6em",
-          fontFamily: "Arial",
+          position: "relative",
+          cursor: "pointer",
+          paddingTop: 20,
+          textAlign: "center",
+          color: "black",
+          backgroundImage: "url(/ai-is-here/OC_AI.png)",
+          backgroundSize: "cover",
+          backgroundPosition: "0px -40px",
+          borderRadius: 5,
         }}
-        component="h1"
-        variant="h2"
+        initial={backgroundAnimation.initial}
+        animate={backgroundAnimation.animate}
+        transition={backgroundAnimation.transition}
+        whileHover={hoverAnimation} // Add hover animation
       >
-        <Stack
+        <Typography
           style={{
-            color: "white",
-            textShadow: "black 2px 5px 5px",
+            fontSize: "6em",
+            fontFamily: "Arial",
           }}
-          direction="row"
-          spacing={1}
-          justifyContent="center"
-          alignItems={"center"}
+          component="h1"
+          variant="h2"
         >
-          <motion.span
-            {...letterAnimation}
-            transition={{ delay: timeBetweenLetters * 1 }}
-            whileHover={letterHoverAnimation} // Add hover animation for the letter
-          >
-            A
-          </motion.span>
-          <motion.span
-            {...letterAnimation}
-            transition={{ delay: timeBetweenLetters * 2 }}
-            whileHover={letterHoverAnimation} // Add hover animation for the letter
-          >
-            I
-          </motion.span>
-          <motion.span
+          <Stack
             style={{
-              fontFamily: "Arial",
-              fontSize: ".5em",
-              padding: "0px 10px 0px 10px",
+              color: "white",
+              textShadow: "black 2px 5px 5px",
             }}
-            {...letterAnimation}
-            transition={{ delay: timeBetweenLetters * 6 }}
-            whileHover={letterHoverAnimation} // Add hover animation for the letter
+            direction="row"
+            spacing={1}
+            justifyContent="center"
+            alignItems={"center"}
           >
-            @
-          </motion.span>
-          <motion.span
-            {...letterAnimation}
-            transition={{ delay: timeBetweenLetters * 4 }}
-            whileHover={letterHoverAnimation} // Add hover animation for the letter
-          >
-            O
-          </motion.span>
-          <motion.span
-            {...letterAnimation}
-            transition={{ delay: timeBetweenLetters * 5 }}
-            whileHover={letterHoverAnimation} // Add hover animation for the letter
-          >
-            C
-          </motion.span>
-        </Stack>
-      </Typography>
-    </motion.div>
+            <motion.span
+              {...letterAnimation}
+              transition={{ delay: timeBetweenLetters * 1 }}
+              whileHover={letterHoverAnimation} // Add hover animation for the letter
+            >
+              A
+            </motion.span>
+            <motion.span
+              {...letterAnimation}
+              transition={{ delay: timeBetweenLetters * 2 }}
+              whileHover={letterHoverAnimation} // Add hover animation for the letter
+            >
+              I
+            </motion.span>
+            <motion.span
+              style={{
+                fontFamily: "Arial",
+                fontSize: ".5em",
+                padding: "0px 10px 0px 10px",
+              }}
+              {...letterAnimation}
+              transition={{ delay: timeBetweenLetters * 6 }}
+              whileHover={letterHoverAnimation} // Add hover animation for the letter
+            >
+              @
+            </motion.span>
+            <motion.span
+              {...letterAnimation}
+              transition={{ delay: timeBetweenLetters * 4 }}
+              whileHover={letterHoverAnimation} // Add hover animation for the letter
+            >
+              O
+            </motion.span>
+            <motion.span
+              {...letterAnimation}
+              transition={{ delay: timeBetweenLetters * 5 }}
+              whileHover={letterHoverAnimation} // Add hover animation for the letter
+            >
+              C
+            </motion.span>
+          </Stack>
+        </Typography>
+      </motion.div>
+      <MainAppBar />
+    </>
   );
 }

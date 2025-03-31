@@ -2,11 +2,20 @@ TODO:
 
 Spring 2025 re-envisioning.
 
+03/31/2025
+  - [x] Bots 
+    - Streamline the login->manage bots experience
+    - Clicking on a bot should swap in the show page, not link to it...
+    - Self contained components embedded in posts (or lifted to top nav...)
+  - Step 3: How to reach this again?
+
 03/28/2025
    TODO:
    * Posts:
+     - [BEGUN!] Bots 
+       - Streamline the login->manage bots experience
+       - Clicking on a bot should swap in the show page, not link to it...
      - Textbook
-     - Bots 
      - CAT video.
    * AI summaries (transcripts?) for all videos
      - Click to read more

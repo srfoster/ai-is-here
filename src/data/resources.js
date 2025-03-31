@@ -28,6 +28,14 @@ export default [
   },
   {
     "tags": ["for-faculty", "video", "discussion"],
+    "dateCreated": "2025-03-20",
+    "title": "The AI Natives are Coming",
+    "slug": "ai-natives",
+    "author": ["stephen-foster", "lindsey-handley"],
+    "content": "Conjecture and discussion about the eventuality of 'AI Natives'\n\nhttps://youtu.be/UebuD_n7w4s"
+  },
+  {
+    "tags": ["for-faculty", "video", "discussion"],
     "dateCreated": "2025-03-15",
     "title": "DeepSeek vs ChatGPT",
     "slug": "deepseek-vs-chatgpt",

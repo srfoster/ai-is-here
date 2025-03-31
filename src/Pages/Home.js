@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, Container, Stack, Chip } from '@mui/material';
+import { Card, CardContent, CardHeader, Container, Stack, Chip, Typography } from '@mui/material';
 import { OutOfCreditsIfOutOfCredits } from '../useGpt';
 import { Link } from 'react-router-dom';
 import { motion, Reorder, useAnimation } from 'framer-motion';
@@ -20,7 +20,10 @@ export function Home() {
   }, []);
 
   return (
-    <Container maxWidth="sm">
+    <>
+      <Typography variant="h4" gutterBottom>
+        Blog
+      </Typography>
 
       {resources.map((resource, i) => {
         const authorInfos = authors.filter((a) => resource.author.includes(a.slug));
@@ -69,36 +72,14 @@ export function Home() {
         );
       })}
 
-      {false && 
-        <>
-          <OutOfCreditsIfOutOfCredits afterRefresh={() => { window.location.reload(); }} />
-
-          <AnimatedSection>
-            <HomePageTile title="Automated Tutor">
-              <p>Configurable AI tutoring bots.
-                Click <Link to="/bots">here</Link>.
-              </p>
-            </HomePageTile>
-          </AnimatedSection>
-
-
-          <AnimatedSection>
-            <HomePageTile title="Book">
-              <p>I've written part of a sample textbook. 
-                Click <Link to="/book">here</Link> to start reading.
-              </p>
-            </HomePageTile>
-          </AnimatedSection>
-        </>
-      }
-    </Container>
+    </>
   );
 }
 
 
 function AnimatedSection({ children }) {
   const controls = useAnimation();
-  const [ref, inView] = useInView({ threshold: 0.5 }); 
+  const [ref, inView] = useInView({ threshold: 0.5, triggerOnce: true }); 
 
   useEffect(() => {
     if (inView) {
@@ -122,13 +103,3 @@ return (
   );
 }
 
-function HomePageTile({ title, children }) {
-  return (
-    <Card>
-      <CardHeader title={title}></CardHeader>
-      <CardContent>
-        {children}
-      </CardContent>
-    </Card>
-  );
-}
