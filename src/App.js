@@ -77,7 +77,7 @@ function App() {
               element={
                 <Container maxWidth="sm" >
                   <LoginWidget loggedInContent={<>
-                    <Typography variant="h5" gutterBottom>
+                    <Typography variant="h5" mt={2}  gutterBottom>
                       Apps
                     </Typography>
                     <AppCards />

@@ -1,7 +1,7 @@
 
 import * as React from 'react';
 import gptProxyData from "./gptProxyData.json";
-import { Alert, Button, Card, CardContent, Chip, Typography, TextField} from '@mui/material';
+import { Alert, Button, Card, CardContent, Chip, Typography, TextField, Stack} from '@mui/material';
 import { useLocalStorage } from 'react-use'
 import { useLocation } from 'react-router-dom';
 
@@ -60,38 +60,37 @@ export function LoginWidget({loggedInContent}){
       <OutOfCreditsIfOutOfCredits afterRefresh={() => {
 
       }} />
-      {remainingCredits ? loggedInContent : <Alert severity="info">You are not logged in, or you are out of credits.</Alert>}
+      {remainingCredits && loggedInContent}
     </div>
   )
 }
 
 export let OutOfCreditsIfOutOfCredits = ({afterRefresh, showLogout}) => {
   
-  let {remainingCredits, refreshCredits} = React.useContext(CreditStringContext)
+  let {remainingCredits, creditString, refreshCredits} = React.useContext(CreditStringContext)
 
   console.log("Remaining Credits", remainingCredits)
 
   if(remainingCredits < 0 || remainingCredits == undefined){
     return <OutOfCredits afterRefresh={afterRefresh} />
   } else {
-    return <Alert severity='info'>
-      <Chip label={"Remaining credits: " + remainingCredits} />
-      {(showLogout || showLogout === undefined) && <>
-        <br/>
-        <br/>
-        <Logout afterRefresh={afterRefresh} />
-      </>}
-    </Alert>
+    return <Stack direction="row" spacing={1} alignItems="center">
+        <Chip label={"Remaining credits: " + remainingCredits} />
+        {(showLogout || showLogout === undefined) && creditString && <>
+          <Logout afterRefresh={afterRefresh} />
+        </>}
+      </Stack>
   }
 }
 
 export let Logout = ({afterRefresh}) => {
-  let [currentCreditString, setCurrentCreditString] = useLocalStorage("credit-string","")
-  return <Button variant="contained"
+  let {creditString, setCreditString, refreshCredits} = React.useContext(CreditStringContext)
+
+  return <Button variant="text"
                  onClick={() => {
-                   setCurrentCreditString("")
+                   setCreditString("")
                    afterRefresh()
-                 }}>Logout</Button>
+    }}>Logout</Button>
 }
 
 export let OutOfCredits = ({afterRefresh}) => {
@@ -110,7 +109,6 @@ export let OutOfCredits = ({afterRefresh}) => {
       />
       <br/>
       <br/>
-      <Button variant="contained" onClick={() => afterRefresh ? afterRefresh() : console.log("No afterRefresh specified for OutOfCredits component")}>Submit</Button>
     </CardContent>
   </Card> 
 }
