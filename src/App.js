@@ -1,6 +1,5 @@
 import * as React from 'react';
 import './App.css';
-import { LoginWidget, CreditStringContext, useCheckCredits } from './useGpt';
 import { 
   HashRouter as Router,
   Routes,
@@ -19,11 +18,12 @@ import AuthorPage from './Pages/AuthorPage';
 import ResourcePage from './Pages/ResourcePage';
 import MetaTextbook from './Pages/MetaTextbook/MetaTextbook'; // Import MetaTextbook
 
-import { TutorRoutes } from './Tutor';
+import { TutorRoutes } from './Apps/BotsForYourStudents/Tutor';
 
-import authorsData from './data/authors'; // Import the authors JSON
-import DynamicAvatar from './Components/DynamicAvatar';
-import { Card, CardContent, CardHeader, CssBaseline, Typography, Container} from '@mui/material';
+import { CssBaseline, Typography, Container} from '@mui/material';
+
+import { AppCards } from './Apps/AppCards'; 
+import { LoginWidget, CreditStringContext, useCheckCredits } from './Hooks/useGpt';
 
 
 // Create a dark theme
@@ -101,44 +101,5 @@ function App() {
   );
 }
 
-let AppCards = () => {
-  return <>
-    <AppCard
-      authors={["stephen-foster"]}
-      title="Bots for your students"
-      description="Make automated tutors for your students."
-      link="/bots"
-    />
-    <AppCard
-      authors={["stephen-foster"]}
-      title="Textbook"
-      description="My work-in-progress demonstration of an AI-powered textbook"
-      link="/book" />
-  </>
-}
-
-let AppCard = ({ authors, title, description, link }) => {
-  return (
-    <Link to={link} style={{ textDecoration: 'none', color: 'inherit' }}>
-      <Card style={{marginBottom: 20}}>
-        <CardHeader
-          title={
-            <Typography variant="h5" gutterBottom>
-              {title}
-            </Typography>
-          }
-          subheader={
-            <Typography variant="body2" color="text.secondary">
-              {description}
-            </Typography>
-          }
-          avatar={
-            <DynamicAvatar avatarInfo={authorsData.filter((a) => authors.includes(a.slug)).map((a) => a.avatar).filter(x => x)} />
-          }
-        />
-      </Card>
-    </Link>
-  );
-};
 
 export default App;

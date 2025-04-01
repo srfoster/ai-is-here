@@ -2,6 +2,12 @@ TODO:
 
 Spring 2025 re-envisioning.
 
+04/01/2025
+
+  - [ ] Refactor into "Apps"   
+    - Move main app pages into their app folders
+    - Hamburger item hit boxes are buggy
+
 03/31/2025
   - [x] Bots 
     - Streamline the login->manage bots experience

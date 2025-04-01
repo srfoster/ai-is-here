@@ -6,7 +6,7 @@
 */
 
 import * as React from 'react';
-import './App.css';
+//import './App.css';
 import ReactMarkdown from 'react-markdown'
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -31,20 +31,9 @@ import {useLocalStorage} from 'react-use'
 import Confetti from 'react-confetti'
 
 import remarkGfm from 'remark-gfm'
-import { useThemeProps } from '@mui/material';
 import Avatar, { genConfig } from 'react-nice-avatar'
-import Tooltip from '@mui/material/Tooltip';
-import { CognitoJwtVerifier } from "aws-jwt-verify";
 
-import { useGpt, UsageContext } from "./useGpt";
-
-/*
-import {
-  useWindowSize,
-} from '@react-hook/window-size'
-import { useSwipeable } from "react-swipeable";
-import { animated, to, useSpring } from '@react-spring/web'
-*/
+import { useGpt, UsageContext } from "../../Hooks/useGpt";
 
 import { useLocation,
   HashRouter as Router,

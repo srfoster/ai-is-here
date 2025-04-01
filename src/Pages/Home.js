@@ -1,9 +1,10 @@
 import { Card, CardContent, CardHeader, Container, Stack, Chip, Typography } from '@mui/material';
-import { OutOfCreditsIfOutOfCredits } from '../useGpt';
+
 import { Link } from 'react-router-dom';
 import { motion, Reorder, useAnimation } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { useEffect, useState } from 'react';
+
 import resourcesData from '../data/resources'; // Import the resources JSON
 import authorsData from '../data/authors'; // Import the authors JSON
 import MarkdownRenderer from '../Components/MarkdownRenderer';

@@ -1,10 +1,9 @@
 import * as React from 'react';
 import { Benchmark, ClickToReveal, GPT, CustomizedText,GatedSection, AvatarSays, AVATARS, wordsToDollars, BookCard} from './EReader';
-import { UsageContext } from './useGpt';
+import { UsageContext } from '../../Hooks/useGpt';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 
 let TitleAndAuthor = <>
   <Typography pt={1} style={{ textAlign: "center" }} component="h1" variant="h2">Education and AI</Typography>

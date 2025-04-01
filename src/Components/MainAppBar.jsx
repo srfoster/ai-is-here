@@ -14,13 +14,13 @@ export function MainAppBar() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <div style={{ flexGrow: 1 }}></div>
-      <BasicMenu style={{}} />
+      <MainHamburgerMenu style={{}} />
     </Box>
   );
 }
 
 
-function BasicMenu({ style }) {
+export function MainHamburgerMenu({ style }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {

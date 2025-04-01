@@ -1,26 +1,10 @@
-/*
-
-To get rid of the [GPT] flicker and send a proper conversation, need to fix up the backend to accept messages like [{role: "user", ...}, {role: "agent", ...}]:
-* https://github.com/srfoster/ai-is-here-backend/blob/main/js/main.js
-
-*/
-
-
 import * as React from 'react';
-import './App.css';
 import Avatar, { genConfig } from 'react-nice-avatar'
-import { AvatarSays, AVATARS } from './EReader';
 import { Button, Card, Checkbox, Container, TextField, Typography, Stack, Slider, CardContent, IconButton } from '@mui/material';
 
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
-
-import { useGpt, UsageContext, OutOfCredits, CreditStringContext } from "./useGpt";
-import { useDocs, useDoc, useChildKeys, useConversations } from "./useDocuments";
-
-import { Input } from 'react-chat-elements'
-import * as RCE from 'react-chat-elements'
 
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import Markdown from 'react-markdown'
@@ -33,20 +17,27 @@ import Tab from '@mui/material/Tab';
 import { useLocalStorage } from 'react-use';
 import { v4 as uuidv4 } from 'uuid';
 
-import gptProxyData from "./gptProxyData.json";
-
 import TimeAgo from 'javascript-time-ago';
 
 import Tooltip from "@mui/material/Tooltip";
 import FileCopyIcon from "@mui/icons-material/FileCopy";
 import DoneIcon from "@mui/icons-material/Done";
-import ChatBubble from './Components/ChatBubble';
-import ChatInput from './Components/ChatInput';
+
 
 import { Route } from 'react-router-dom';
 
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
+
+import { useGpt, UsageContext, OutOfCredits, CreditStringContext } from "../../Hooks/useGpt";
+import { useDocs, useDoc, useChildKeys, useConversations } from "../../Hooks/useDocuments";
+import { AvatarSays, AVATARS } from '../../Apps/MetaTextbook/EReader';
+import gptProxyData from "../../gptProxyData.json";
+import ChatBubble from '../../Components/ChatBubble';
+import ChatInput from '../../Components/ChatInput';
+import '../../App.css';
+
+
 
 TimeAgo.addDefaultLocale(en);
 

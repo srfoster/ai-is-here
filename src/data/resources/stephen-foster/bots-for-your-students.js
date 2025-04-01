@@ -1,29 +1,32 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { OutOfCreditsIfOutOfCredits, useCheckCredits } from "../../../useGpt";
-import { TutorManager } from "../../../Tutor";
-import { Link } from "react-router-dom";
-import { CreditStringContext } from "../../../useGpt";
+import { BotsForYourStudentsAppCard } from "../../../Apps/AppCards";
+import { CreditStringContext } from "../../../Hooks/useGpt";
+import { MainHamburgerMenu } from "../../../Components/MainAppBar";
 
 export default () => {
     const {creditString,setCreditString,remainingCredits} = React.useContext(CreditStringContext);
 
     return <>
+        <ReactMarkdown>{`I made a platform for you to make bots for your students.
+
+### Step 1
+
+Ask me for an access key.  
+
+### Step 2
+
+Select "Apps" from the menu at the top of the page.  It looks like this:
+`}</ReactMarkdown>
+        <div style={{marginLeft: 10, marginTop: -10}}><MainHamburgerMenu /></div >
         <ReactMarkdown>{
-            `I made a platform for you to make bots for your students.
+            `Login with your access key and select the "Bots for your students" app. It looks like this:
+`}</ReactMarkdown>
+        <BotsForYourStudentsAppCard />
+        <ReactMarkdown>{
+            `### Step 3
 
-### Step 1: Login`}
-        </ReactMarkdown>
-        <OutOfCreditsIfOutOfCredits afterRefresh={() => { }} />
-        <ReactMarkdown>
-            {`---\n### Step 2: Create a bot`}
-        </ReactMarkdown>
-        {remainingCredits > 0 ? <TutorManager /> : "Log in first (see above)"}
-        <ReactMarkdown>
-            {`---\n### Step 3: Want to try with your students?
-
-Bookmark [this link](/ai-is-here/#/bots)
-`}
-        </ReactMarkdown>
+Make tutoring bots for your students!`
+        }</ReactMarkdown>
     </>
 }

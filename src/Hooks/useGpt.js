@@ -1,8 +1,7 @@
 
 import * as React from 'react';
-import gptProxyData from "./gptProxyData.json";
+import gptProxyData from "../gptProxyData.json";
 import { Alert, Button, Card, CardContent, Chip, Typography, TextField, Stack} from '@mui/material';
-import { useLocalStorage } from 'react-use'
 import { useLocation } from 'react-router-dom';
 
 export const UsageContext = React.createContext();
