@@ -31,7 +31,6 @@ import Toolbar from '@mui/material/Toolbar';
 
 import { useGpt, UsageContext, OutOfCredits, CreditStringContext } from "../../Hooks/useGpt";
 import { useDocs, useDoc, useChildKeys, useConversations } from "../../Hooks/useDocuments";
-import { AvatarSays, AVATARS } from '../../Apps/MetaTextbook/EReader';
 import gptProxyData from "../../gptProxyData.json";
 import ChatBubble from '../../Components/ChatBubble';
 import ChatInput from '../../Components/ChatInput';

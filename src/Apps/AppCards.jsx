@@ -50,7 +50,7 @@ export let AppCard = ({ authors, title, description, link }) => {
             </Typography>
           }
           avatar={
-            <DynamicAvatar avatarInfo={authorsData.filter((a) => authors.includes(a.slug)).map((a) => a.avatar).filter(x => x)} />
+            <DynamicAvatar authorInfos={authorsData.filter((a) => authors.includes(a.slug))} />
           }
         />
       </Card>

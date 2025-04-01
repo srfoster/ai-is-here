@@ -5,8 +5,31 @@ Spring 2025 re-envisioning.
 04/01/2025
 
   - [ ] Refactor into "Apps"   
-    - Move main app pages into their app folders
-    - Hamburger item hit boxes are buggy
+    - [x] Hamburger item hit boxes are buggy
+    - [x] Move main app pages into their app folders
+    - [x] Do the textbook post
+  - Content and presentation
+    - [ ] 30 min? Spruce up the author and blog post pages
+      - [x] Regression: App cards dynamic avatar broke
+      - More info (author avatars, etc.)
+      - Bots for your student page - no content
+    - [ ] 30 min? CAT video. Upload.
+    - [ ] 30 min? AI summaries (transcripts?) for all videos
+      - Click to read more
+
+    12:00 LUNCH??
+    - [ ] 30 min? Search (by text) and filter (by tags)
+
+
+   * Deploy to ai-is-here.com/olympic-college
+   * Solicit content:
+     - Lindsey has more videos?
+     - Respond to Kathy (re: CAT video)
+     - Student voices (ask on discord)
+     - Marco polo solicitations to: Candice, Davis, Sage, Mirelle
+     - Graph to track "conversations"
+       - Conversation view instead of feed view?
+     - Solicit from other colleges/universities
 
 03/31/2025
   - [x] Bots 

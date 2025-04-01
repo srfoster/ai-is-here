@@ -16,7 +16,7 @@ import Logo from './Components/Logo'; // Import the Logo component
 
 import AuthorPage from './Pages/AuthorPage';
 import ResourcePage from './Pages/ResourcePage';
-import MetaTextbook from './Pages/MetaTextbook/MetaTextbook'; // Import MetaTextbook
+import MetaTextbook from './Apps/MetaTextbook/MetaTextbook'; // Import MetaTextbook
 
 import { TutorRoutes } from './Apps/BotsForYourStudents/Tutor';
 

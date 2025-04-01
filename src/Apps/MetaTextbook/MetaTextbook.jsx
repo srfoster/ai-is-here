@@ -1,6 +1,6 @@
 import React from 'react';
-import { EReader } from '../../Apps/MetaTextbook/EReader';
-import { Introduction, Chapter1, Acknowledgements } from '../../Apps/MetaTextbook/Sections';
+import { EReader } from './EReader';
+import { Introduction, Chapter1, Acknowledgements } from './Sections';
 
 const fullText = [
   ...Introduction,

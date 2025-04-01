@@ -53,16 +53,20 @@ export function MainHamburgerMenu({ style }) {
           'aria-labelledby': 'basic-button',
         }}
       >
-        <MenuItem onClick={handleClose}>
-          <Typography variant="p">
-            <Link to="/" style={{ color: "white", textDecoration: "none" }}>Home</Link>
-          </Typography>
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Typography variant="p">
-            <Link to="/login" style={{ color: "white", textDecoration: "none" }}>Apps</Link>
-          </Typography>
-        </MenuItem>
+        <Link to="/" style={{ color: "white", textDecoration: "none" }}>
+          <MenuItem onClick={handleClose}>
+            <Typography variant="p">
+            Home
+            </Typography>
+          </MenuItem>
+        </Link>
+        <Link to="/login" style={{ color: "white", textDecoration: "none" }}>
+          <MenuItem onClick={handleClose}>
+            <Typography variant="p">
+              Apps
+            </Typography>
+          </MenuItem>
+        </Link>
       </Menu>
     </div>
   );

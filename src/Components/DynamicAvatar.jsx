@@ -1,19 +1,24 @@
 import { Avatar, AvatarGroup, Stack } from '@mui/material';
+import {Link} from 'react-router-dom';
+import authorsData from '../data/authors'; // Import the authors JSON
 
-export default function DynamicAvatar({ avatarInfo }) {
-  if (avatarInfo == undefined || avatarInfo.length === 0) {
-    return <div style={{width: 50, height: 50, backgroundColor: "black"}}></div>
-  }
+export default function DynamicAvatar({ authorInfos }) {
+  if(!authorInfos.length)
+    authorInfos = [authorInfos];
 
-  let size = 50 / avatarInfo.length;
+  authorInfos = authorInfos.map((a) => {
+    if(typeof a == "string")
+      return authorsData.find((x) => x.slug == a);
+    return a
+  }).filter(x => x);
 
-  if (!avatarInfo.length) {
-      return <Avatar style={{ width: size, height: size }} src={ avatarInfo} />
-  } else {
-    return <AvatarGroup max={avatarInfo.length}>
-      {avatarInfo.map((avatar, i) => {
-          return <Avatar key={i} src={ avatar } />
-      })}
-    </AvatarGroup>
-  }
+
+
+  return <AvatarGroup max={authorInfos.length}>
+    {authorInfos.map((author, i) => {
+      return <Link style={{marginRight: -10}} to={"/authors/" + author.slug}>
+        <Avatar key={i} src={ author.avatar } />
+      </Link>
+    })}
+  </AvatarGroup>
 }

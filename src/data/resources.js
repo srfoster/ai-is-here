@@ -1,4 +1,5 @@
 import BotsForYourStudents from "./resources/stephen-foster/bots-for-your-students";
+import AIPoweredTextbooks from "./resources/stephen-foster/ai-powered-textbooks";
 
 
 export default [
@@ -9,14 +10,6 @@ export default [
     "slug": "bots-for-your-students",
     "author": ["stephen-foster"],
     "content": BotsForYourStudents 
-  },
-  {
-    "tags": ["for-faculty", "software"],
-    "dateCreated": "2025-03-27",
-    "title": "AI-powered Textbooks",
-    "slug": "ai-textbookx",
-    "author": ["stephen-foster"],
-    "content": "I'm exploring what it means to have online textbooks with AI-generated content on the fly. Check it out here!"
   },
   {
     "tags": ["for-faculty", "video", "tutorial", "how-to", "notebook-llm"],
@@ -89,6 +82,13 @@ export default [
     "slug": "ai-panel-discussion",
     "author": ["stephen-foster", "lindsey-handley", "justin-lewis"],
     "content": "A 45-minute AI panel discussion from Fall 2023:\n\nhttps://youtu.be/eHiKEkuYz2U"
+  },
+  {
+    "tags": ["for-faculty", "software"],
+    "dateCreated": "2023-06-01",
+    "title": "AI-powered Textbooks",
+    "slug": "ai-textbookx",
+    "author": ["stephen-foster"],
+    "content": AIPoweredTextbooks
   }
-  
 ]

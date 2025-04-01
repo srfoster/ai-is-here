@@ -9,6 +9,7 @@ import resourcesData from '../data/resources'; // Import the resources JSON
 import authorsData from '../data/authors'; // Import the authors JSON
 import MarkdownRenderer from '../Components/MarkdownRenderer';
 import DynamicAvatar from '../Components/DynamicAvatar';
+import BlogPostCard from '../Components/BlogPostCard';
 
 export function Home() {
   const [resources, setResources] = useState([]);
@@ -30,45 +31,7 @@ export function Home() {
         const authorInfos = authors.filter((a) => resource.author.includes(a.slug));
         return (
           <AnimatedSection key={i}>
-            <Card>
-              <CardHeader
-                title={
-                  <Link to={`/pages/${resource.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                    {resource.title}
-                  </Link>
-                }
-                subheader={
-                  <>
-                    By{' '}
-                    { resource.author.map((authorSlug) =>
-                      <Link key={authorSlug} to={`/authors/${authorSlug}`} style={{ textDecoration: 'underline', color: 'cyan' }}>
-                        {authors.find((a) => a.slug === authorSlug)?.name || authorSlug }
-                      </Link>
-                    ).reduce((prev, curr) => [prev, ', ', curr])}
-                    {' '}on {new Date(resource.dateCreated).toLocaleDateString()}
-                  </>
-                }
-                avatar={
-                  <DynamicAvatar avatarInfo={ authorInfos.map((a) => a.avatar).filter(x=>x)} />
-                }
-              />
-              <CardContent>
-                {
-                  typeof (resource.content) == "string" ?
-                  <MarkdownRenderer>{resource.content}</MarkdownRenderer>
-                    : (
-                      (typeof (resource.content) == "function") 
-                      ? <resource.content /> : resource.content
-                    )
-                }
-
-                <Stack direction="row" spacing={1}>
-                  {resource.tags.map((tag, index) => (
-                    <Chip key={index} label={tag} variant="outlined" />
-                  ))}
-                </Stack>
-              </CardContent>
-            </Card>
+            <BlogPostCard resource={resource} authors={authors} authorInfos={authorInfos} />
           </AnimatedSection>
         );
       })}
