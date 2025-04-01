@@ -4,6 +4,15 @@ Spring 2025 re-envisioning.
 
 04/02/2025
     - [ ] 30 min? CAT video. Upload.
+      - See more / previews
+    - Solicit content:
+      - Lindsey has more videos?
+      - Respond to Kathy (re: CAT video)
+      - Student voices (ask on discord)
+      - Marco polo solicitations to: Candice, Davis, Sage, Mirelle
+      - Graph to track "conversations"
+        - Conversation view instead of feed view?
+      - Solicit from other colleges/universities
 
 04/01/2025
 
@@ -21,19 +30,7 @@ Spring 2025 re-envisioning.
     - [x] 30 min? Text summaries for all videos
       - Click to read more
     - [x] 30 min? Search (by text) and filter (by tags)
-
-
-   * Deploy to GH pages
-
-
-   * Solicit content:
-     - Lindsey has more videos?
-     - Respond to Kathy (re: CAT video)
-     - Student voices (ask on discord)
-     - Marco polo solicitations to: Candice, Davis, Sage, Mirelle
-     - Graph to track "conversations"
-       - Conversation view instead of feed view?
-     - Solicit from other colleges/universities
+    - [x] Deploy to GH pages
 
 03/31/2025
   - [x] Bots 
