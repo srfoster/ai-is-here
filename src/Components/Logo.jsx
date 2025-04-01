@@ -15,12 +15,12 @@ export default function Logo() {
     initial: {
       opacity: 0,
       backgroundPosition: "0px -40px",
-      boxShadow: "0px 0px 20px 20px rgba(0, 0, 0, 0.3) inset",
+      boxShadow: "0px 0px 20px 20px rgba(255, 255, 255, 0.3) inset",
     },
     animate: {
       opacity: 1,
       backgroundPosition: "0px -45px",
-      boxShadow: "0px 0px 20px 20px rgba(0, 0, 0, 0.5) inset",
+      boxShadow: "0px 0px 20px 20px rgba(255, 255, 255, 0.5) inset",
     },
     transition: { duration: 1 },
   };

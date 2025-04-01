@@ -11,6 +11,8 @@ import MarkdownRenderer from '../Components/MarkdownRenderer';
 import DynamicAvatar from '../Components/DynamicAvatar';
 import BlogPostCard from '../Components/BlogPostCard';
 
+import SearchAndFilter from '../Components/SearchAndFilter';
+
 export function Home() {
   const [resources, setResources] = useState([]);
   const [authors, setAuthors] = useState({});
@@ -26,6 +28,9 @@ export function Home() {
       <Typography variant="h4" gutterBottom>
         Blog
       </Typography>
+
+      <SearchAndFilter resources={resources} onFilter={setResources} />
+      <br/>
 
       {resources.map((resource, i) => {
         const authorInfos = authors.filter((a) => resource.author.includes(a.slug));

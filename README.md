@@ -2,26 +2,30 @@ TODO:
 
 Spring 2025 re-envisioning.
 
+04/02/2025
+    - [ ] 30 min? CAT video. Upload.
+
 04/01/2025
 
-  - [ ] Refactor into "Apps"   
+  - [x] Refactor into "Apps"   
     - [x] Hamburger item hit boxes are buggy
     - [x] Move main app pages into their app folders
     - [x] Do the textbook post
   - Content and presentation
-    - [ ] 30 min? Spruce up the author and blog post pages
+    - [x] 30 min? Spruce up the author and blog post pages
       - [x] Regression: App cards dynamic avatar broke
-      - More info (author avatars, etc.)
-      - Bots for your student page - no content
-    - [ ] 30 min? CAT video. Upload.
-    - [ ] 30 min? AI summaries (transcripts?) for all videos
-      - Click to read more
+      - [x] More info (author avatars, etc.)
+      - [x] Bots for your student page - no content
 
     12:00 LUNCH??
-    - [ ] 30 min? Search (by text) and filter (by tags)
+    - [x] 30 min? Text summaries for all videos
+      - Click to read more
+    - [x] 30 min? Search (by text) and filter (by tags)
 
 
-   * Deploy to ai-is-here.com/olympic-college
+   * Deploy to GH pages
+
+
    * Solicit content:
      - Lindsey has more videos?
      - Respond to Kathy (re: CAT video)

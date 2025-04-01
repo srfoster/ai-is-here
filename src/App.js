@@ -65,7 +65,7 @@ function App() {
         <Router>
           <br />
 
-          <Container maxWidth="sm">
+          <Container maxWidth="md">
             <Logo />
           <br/>
 
