@@ -4,6 +4,14 @@ import AIPoweredTextbooks from "./resources/stephen-foster/ai-powered-textbooks"
 
 export default [
   {
+    "tags": ["for-faculty", "video", "tutorial", "how-to", "notebook-llm"],
+    "dateCreated": "2025-04-02",
+    "title": "Classroom Assessment Technique generation",
+    "slug": "cat-generation",
+    "author": ["stephen-foster"],
+    "content": "How to generate Classroom Assessment Techniques using NotebookLM\n\nhttps://youtu.be/d0_FUPCJPNE\n\nIn this video, we demonstrate how to use NotebookLM and/or ChatGPT to generate Classroom Assessment Techniques (CATs) for your class."
+  },
+  {
     "tags": ["for-faculty", "software"],
     "dateCreated": "2025-03-27",
     "title": "Bots for Your Students",
@@ -11,16 +19,6 @@ export default [
     "author": ["stephen-foster"],
     "content": BotsForYourStudents 
   },
-  /*
-  {
-    "tags": ["for-faculty", "video", "tutorial", "how-to", "notebook-llm"],
-    "dateCreated": "2025-03-25",
-    "title": "Classroom Assessment Tool generation",
-    "slug": "cat-generation",
-    "author": ["stephen-foster"],
-    "content": "How to generate a Classroom Assessment Tool using AI\n\nhttps://youtu.be/1a2b3c4d5e6"
-  },
-  */
   {
     "tags": ["for-faculty", "video", "discussion", "ai-ambassadors"],
     "dateCreated": "2025-03-20",
