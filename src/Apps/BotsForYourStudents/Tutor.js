@@ -385,13 +385,10 @@ export function TutorManager() {
   return <>
       <Container maxWidth="sm" style={{}} >
       {selectedBot ? <>
-        <Stack direction="row" alignItems="center" justifyContent={"space-between"}>
           <Button variant="text" onClick={() => {
             setSelectedBot(undefined)
           }
           }>Back to bots</Button>
-          <Link to={`/bots/${selectedBot}`} style={{ color: "blue", textDecoration: "underline" }}>Link to bot</Link>
-        </Stack>
         <Tutor bot={selectedBot} />
       </> :
         <>
@@ -616,7 +613,9 @@ function Chat({providedHiddenPrompt, bot}){
             <div 
               style={{ textAlign: "center", paddingBottom: "0px important!", marginBottom: 0, fontSize: "3em", fontWeight: "bold"}} 
               >
+                <Link to={`/bots/${documentId}`} style={{ color: "white", textDecoration: "none"}} >
                 {nextTitle}
+                </Link>
             </div>
           </Stack>
           <br/>
