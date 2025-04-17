@@ -385,10 +385,13 @@ export function TutorManager() {
   return <>
       <Container maxWidth="sm" style={{}} >
       {selectedBot ? <>
-        <Button variant="text" onClick={() => {
-          setSelectedBot(undefined)
-        }
-        }>Back to bots</Button>
+        <Stack direction="row" alignItems="center" justifyContent={"space-between"}>
+          <Button variant="text" onClick={() => {
+            setSelectedBot(undefined)
+          }
+          }>Back to bots</Button>
+          <Link to={`/bots/${selectedBot}`} style={{ color: "blue", textDecoration: "underline" }}>Link to bot</Link>
+        </Stack>
         <Tutor bot={selectedBot} />
       </> :
         <>
@@ -801,7 +804,6 @@ export function TutorRoutes() {
             <Route path="/bots/:documentId"
               element={
                 <>
-                  <TutorAppBar />
                   <Tutor />
                 </>
               }
