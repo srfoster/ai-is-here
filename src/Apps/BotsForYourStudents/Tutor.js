@@ -29,7 +29,7 @@ import { Route } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 
-import { useGpt, UsageContext, OutOfCredits, CreditStringContext } from "../../Hooks/useGpt";
+import { useGpt, UsageContext, OutOfCredits, CreditStringContext, LoginWidget } from "../../Hooks/useGpt";
 import { useDocs, useDoc, useChildKeys, useConversations } from "../../Hooks/useDocuments";
 import gptProxyData from "../../gptProxyData.json";
 import ChatBubble from '../../Components/ChatBubble';
@@ -424,9 +424,14 @@ export function Tutor({hiddenPrompt, bot}) {
 
     return (
       <Container maxWidth="lg" style={{paddingTop: 30}}>
-        <UsageContext.Provider value={{ usageData, increaseGPTWords }}>
+        <LoginWidget
+          hideCredits={true}
+          hideLogout={true}
+          loggedInContent={
+          <UsageContext.Provider value={{ usageData, increaseGPTWords }}>
             <Chat providedHiddenPrompt={hiddenPrompt} bot={bot} />
-        </UsageContext.Provider> 
+          </UsageContext.Provider>
+        } />
       </Container>
     )
 }
@@ -441,7 +446,7 @@ function postProcessGPT(text, afterRefresh){
     let newText = text.replace(/\[OutOfCredits\]/g, "")
     return <>
       {newText}
-      <OutOfCredits afterRefresh={afterRefresh} />
+      You appear to be out of credits, please contact whomever gave you your access key and request more.
     </>
   }
 
@@ -490,6 +495,10 @@ function Chat({providedHiddenPrompt, bot}){
 
     React.useEffect(()=>{
       if(!conversations || conversations.length == 0) return
+
+      //If there's an error conversations might be: { message: "Failed to list conversations" }
+      if(!conversations.filter) return
+
 
       let lastConversation = 
          conversations.filter((c)=>c.documentId.match(`${documentId}/`))

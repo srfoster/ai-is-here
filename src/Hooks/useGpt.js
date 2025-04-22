@@ -1,7 +1,7 @@
 
 import * as React from 'react';
 import gptProxyData from "../gptProxyData.json";
-import { Alert, Button, Card, CardContent, Chip, Typography, TextField, Stack} from '@mui/material';
+import { Alert, Button, Card, CardContent, Chip, Fade, Typography, TextField, Stack} from '@mui/material';
 import { useLocation } from 'react-router-dom';
 
 export const UsageContext = React.createContext();
@@ -39,7 +39,7 @@ export let useCheckCredits = (creditString) => {
   }
 }
 
-export function LoginWidget({loggedInContent}){
+export function LoginWidget({loggedInContent, hideCredits = false, hideLogout = false}) {
   let location = useLocation()
   let accessKey = new URLSearchParams(location.search).get("key")
   const {creditString,setCreditString,remainingCredits} = React.useContext(CreditStringContext);
@@ -56,26 +56,42 @@ export function LoginWidget({loggedInContent}){
 
   return (
     <div>
-      <OutOfCreditsIfOutOfCredits afterRefresh={() => {
+      <OutOfCreditsIfOutOfCredits
+        hideCredits={hideCredits}
+        hideLogout={hideLogout}
+        showCredits={false} afterRefresh={() => {
 
       }} />
-      {remainingCredits && loggedInContent}
+      {(remainingCredits && remainingCredits > 0) ?
+        loggedInContent : 
+        creditString && creditString.length > 0 &&
+        (
+          remainingCredits == null ?
+          <Alert severity="warning" style={{marginTop: 20}}>
+             Looking for access key...  <Fade in={true} style={{ transitionDelay: '1000ms' }}><Chip label="Not found" /></Fade>
+          </Alert> :
+          <Alert severity="error" style={{marginTop: 20}}>
+              This access key above has no credits left.
+          </Alert>
+        )
+      }
     </div>
   )
 }
 
-export let OutOfCreditsIfOutOfCredits = ({afterRefresh, showLogout}) => {
+export let OutOfCreditsIfOutOfCredits = ({hideCredits = false, hideLogout = false, afterRefresh, showLogout}) => {
   
   let {remainingCredits, creditString, refreshCredits} = React.useContext(CreditStringContext)
 
   console.log("Remaining Credits", remainingCredits)
 
-  if(remainingCredits < 0 || remainingCredits == undefined){
+  if(remainingCredits <= 0 || remainingCredits == undefined){
     return <OutOfCredits afterRefresh={afterRefresh} />
   } else {
     return <Stack direction="row" spacing={1} alignItems="center">
-        <Chip label={"Remaining credits: " + remainingCredits} />
-        {(showLogout || showLogout === undefined) && creditString && <>
+      {!hideCredits && <Chip label={"Remaining credits: " + remainingCredits} />}
+      {!hideLogout && 
+        (showLogout || showLogout === undefined) && creditString && <>
           <Logout afterRefresh={afterRefresh} />
         </>}
       </Stack>
