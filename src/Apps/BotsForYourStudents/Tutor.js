@@ -439,7 +439,10 @@ function postProcessGPT(text, afterRefresh){
 
   if(newText.match(/\[OutOfCredits\]/)){
     let newText = text.replace(/\[OutOfCredits\]/g, "")
-    return [newText, <OutOfCredits afterRefresh={afterRefresh} />]
+    return <>
+      {newText}
+      <OutOfCredits afterRefresh={afterRefresh} />
+    </>
   }
 
   return newText
@@ -486,7 +489,7 @@ function Chat({providedHiddenPrompt, bot}){
 
 
     React.useEffect(()=>{
-      if(!conversations || conversations.lenght == 0) return
+      if(!conversations || conversations.length == 0) return
 
       let lastConversation = 
          conversations.filter((c)=>c.documentId.match(`${documentId}/`))
@@ -637,7 +640,10 @@ function Chat({providedHiddenPrompt, bot}){
               type={"text"}
               title={"GPT"}
               text={typeof(postProcessedResponse) == "string" ? 
-              <Markdown remarkPlugins={remarkGfm}>{postProcessedResponse}</Markdown> : postProcessedResponse}
+                <Markdown remarkPlugins={remarkGfm}>{postProcessedResponse}</Markdown> : (
+                  React.isValidElement(postProcessedResponse) ? postProcessedResponse : <>You appear to be out of credits, please contact whomever gave you your access key and request more.</>)
+
+              }
             />
           }
           <ChatInput
@@ -666,7 +672,7 @@ function ChatHistory({messages, avatar}){
                 type={"text"}
                 title={i.user}
                 text={typeof(i.text) == "string" ? 
-                  <Markdown remarkPlugins={remarkGfm}>{i.text}</Markdown> : i.text}
+                  <Markdown remarkPlugins={remarkGfm}>{i.text}</Markdown> : (React.isValidElement(i.text) ? i.text : <>You appear to be out of credits, please contact whomever gave you your access key and request more.</>)}
             />
         </>
       })}
