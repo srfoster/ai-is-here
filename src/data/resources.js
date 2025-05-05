@@ -4,6 +4,23 @@ import AIPoweredTextbooks from "./resources/stephen-foster/ai-powered-textbooks"
 
 export default [
   {
+    "tags": ["for-faculty", "video", "llms"],
+    "dateCreated": "2025-05-05",
+    "title": "LLMs under the hood",
+    "slug": "llms-under-the-hood",
+    "author": ["stephen-foster"],
+    "content": `These videos helped me understand how the groundbreaking 'transformer architecture' works.  You'll need to brush up on your linear algebra to fully understand it, but they're great if you want to start de-mystifying the mathematics and computer science that make large language models possible.  
+    
+The first is a short overview; the others are deeper dives:
+    
+https://www.youtube.com/watch?v=LPZh9BOjkQs
+
+https://www.youtube.com/watch?v=wjZofJX0v4M
+    
+https://www.youtube.com/watch?v=9-Jl0dxWQs8
+    `
+  },
+  {
     "tags": ["for-faculty", "video", "tutorial", "how-to", "notebook-llm"],
     "dateCreated": "2025-04-02",
     "title": "Classroom Assessment Technique generation",
