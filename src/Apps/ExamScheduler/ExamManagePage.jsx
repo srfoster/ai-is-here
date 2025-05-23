@@ -1,5 +1,6 @@
 import React from "react";
-import { Typography, Box, Tabs, Tab, Paper, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { Typography, Box, Tabs, Tab, Paper, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, InputAdornment } from "@mui/material";
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 function a11yProps(index) {
   return {
@@ -27,7 +28,21 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
   }, [slots]);
 
   const handleOpenDialog = (slot = { start: '', end: '', capacity: 1 }, index = null) => {
-    setSlotForm(slot);
+    // Split start and end into date and time for the form
+    let startDate = '', startTime = '', endDate = '', endTime = '';
+    if (slot.start) {
+      [startDate, startTime] = slot.start.split('T');
+    }
+    if (slot.end) {
+      [endDate, endTime] = slot.end.split('T');
+    }
+    setSlotForm({
+      startDate: startDate || '',
+      startTime: startTime || '',
+      endDate: endDate || '',
+      endTime: endTime || '',
+      capacity: slot.capacity || 1,
+    });
     setEditIndex(index);
     setDialogOpen(true);
   };
@@ -37,16 +52,46 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
     setEditIndex(null);
   };
   const handleSaveSlot = () => {
+    // Combine date and time fields into ISO strings
+    const start = slotForm.startDate && slotForm.startTime ? `${slotForm.startDate}T${slotForm.startTime}` : '';
+    const end = slotForm.endDate && slotForm.endTime ? `${slotForm.endDate}T${slotForm.endTime}` : '';
     if (editIndex === null) {
-      setSlots([...slots, { ...slotForm, signups: [] }]);
+      setSlots([...slots, { start, end, capacity: slotForm.capacity, signups: [] }]);
     } else {
-      setSlots(slots.map((s, i) => i === editIndex ? { ...slotForm, signups: s.signups || [] } : s));
+      setSlots(slots.map((s, i) => i === editIndex ? { start, end, capacity: slotForm.capacity, signups: s.signups || [] } : s));
     }
     handleCloseDialog();
   };
   const handleDeleteSlot = (index) => {
     setSlots(slots.filter((_, i) => i !== index));
   };
+
+  // Add a simple clock picker component
+  function ClockPicker({ label, value, onChange }) {
+    // value: "HH:MM" string
+    const handleChange = (e) => {
+      onChange(e.target.value);
+    };
+    return (
+      <TextField
+        label={label}
+        type="time"
+        value={value}
+        onChange={handleChange}
+        InputLabelProps={{ shrink: true }}
+        inputProps={{ step: 60 }} // 1 minute steps
+        fullWidth
+        margin="dense"
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <AccessTimeIcon />
+            </InputAdornment>
+          )
+        }}
+      />
+    );
+  }
 
   if (!exam) {
     return <Box p={3}><Typography>Exam not found.</Typography></Box>;
@@ -98,24 +143,38 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
           <Dialog open={dialogOpen} onClose={handleCloseDialog}>
             <DialogTitle>{editIndex === null ? 'Add Slot' : 'Edit Slot'}</DialogTitle>
             <DialogContent>
-              <TextField
-                label="Start Time"
-                type="datetime-local"
-                fullWidth
-                margin="dense"
-                value={slotForm.start}
-                onChange={e => setSlotForm(f => ({ ...f, start: e.target.value }))}
-                InputLabelProps={{ shrink: true }}
-              />
-              <TextField
-                label="End Time"
-                type="datetime-local"
-                fullWidth
-                margin="dense"
-                value={slotForm.end}
-                onChange={e => setSlotForm(f => ({ ...f, end: e.target.value }))}
-                InputLabelProps={{ shrink: true }}
-              />
+              <Box display="flex" gap={1}>
+                <TextField
+                  label="Start Date"
+                  type="date"
+                  fullWidth
+                  margin="dense"
+                  value={slotForm.startDate || ''}
+                  onChange={e => setSlotForm(f => ({ ...f, startDate: e.target.value }))}
+                  InputLabelProps={{ shrink: true }}
+                />
+                <ClockPicker
+                  label="Start Time"
+                  value={slotForm.startTime || ''}
+                  onChange={val => setSlotForm(f => ({ ...f, startTime: val }))}
+                />
+              </Box>
+              <Box display="flex" gap={1}>
+                <TextField
+                  label="End Date"
+                  type="date"
+                  fullWidth
+                  margin="dense"
+                  value={slotForm.endDate || ''}
+                  onChange={e => setSlotForm(f => ({ ...f, endDate: e.target.value }))}
+                  InputLabelProps={{ shrink: true }}
+                />
+                <ClockPicker
+                  label="End Time"
+                  value={slotForm.endTime || ''}
+                  onChange={val => setSlotForm(f => ({ ...f, endTime: val }))}
+                />
+              </Box>
               <TextField
                 label="Capacity"
                 type="number"
@@ -136,8 +195,114 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
       {tab === 1 && (
         <Box>
           <Typography variant="h6">Rosters</Typography>
-          {/* TODO: Add UI for pasting/editing rosters, adding/removing emails */}
-          <pre>{JSON.stringify(exam.rosters, null, 2)}</pre>
+          <Button variant="contained" color="primary" sx={{ mb: 2 }} onClick={() => setDialogOpen('add-roster')}>+ Add Roster</Button>
+          {exam.rosters.map((roster, rIdx) => (
+            <Paper key={rIdx} sx={{ p: 2, mb: 2 }}>
+              <Box display="flex" alignItems="center" justifyContent="space-between">
+                <Typography variant="subtitle1">Roster {rIdx + 1}</Typography>
+                <Button color="error" size="small" onClick={() => {
+                  const newRosters = exam.rosters.filter((_, i) => i !== rIdx);
+                  updateExam({ ...exam, rosters: newRosters });
+                }}>Delete Roster</Button>
+              </Box>
+              <TableContainer component={Paper} sx={{ mb: 2 }}>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Email</TableCell>
+                      <TableCell>Signed Up Slot</TableCell>
+                      <TableCell align="right">Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {roster.map((email, eIdx) => {
+                      let slotIdx = null;
+                      let slotLabel = '';
+                      exam.slots.forEach((slot, idx) => {
+                        if (slot.signups && slot.signups.includes(email)) {
+                          slotIdx = idx;
+                          slotLabel = `${slot.start} - ${slot.end}`;
+                        }
+                      });
+                      return (
+                        <TableRow key={eIdx}>
+                          <TableCell>{email}</TableCell>
+                          <TableCell>{slotIdx !== null ? slotLabel : <em>Not signed up</em>}</TableCell>
+                          <TableCell align="right">
+                            <Button size="small" color="error" onClick={() => {
+                              const newRoster = roster.filter((_, i) => i !== eIdx);
+                              const newRosters = exam.rosters.map((r, i) => i === rIdx ? newRoster : r);
+                              updateExam({ ...exam, rosters: newRosters });
+                            }}>Delete</Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                    <TableRow>
+                      <TableCell colSpan={3}>
+                        <Box display="flex" gap={1} alignItems="center">
+                          <TextField
+                            label="Add Email"
+                            size="small"
+                            value={slotForm.addEmailInput && slotForm.addEmailRosterIdx === rIdx ? slotForm.addEmailInput : ''}
+                            onChange={e => setSlotForm(f => ({ ...f, addEmailInput: e.target.value, addEmailRosterIdx: rIdx }))}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter' && slotForm.addEmailInput && slotForm.addEmailRosterIdx === rIdx) {
+                                const email = slotForm.addEmailInput.trim();
+                                if (email && !roster.includes(email)) {
+                                  const newRoster = [...roster, email];
+                                  const newRosters = exam.rosters.map((r, i) => i === rIdx ? newRoster : r);
+                                  updateExam({ ...exam, rosters: newRosters });
+                                }
+                                setSlotForm(f => ({ ...f, addEmailInput: '', addEmailRosterIdx: null }));
+                              }
+                            }}
+                          />
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => {
+                              const email = slotForm.addEmailInput?.trim();
+                              if (email && !roster.includes(email)) {
+                                const newRoster = [...roster, email];
+                                const newRosters = exam.rosters.map((r, i) => i === rIdx ? newRoster : r);
+                                updateExam({ ...exam, rosters: newRosters });
+                              }
+                              setSlotForm(f => ({ ...f, addEmailInput: '', addEmailRosterIdx: null }));
+                            }}
+                            disabled={!slotForm.addEmailInput || slotForm.addEmailRosterIdx !== rIdx}
+                          >Add</Button>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          ))}
+          <Dialog open={dialogOpen === 'add-roster'} onClose={() => setDialogOpen(false)}>
+            <DialogTitle>Add Roster</DialogTitle>
+            <DialogContent>
+              <TextField
+                label="Paste emails (comma, space, or newline separated)"
+                multiline
+                minRows={4}
+                fullWidth
+                margin="dense"
+                value={slotForm.rosterInput || ''}
+                onChange={e => setSlotForm(f => ({ ...f, rosterInput: e.target.value }))}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+              <Button onClick={() => {
+                const emails = (slotForm.rosterInput || '').split(/\s|,|;/).map(s => s.trim()).filter(Boolean);
+                updateExam({ ...exam, rosters: [...exam.rosters, emails] });
+                setSlotForm(f => ({ ...f, rosterInput: '' }));
+                setDialogOpen(false);
+              }} variant="contained">Add</Button>
+            </DialogActions>
+          </Dialog>
         </Box>
       )}
       {tab === 2 && (
