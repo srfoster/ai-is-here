@@ -19,6 +19,7 @@ import ResourcePage from './Pages/ResourcePage';
 import MetaTextbook from './Apps/MetaTextbook/MetaTextbook'; // Import MetaTextbook
 import ExamScheduler from './Apps/ExamScheduler/ExamScheduler';
 import ExamManagePage from './Apps/ExamScheduler/ExamManagePage';
+import ExamSignupRoutePage from './Apps/ExamScheduler/ExamSignupRoutePage';
 
 import { TutorRoutes } from './Apps/BotsForYourStudents/Tutor';
 
@@ -76,6 +77,7 @@ function App() {
             { TutorRoutes()}
             <Route path="/exam-scheduler" element={<ExamScheduler />} />
             <Route path="/exam-scheduler/:examId" element={<ExamManagePage />} />
+            <Route path="/exam-signup/:examId/:uuid" element={<ExamSignupRoutePage />} />
 
             <Route path="/login"
               element={

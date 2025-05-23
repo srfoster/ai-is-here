@@ -1,0 +1,145 @@
+# ExamScheduler Lambda Backend Requirements and Sample Code
+
+## Requirements
+
+### API Contract
+- All requests are POST or PUT.
+- The request body is JSON and always includes:
+  - `operation`: one of "list", "read", "create", "update", "delete"
+  - `accessKey`: string (used for authentication/authorization)
+  - For "read", "update", "delete": `examId` (the UUID of the exam)
+  - For "create" and "update": all exam fields (see below)
+- The endpoint is `/exams` (or similar).
+
+### Exam Data Model
+- Each exam is a single item in DynamoDB.
+- Example exam object:
+```
+{
+  "id": "b6e2e2e2-1234-4cde-8a2b-abcdefabcdef",
+  "name": "Final Exam - Math 101",
+  "slots": [
+    {
+      "start": "2025-06-01T09:00",
+      "end": "2025-06-01T10:00",
+      "capacity": 3,
+      "signups": ["alice@example.com", "bob@example.com"]
+    }
+  ],
+  "rosters": [
+    [
+      { "email": "alice@example.com", "uuid": "uuid-alice" }
+    ]
+  ]
+}
+```
+
+### DynamoDB Table
+- Table name: `ExamSchedulerExams`
+- Partition key: `id` (string, UUID)
+- All other fields as attributes.
+
+### Operations
+- **list**: Return all exams the user has access to (for now, return all).
+- **read**: Return a single exam by `examId`.
+- **create**: Insert a new exam (with a new UUID if not provided).
+- **update**: Update an existing exam by `examId`.
+- **delete**: Delete an exam by `examId`.
+
+### Authentication
+- The `accessKey` is passed in the body. For now, just log or echo it; in production, validate it.
+
+### Error Handling
+- Return HTTP 400 for missing/invalid parameters.
+- Return HTTP 404 for not found.
+- Return HTTP 500 for server errors.
+
+---
+
+## Sample Lambda Handler (Node.js, AWS SDK v3)
+
+```javascript
+import { DynamoDBClient, PutItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand } from "@aws-sdk/client-dynamodb";
+import { v4 as uuidv4 } from "uuid";
+import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
+
+const TABLE_NAME = process.env.EXAM_TABLE || "ExamSchedulerExams";
+const db = new DynamoDBClient({});
+
+export const handler = async (event) => {
+  let body;
+  try {
+    body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
+  } catch (e) {
+    return { statusCode: 400, body: JSON.stringify({ error: "Invalid JSON" }) };
+  }
+
+  const { operation, accessKey, examId, ...examData } = body;
+  if (!operation || !accessKey) {
+    return { statusCode: 400, body: JSON.stringify({ error: "Missing operation or accessKey" }) };
+  }
+
+  try {
+    if (operation === "list") {
+      // List all exams (optionally filter by accessKey)
+      const result = await db.send(new ScanCommand({ TableName: TABLE_NAME }));
+      const exams = result.Items.map(item => unmarshall(item));
+      return { statusCode: 200, body: JSON.stringify(exams) };
+    }
+
+    if (operation === "read") {
+      if (!examId) return { statusCode: 400, body: JSON.stringify({ error: "Missing examId" }) };
+      const result = await db.send(new GetItemCommand({
+        TableName: TABLE_NAME,
+        Key: { id: { S: examId } }
+      }));
+      if (!result.Item) return { statusCode: 404, body: JSON.stringify({ error: "Not found" }) };
+      return { statusCode: 200, body: JSON.stringify(unmarshall(result.Item)) };
+    }
+
+    if (operation === "create") {
+      const id = examData.id || uuidv4();
+      const item = { ...examData, id };
+      await db.send(new PutItemCommand({
+        TableName: TABLE_NAME,
+        Item: marshall(item)
+      }));
+      return { statusCode: 200, body: JSON.stringify(item) };
+    }
+
+    if (operation === "update") {
+      if (!examData.id) return { statusCode: 400, body: JSON.stringify({ error: "Missing exam id" }) };
+      await db.send(new PutItemCommand({
+        TableName: TABLE_NAME,
+        Item: marshall(examData)
+      }));
+      return { statusCode: 200, body: JSON.stringify(examData) };
+    }
+
+    if (operation === "delete") {
+      if (!examId) return { statusCode: 400, body: JSON.stringify({ error: "Missing examId" }) };
+      await db.send(new DeleteItemCommand({
+        TableName: TABLE_NAME,
+        Key: { id: { S: examId } }
+      }));
+      return { statusCode: 200, body: JSON.stringify({ success: true }) };
+    }
+
+    return { statusCode: 400, body: JSON.stringify({ error: "Unknown operation" }) };
+  } catch (err) {
+    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+  }
+};
+```
+
+---
+
+## Additional Notes
+- **Dependencies:**
+  - `@aws-sdk/client-dynamodb`
+  - `@aws-sdk/util-dynamodb`
+  - `uuid`
+- **Environment Variables:**
+  - `EXAM_TABLE` (optional, defaults to `ExamSchedulerExams`)
+- **Security:**
+  - In production, validate `accessKey` and restrict access to only the user's exams.

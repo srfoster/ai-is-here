@@ -1,6 +1,8 @@
 import React from "react";
 import { Typography, Box, Tabs, Tab, Paper, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Dialog, DialogTitle, DialogContent, DialogActions, IconButton, InputAdornment } from "@mui/material";
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import { format, parseISO } from 'date-fns';
+import { v4 as uuidv4 } from 'uuid';
 
 function a11yProps(index) {
   return {
@@ -26,6 +28,27 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
     }
     // eslint-disable-next-line
   }, [slots]);
+
+  // Ensure every email in every roster has a UUID
+  React.useEffect(() => {
+    let changed = false;
+    const newRosters = exam.rosters.map(roster =>
+      roster.map(entry => {
+        if (typeof entry === 'string') {
+          changed = true;
+          return { email: entry, uuid: uuidv4() };
+        } else if (!entry.uuid) {
+          changed = true;
+          return { ...entry, uuid: uuidv4() };
+        }
+        return entry;
+      })
+    );
+    if (changed) {
+      updateExam({ ...exam, rosters: newRosters });
+    }
+    // eslint-disable-next-line
+  }, [exam]);
 
   const handleOpenDialog = (slot = { start: '', end: '', capacity: 1 }, index = null) => {
     // Split start and end into date and time for the form
@@ -104,7 +127,7 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
       <Typography variant="subtitle1" gutterBottom>Exam ID: {exam.id}</Typography>
       <Paper sx={{ mb: 2 }}>
         <Tabs value={tab} onChange={(_, v) => setTab(v)} aria-label="exam management tabs">
-          <Tab label="Slots" {...a11yProps(0)} />
+          {/* <Tab label="Slots" {...a11yProps(0)} /> */}
           <Tab label="Rosters" {...a11yProps(1)} />
           <Tab label="Signups" {...a11yProps(2)} />
         </Tabs>
@@ -210,24 +233,62 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
                   <TableHead>
                     <TableRow>
                       <TableCell>Email</TableCell>
+                      <TableCell>Signup Link</TableCell>
                       <TableCell>Signed Up Slot</TableCell>
+                      <TableCell>Assign to Slot</TableCell>
                       <TableCell align="right">Actions</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {roster.map((email, eIdx) => {
+                    {roster.map((entry, eIdx) => {
+                      const email = typeof entry === 'string' ? entry : entry.email;
+                      const uuid = typeof entry === 'string' ? '' : entry.uuid;
                       let slotIdx = null;
                       let slotLabel = '';
                       exam.slots.forEach((slot, idx) => {
                         if (slot.signups && slot.signups.includes(email)) {
                           slotIdx = idx;
-                          slotLabel = `${slot.start} - ${slot.end}`;
+                          slotLabel = `${format(parseISO(slot.start), 'PPpp')} - ${format(parseISO(slot.end), 'PPpp')}`;
                         }
                       });
+                      // Always use the uuid for exam.id
+                      const signupUrl = `${window.location.origin}/exam-signup/${exam.id}/${uuid}`;
                       return (
                         <TableRow key={eIdx}>
                           <TableCell>{email}</TableCell>
+                          <TableCell>
+                            {uuid && (
+                              <Button size="small" onClick={() => {
+                                navigator.clipboard.writeText(signupUrl);
+                              }}>Copy Link</Button>
+                            )}
+                          </TableCell>
                           <TableCell>{slotIdx !== null ? slotLabel : <em>Not signed up</em>}</TableCell>
+                          <TableCell>
+                            <select
+                              value={slotIdx !== null ? slotIdx : ''}
+                              onChange={e => {
+                                const newSlots = exam.slots.map((slot, idx) => {
+                                  let signups = slot.signups ? [...slot.signups] : [];
+                                  // Remove from all slots first
+                                  signups = signups.filter(s => s !== email);
+                                  // Add to selected slot
+                                  if (String(idx) === e.target.value) {
+                                    signups.push(email);
+                                  }
+                                  return { ...slot, signups };
+                                });
+                                updateExam({ ...exam, slots: newSlots });
+                              }}
+                            >
+                              <option value="">Not signed up</option>
+                              {exam.slots.map((slot, idx) => (
+                                <option key={idx} value={idx}>
+                                  {format(parseISO(slot.start), 'PPpp')} - {format(parseISO(slot.end), 'PPpp')}
+                                </option>
+                              ))}
+                            </select>
+                          </TableCell>
                           <TableCell align="right">
                             <Button size="small" color="error" onClick={() => {
                               const newRoster = roster.filter((_, i) => i !== eIdx);
@@ -239,7 +300,7 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
                       );
                     })}
                     <TableRow>
-                      <TableCell colSpan={3}>
+                      <TableCell colSpan={4}>
                         <Box display="flex" gap={1} alignItems="center">
                           <TextField
                             label="Add Email"
