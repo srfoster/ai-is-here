@@ -17,7 +17,8 @@ import Logo from './Components/Logo'; // Import the Logo component
 import AuthorPage from './Pages/AuthorPage';
 import ResourcePage from './Pages/ResourcePage';
 import MetaTextbook from './Apps/MetaTextbook/MetaTextbook'; // Import MetaTextbook
-import ExamScheduler from './Apps/ExamScheduler';
+import ExamScheduler from './Apps/ExamScheduler/ExamScheduler';
+import ExamManagePage from './Apps/ExamScheduler/ExamManagePage';
 
 import { TutorRoutes } from './Apps/BotsForYourStudents/Tutor';
 
@@ -74,6 +75,7 @@ function App() {
             <Route path="/book" element={<MetaTextbook />} />
             { TutorRoutes()}
             <Route path="/exam-scheduler" element={<ExamScheduler />} />
+            <Route path="/exam-scheduler/:examId" element={<ExamManagePage />} />
 
             <Route path="/login"
               element={

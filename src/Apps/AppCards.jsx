@@ -9,6 +9,7 @@ import {
 import authorsData from '../data/authors'; // Import the authors JSON
 import DynamicAvatar from '../Components/DynamicAvatar';
 import { Card, CardHeader, Typography } from '@mui/material';
+import ExamScheduler from './ExamScheduler/ExamScheduler';
 
 export let AppCards = () => {
   return <>
