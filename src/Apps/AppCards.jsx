@@ -14,6 +14,7 @@ export let AppCards = () => {
   return <>
     <BotsForYourStudentsAppCard />
     <MetaTextbookAppCard />
+    <ExamSchedulerAppCard />
   </>
 }
 
@@ -32,6 +33,15 @@ export let MetaTextbookAppCard = () => {
         title="Textbook"
         description="My work-in-progress demonstration of an AI-powered textbook"
         link="/book" />
+}
+
+export let ExamSchedulerAppCard = () => {
+  return <AppCard
+    authors={["stephen-foster"]}
+    title="Exam Scheduler"
+    description="Schedule and manage exams for your students."
+    link="/exam-scheduler"
+  />
 }
 
 export let AppCard = ({ authors, title, description, link }) => {
