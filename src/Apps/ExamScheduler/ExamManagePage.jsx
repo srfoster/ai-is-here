@@ -3,6 +3,7 @@ import { Typography, Box, Tabs, Tab, Paper, Button, Table, TableBody, TableCell,
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { format, parseISO } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
+import debounce from 'lodash.debounce';
 
 function a11yProps(index) {
   return {
@@ -16,7 +17,8 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
   const [slots, setSlots] = React.useState(exam ? exam.slots : []);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [editIndex, setEditIndex] = React.useState(null);
-  const [slotForm, setSlotForm] = React.useState({ start: '', end: '', capacity: 1 });
+  const [slotForm, setSlotForm] = React.useState({ start: '', end: '', seatCapacity: 1 });
+  const [name, setName] = React.useState(exam.name);
 
   React.useEffect(() => {
     if (exam) setSlots(exam.slots);
@@ -50,7 +52,7 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
     // eslint-disable-next-line
   }, [exam]);
 
-  const handleOpenDialog = (slot = { start: '', end: '', capacity: 1 }, index = null) => {
+  const handleOpenDialog = (slot = { start: '', end: '', seatCapacity: 1 }, index = null) => {
     // Split start and end into date and time for the form
     let startDate = '', startTime = '', endDate = '', endTime = '';
     if (slot.start) {
@@ -64,14 +66,14 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
       startTime: startTime || '',
       endDate: endDate || '',
       endTime: endTime || '',
-      capacity: slot.capacity || 1,
+      seatCapacity: slot.seatCapacity || 1,
     });
     setEditIndex(index);
     setDialogOpen(true);
   };
   const handleCloseDialog = () => {
     setDialogOpen(false);
-    setSlotForm({ start: '', end: '', capacity: 1 });
+    setSlotForm({ start: '', end: '', seatCapacity: 1 });
     setEditIndex(null);
   };
   const handleSaveSlot = () => {
@@ -79,9 +81,9 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
     const start = slotForm.startDate && slotForm.startTime ? `${slotForm.startDate}T${slotForm.startTime}` : '';
     const end = slotForm.endDate && slotForm.endTime ? `${slotForm.endDate}T${slotForm.endTime}` : '';
     if (editIndex === null) {
-      setSlots([...slots, { start, end, capacity: slotForm.capacity, signups: [] }]);
+      setSlots([...slots, { start, end, seatCapacity: slotForm.seatCapacity, signups: [] }]);
     } else {
-      setSlots(slots.map((s, i) => i === editIndex ? { start, end, capacity: slotForm.capacity, signups: s.signups || [] } : s));
+      setSlots(slots.map((s, i) => i === editIndex ? { start, end, seatCapacity: slotForm.seatCapacity, signups: s.signups || [] } : s));
     }
     handleCloseDialog();
   };
@@ -89,32 +91,43 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
     setSlots(slots.filter((_, i) => i !== index));
   };
 
-  // Add a simple clock picker component
-  function ClockPicker({ label, value, onChange }) {
-    // value: "HH:MM" string
-    const handleChange = (e) => {
-      onChange(e.target.value);
-    };
+  function generateHourOptions() {
+    const hours = [];
+    for (let i = 5; i <= 23; i++) {
+      const hour = i < 10 ? `0${i}:00` : `${i}:00`;
+      hours.push(hour);
+    }
+    return hours;
+  }
+
+  const hourOptions = generateHourOptions();
+
+  function HourDropdown({ label, value, onChange }) {
     return (
       <TextField
+        select
         label={label}
-        type="time"
         value={value}
-        onChange={handleChange}
-        InputLabelProps={{ shrink: true }}
-        inputProps={{ step: 60 }} // 1 minute steps
+        onChange={onChange}
         fullWidth
         margin="dense"
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <AccessTimeIcon />
-            </InputAdornment>
-          )
-        }}
-      />
+        SelectProps={{ native: true }}
+      >
+        {hourOptions.map((hour) => (
+          <option key={hour} value={hour}>{hour}</option>
+        ))}
+      </TextField>
     );
   }
+
+  const handleNameChange = (e) => {
+    setName(e.target.value); // Update the local state immediately
+    debouncedUpdateName(e.target.value); // Debounced update to the backend
+  };
+
+  const debouncedUpdateName = debounce((newName) => {
+    updateExam({ ...exam, name: newName });
+  }, 300); // Debounce with a 300ms delay
 
   if (!exam) {
     return <Box p={3}><Typography>Exam not found.</Typography></Box>;
@@ -123,13 +136,21 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
   return (
     <Box p={3}>
       <Button onClick={onBack} sx={{ mb: 2 }}>&larr; Back to Dashboard</Button>
-      <Typography variant="h4" gutterBottom>Manage Exam: {exam.name}</Typography>
+      <Typography variant="h4" gutterBottom>
+        Manage Exam: 
+        <TextField
+          value={name}
+          onChange={handleNameChange}
+          variant="outlined"
+          size="small"
+          sx={{ ml: 2 }}
+        />
+      </Typography>
       <Typography variant="subtitle1" gutterBottom>Exam ID: {exam.id}</Typography>
       <Paper sx={{ mb: 2 }}>
         <Tabs value={tab} onChange={(_, v) => setTab(v)} aria-label="exam management tabs">
-          {/* <Tab label="Slots" {...a11yProps(0)} /> */}
+          <Tab label="Slots" {...a11yProps(0)} />
           <Tab label="Rosters" {...a11yProps(1)} />
-          <Tab label="Signups" {...a11yProps(2)} />
         </Tabs>
       </Paper>
       {tab === 0 && (
@@ -152,7 +173,7 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
                   <TableRow key={idx}>
                     <TableCell>{slot.start}</TableCell>
                     <TableCell>{slot.end}</TableCell>
-                    <TableCell>{slot.capacity}</TableCell>
+                    <TableCell>{slot.seatCapacity}</TableCell>
                     <TableCell>{slot.signups ? slot.signups.length : 0}</TableCell>
                     <TableCell align="right">
                       <Button size="small" onClick={() => handleOpenDialog(slot, idx)}>Edit</Button>
@@ -173,29 +194,20 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
                   fullWidth
                   margin="dense"
                   value={slotForm.startDate || ''}
-                  onChange={e => setSlotForm(f => ({ ...f, startDate: e.target.value }))}
+                  onChange={e => setSlotForm(f => ({ ...f, startDate: e.target.value, endDate: e.target.value }))}
                   InputLabelProps={{ shrink: true }}
                 />
-                <ClockPicker
+                <HourDropdown
                   label="Start Time"
                   value={slotForm.startTime || ''}
-                  onChange={val => setSlotForm(f => ({ ...f, startTime: val }))}
+                  onChange={(e) => setSlotForm(f => ({ ...f, startTime: e.target.value, endTime: f.endTime || e.target.value }))}
                 />
               </Box>
               <Box display="flex" gap={1}>
-                <TextField
-                  label="End Date"
-                  type="date"
-                  fullWidth
-                  margin="dense"
-                  value={slotForm.endDate || ''}
-                  onChange={e => setSlotForm(f => ({ ...f, endDate: e.target.value }))}
-                  InputLabelProps={{ shrink: true }}
-                />
-                <ClockPicker
+                <HourDropdown
                   label="End Time"
                   value={slotForm.endTime || ''}
-                  onChange={val => setSlotForm(f => ({ ...f, endTime: val }))}
+                  onChange={(e) => setSlotForm(f => ({ ...f, endTime: e.target.value }))}
                 />
               </Box>
               <TextField
@@ -203,8 +215,8 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
                 type="number"
                 fullWidth
                 margin="dense"
-                value={slotForm.capacity}
-                onChange={e => setSlotForm(f => ({ ...f, capacity: Number(e.target.value) }))}
+                value={slotForm.seatCapacity}
+                onChange={e => setSlotForm(f => ({ ...f, seatCapacity: Number(e.target.value) }))}
                 inputProps={{ min: 1 }}
               />
             </DialogContent>
@@ -246,13 +258,13 @@ const ExamManagePage = ({ exam, updateExam, onBack }) => {
                       let slotIdx = null;
                       let slotLabel = '';
                       exam.slots.forEach((slot, idx) => {
-                        if (slot.signups && slot.signups.includes(email)) {
+                        if (slot.signups && slot.signups.includes(uuid)) {
                           slotIdx = idx;
                           slotLabel = `${format(parseISO(slot.start), 'PPpp')} - ${format(parseISO(slot.end), 'PPpp')}`;
                         }
                       });
                       // Always use the uuid for exam.id
-                      const signupUrl = `${window.location.origin}/exam-signup/${exam.id}/${uuid}`;
+                      const signupUrl = `${window.location.origin}/#/exam-signup/${exam.id}/${uuid}`;
                       return (
                         <TableRow key={eIdx}>
                           <TableCell>{email}</TableCell>

@@ -10,6 +10,8 @@ const ExamScheduler = () => {
 	const [loading, setLoading] = React.useState(true);
 	const { creditString: accessKey } = React.useContext(CreditStringContext);
 
+	console.log("Exams", exams);
+
 	React.useEffect(() => {
 		if (!accessKey) return;
 		getExams(accessKey).then((data) => {
@@ -38,6 +40,7 @@ const ExamScheduler = () => {
 					exams={exams}
 					updateExam={handleUpdateExam}
 					onSelectExam={handleSelectExam}
+					setExams={setExams} // Pass setExams as a prop
 				/>
 			) : (
 				<ExamManagePage

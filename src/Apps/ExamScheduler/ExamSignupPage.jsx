@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography, Paper, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Alert } from "@mui/material";
 import { format, parseISO } from "date-fns";
-import { getExamById, updateExam } from "./ExamSchedulerService";
+import { getExamById, getExamByStudentUUID, updateExam, signup } from "./ExamSchedulerService";
 
 const ExamSignupPage = ({ uuid, examId }) => {
   const [exam, setExam] = React.useState(null);
@@ -10,22 +10,25 @@ const ExamSignupPage = ({ uuid, examId }) => {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    getExamById(examId).then(examData => {
+    getExamByStudentUUID(examId, uuid).then(examData => {
       setExam(examData);
+      console.log("Exam Data", examData);
       if (examData) {
         let found = null;
-        for (const roster of examData.rosters) {
-          for (const entry of roster) {
-            if (entry.uuid === uuid) found = entry;
+
+        if (examData.rosters.length > 0) {
+          const studentRoster = examData.rosters.find(roster => roster.find(re=>re.uuid==uuid));
+          if (studentRoster) {
+            setStudent(studentRoster.find(re=>re.uuid === uuid));
           }
         }
-        setStudent(found);
-        if (found) {
-          let idx = null;
-          for (let i = 0; i < examData.slots.length; ++i) {
-            if (examData.slots[i].signups.includes(found.email)) idx = i;
+
+        examData.slots.forEach((slot, idx) => {
+          if (slot.signups.includes(uuid)) {
+            setSlotIdx(idx);
           }
-          setSlotIdx(idx);
+        });
+        if (found) {
         }
       }
       setLoading(false);
@@ -34,17 +37,15 @@ const ExamSignupPage = ({ uuid, examId }) => {
 
   const handleSignup = async (slotIdxToSignup) => {
     if (!exam || !student) return;
-    const email = student.email;
-    // Remove from all slots, add to selected slot
-    const newSlots = exam.slots.map((slot, idx) => {
-      let signups = slot.signups.filter(e => e !== email);
+    await signup(exam.id, slotIdxToSignup, uuid);
+    const updatedExam = { ...exam };
+    updatedExam.slots = updatedExam.slots.map((slot, idx) => {
+      let signups = slot.signups.filter(e => e !== student.email);
       if (idx === slotIdxToSignup) {
-        signups.push(email);
+        signups.push(student.email);
       }
       return { ...slot, signups };
     });
-    const updatedExam = { ...exam, slots: newSlots };
-    await updateExam(updatedExam);
     setExam(updatedExam);
     setSlotIdx(slotIdxToSignup);
   };
@@ -84,7 +85,7 @@ const ExamSignupPage = ({ uuid, examId }) => {
           </TableHead>
           <TableBody>
             {exam.slots.map((slot, idx) => {
-              const isFull = slot.signups.length >= slot.capacity;
+              const isFull = slot.signups.length >= slot.seatCapacity;
               const isSignedUp = slotIdx === idx;
               return (
                 <TableRow key={idx} selected={isSignedUp}>
@@ -93,7 +94,7 @@ const ExamSignupPage = ({ uuid, examId }) => {
                     to<br />
                     {format(parseISO(slot.end), 'PPpp')}
                   </TableCell>
-                  <TableCell>{slot.capacity}</TableCell>
+                  <TableCell>{slot.seatCapacity}</TableCell>
                   <TableCell>{slot.signups.length}</TableCell>
                   <TableCell>
                     {isSignedUp ? (
